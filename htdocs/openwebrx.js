@@ -4,6 +4,7 @@
 	an open-source SDR receiver software with a web UI.
 	Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
 	Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
+	Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -999,6 +1000,11 @@ function onAudioStart(apiType){
     window.setTimeout(function () {
         toggle_panel("openwebrx-panel-log", !!was_error);
     }, 2000);
+	
+    //eroyee added to hide status panel on start
+    window.setTimeout(function () {
+        toggle_panel("openwebrx-panel-status", !!was_error);
+    }, 500);
 
     //Synchronise volume with slider
     updateVolume();
