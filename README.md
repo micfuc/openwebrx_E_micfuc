@@ -1,9 +1,7 @@
 OpenWebRX
 =========
 
-OpenWebRX is a multi-user SDR receiver software with a web interface.
-
-![OpenWebRX](https://www.openwebrx.de/gfx/openwebrx-screenshot.png)
+OpenWebRX is a multi-user SDR receiver software with a web interface. 
 
 It has the following features:
 
@@ -31,30 +29,30 @@ The following methods of setting up a receiver are currently available:
 - Docker images
 - Manual installation
 
-Please checkout the [setup guide on the wiki](https://github.com/jketterl/openwebrx/wiki/Setup-Guide) for more details
+Please checkout the [setup guide on Jakob's wiki](https://github.com/jketterl/openwebrx/wiki/Setup-Guide) for more details
 on the respective methods.
 
-## Community
+## Information
 
-If you have trouble setting up or configuring your receiver, you have some great idea you want to see implemented, or
-you just generally want to have some OpenWebRX-related chat, come visit us over on
+Jakob Ketterl has done a *lot* of work on OpenWebRX and has formed a group list on:
+
 [our groups.io group](https://groups.io/g/openwebrx).
 
-If you want to hang out, chat, or get in touch directly with the developers, receiver operators or users, feel free to
-drop by in [our Discord server](https://discord.gg/gnE9hPz).
+Jakob has a wealth of knowledge and is usually responsive on his group. This fork is absolutely not intended
+to supercede Jakob's work, which should be seen as the primary source for all things good on OWRX. 
 
-## Usage tips
+What will appear here is a somewhat experimental version of OpenWebRX. It will contain changes that have been implemented 
+following personal request(s), and in the interests of possibly enhancing this great software. I make it public because
+the contributions may be useful to some. 
 
-You can zoom the waterfall display by the mouse wheel. You can also drag the waterfall to pan across it.
-
-The filter envelope can be dragged at its ends and moved around to set the passband.
-
-However, if you hold down the shift key, you can drag the center line (BFO) or the whole passband (PBS).
+Any changes you see here should be considered alpha. I only test with Firefox and, other than myself, there is just one other person
+that uses my installation very occasionally. Thus it's quite possible bugs may arise from what I've done - so please bear this in mind 
+if you trial anything, best make a backup beforehand!
 
 ## Licensing
 
 OpenWebRX is available under Affero GPL v3 license
 ([summary](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))).
 
-OpenWebRX is also available under a commercial license on request. Please contact me at the address
+OpenWebRX is also available under a commercial license on request. Please contact Andras at the address
 *&lt;randras@sdr.hu&gt;* for licensing options. 
