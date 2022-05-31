@@ -5,6 +5,7 @@
     an open-source SDR receiver software with a web UI.
     Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
     Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
+    Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -177,6 +178,14 @@
                         <div class="openwebrx-button openwebrx-square-button openwebrx-bookmark-button" style="display:none;" title="Add bookmark...">
                             <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#bookmark"></use></svg>
                         </div>
+                    </div>
+                    <div id="id-step-freq" class="bal">
+                        <img id="id-step-0" src="static/gfx/openwebrx-stepdn-20.png" onclick="freqstep(0)" title="-5/9k">
+                        <img id="id-step-1" src="static/gfx/openwebrx-stepdn-18.png" onclick="freqstep(1)" style="padding-bottom:0px" title="-100">
+                        <img id="id-step-2" src="static/gfx/openwebrx-stepdn-16.png" onclick="freqstep(2)" style="padding-bottom:0px" title="-10">
+                        <img id="id-step-3" src="static/gfx/openwebrx-stepup-16.png" onclick="freqstep(3)" style="padding-bottom:0px" title="+10">
+                        <img id="id-step-4" src="static/gfx/openwebrx-stepup-18.png" onclick="freqstep(4)" style="padding-bottom:0px" title="+100">
+                        <img id="id-step-5" src="static/gfx/openwebrx-stepup-20.png" onclick="freqstep(5)" title="+5/9k">
                     </div>
                     <div class="openwebrx-panel-line">
                         <select id="openwebrx-sdr-profiles-listbox" onchange="sdr_profile_changed();">
