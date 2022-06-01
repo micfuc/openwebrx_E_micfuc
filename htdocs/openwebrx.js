@@ -52,13 +52,34 @@ function toggleMute() {
     updateVolume();
 }
 
+
+/* ----- eroyee add for changing freq steps 20 May 2022 ----- */
+
+function toggleStepHz() {
+    if (StepHz) {
+	StepHz = false;
+    document.getElementById('stepchangeHz').innerHTML = "5";
+    document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
+    } else {
+        StepHz = true;
+		document.getElementById('stepchangeHz').innerHTML = "9";
+	    document.getElementById('stepchangeHz').style.backgroundColor = "blue";
+    }
+}
+
+
 /* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- */
 
 function freqstep(sel) {
 	stepsize = 0;
 	switch(sel) {
     case 0:
-        stepsize = -5000;
+        if (StepHz) {
+            stepsize = -9000;
+            break;
+        } else {
+            stepsize = -5000;
+        }
         break;
     case 1:
         stepsize = -100;
@@ -73,7 +94,12 @@ function freqstep(sel) {
         stepsize = 100;
         break;
     case 5:
-        stepsize = 5000;
+        if (StepHz) {
+            stepsize = 9000;
+            break;
+        } else {
+            stepsize = 5000;
+        }
         break;
     default:
         stepsize = 0;
