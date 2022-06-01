@@ -32,6 +32,7 @@ var fft_compression = "none";
 var fft_codec;
 var waterfall_setup_done = 0;
 var secondary_fft_size;
+var StepHz = false; // eroyee, for frequency step change
 
 function updateVolume() {
     audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
@@ -85,10 +86,10 @@ function freqstep(sel) {
         stepsize = -100;
         break;
     case 2:
-        stepsize = -10;
+        stepsize = -10; // Will only work if 10Hz resolution is set
         break;
     case 3:
-        stepsize = 10;
+        stepsize = 10; // Will only work if 10Hz resolution is set
         break;
     case 4:
         stepsize = 100;
