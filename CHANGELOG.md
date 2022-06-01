@@ -1,3 +1,7 @@
+**1.1.0_E**
+- add frequency step buttons to rx panel, allows changing of frequency via mouse click/touch 
+- slow ssb agc to give 'quieter' rx experience
+
 **1.1.0**
 - Reworked most graphical elements as SVGs for faster loadtimes and crispier display on hi-dpi displays
 - Updated pipelines to match changes in digiham
