@@ -4,6 +4,7 @@
 	an open-source SDR receiver software with a web UI.
 	Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
 	Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
+	Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -50,6 +51,40 @@ function toggleMute() {
 
     updateVolume();
 }
+
+/* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- */
+
+function freqstep(sel) {
+	stepsize = 0;
+	switch(sel) {
+    case 0:
+        stepsize = -5000;
+        break;
+    case 1:
+        stepsize = -100;
+        break;
+    case 2:
+        stepsize = -10;
+        break;
+    case 3:
+        stepsize = 10;
+        break;
+    case 4:
+        stepsize = 100;
+        break;
+    case 5:
+        stepsize = 5000;
+        break;
+    default:
+        stepsize = 0;
+}
+    offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
+    new_offset = offset_frequency + stepsize;
+    if (new_offset !== offset_frequency) {
+        $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset);
+    }
+}
+/* ------------------------------------------------------------------------ */
 
 function zoomInOneStep() {
     zoom_set(zoom_level + 1);
