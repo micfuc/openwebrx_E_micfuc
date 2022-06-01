@@ -64,10 +64,10 @@ function freqstep(sel) {
         stepsize = -100;
         break;
     case 2:
-        stepsize = -10;
+        stepsize = -10; // Will only work if 10Hz resolution is set
         break;
     case 3:
-        stepsize = 10;
+        stepsize = 10; // Will only work if 10Hz resolution is set
         break;
     case 4:
         stepsize = 100;
