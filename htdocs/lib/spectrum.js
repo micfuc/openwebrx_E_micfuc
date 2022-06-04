@@ -1,9 +1,9 @@
 /*
 
-	This file is part of OpenWebRX, it provides a spectrum display
-    Based on code provided by Ubermood ()
+    This file is part of OpenWebRX, it provides a spectrum display and is
+    based on code provided by Ubermood (https://groups.io/g/openwebrx/topic/88626097)
 
-	Copyright (c) 2020-2022 eroyee ()
+	Copyright (c) 2020-2022 eroyee (https://github.com/eroyee/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -36,15 +36,11 @@
                         + '<canvas id="freq-canvas-spectrum" width="16384" height="256" style="width:100%;height:256px;left:0px;position:absolute;bottom:0px;">'
                         + '</div>';
 
-//LUKE below to drop down spectrum container
+//eroyee below to drop down spectrum container
     document.getElementById('spectrum_container').style.height = "130px";
     document.getElementById('spectrum_container').style.opacity = "1";
     var div = qs(".openwebrx-spectrum-container");
     div.insertAdjacentHTML('beforeEnd', divFreqSpectrum);
-    // Insert it into Photo Description DIV
-//L    var div = qs(".webrx-rx-photo-desc");
-///    var div = qs(".webrx-spectrum");
-//L    div.insertAdjacentHTML('beforeEnd', divFreqSpectrum);
      
     // Canvas context for spectrum analyzer
     // var freqSpectrumCtx;
@@ -60,19 +56,7 @@
     freqSpectrumGradient.addColorStop(0.50, 'yellow');
     freqSpectrumGradient.addColorStop(0.25, 'orange');
     freqSpectrumGradient.addColorStop(0.00, 'red');		   
-/*    freqSpectrumGradient.addColorStop(1.00, '#440000');
-    freqSpectrumGradient.addColorStop(0.75, '#aa0000');
-    freqSpectrumGradient.addColorStop(0.50, '#aaaa00');
-    freqSpectrumGradient.addColorStop(0.00, '#ffff00');
-
-    freqSpectrumCtx.fillStyle = "lightGray";
-    for (i=0; i < 10; i++) {
-      var band = 5[i];
-      y = Math.round(band.norm * freqSpectrumCtx.height);
-      freqSpectrumCtx.fillRect(0,y,freqSpectrumCtx.width,1);
-     }
-*/
-		// Update spectrum analyzer
+    // Update spectrum analyzer
 	setInterval(function() {
             freqSpectrumDraw(getFreqData());
         }, 25) 	
@@ -86,7 +70,7 @@
     observer.observe(qs("#webrx-canvas-container"), { attributes : true, attributeFilter : ['style'] });
 	is_on=true;	   
 	}
-// Luke below to flush display & return up
+// eroyee below to flush display & return up
 		else{
 		is_on=false;
         document.getElementById('spectrum_container').style.height = "0px";
