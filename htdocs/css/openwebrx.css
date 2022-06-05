@@ -552,6 +552,26 @@ input[type=range]:disabled {
 }
 /* ----------------------------------------------------- */
 
+/* -- eroyee add transparent 'Ghost' RX panel button --- */
+
+.openwebrx-GhostRX-button {
+
+  background-color: black; 
+/*  border: none; */
+  color: white;
+  height: 16px;
+  width: 16px;
+  border-radius: 3px;
+  border: 1px solid #FFF;
+  font-size: 9px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  bottom: 4px; /* bring up to same level as step buttons */
+}
+
+/* ----------------------------------------------------- */
+
 .openwebrx-demodulator-button
 {
 	height: 19px;
