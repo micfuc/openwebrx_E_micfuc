@@ -49,6 +49,13 @@ Any changes you see here should be considered alpha. I only test with Firefox an
 that uses my installation very occasionally. Thus it's quite possible bugs may arise from what I've done - so please bear this in mind 
 if you trial anything, best make a backup beforehand!
 
+Recent changes include:
+
++Addition of frequency change buttons, allowing the use of click-change to frequency
++Addition of stepchange button for change from 5kHz to 9kHz steps for broadcast SWL
++Addition of Spectrum display - this is somewhat new and may well get some changes 
++Alteration/addition to allow for slower AGC in SSB operation
+
 ## Licensing
 
 OpenWebRX is available under Affero GPL v3 license
