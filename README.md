@@ -34,12 +34,12 @@ on the respective methods.
 
 ## Information
 
-Jakob Ketterl has done a *lot* of work on OpenWebRX and has formed a group list on:
+Jakob Ketterl (https://github.com/jketterl/) has done a *lot* of work improving OpenWebRX which was orignally created by András Retzler (https://github.com/ha7ilm). Jakob has formed a group list on:
 
 [our groups.io group](https://groups.io/g/openwebrx).
 
 Jakob has a wealth of knowledge and is usually responsive on his group. This fork is absolutely not intended
-to supercede Jakob's work, which should be seen as the primary source for all things good on OWRX. 
+to supercede his work, which should be seen as the primary source for all things good on OWRX. 
 
 What will appear here is a somewhat experimental version of OpenWebRX. It will contain changes that have been implemented 
 following personal request(s), and in the interests of possibly enhancing this great software. I make it public because
