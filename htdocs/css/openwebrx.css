@@ -514,6 +514,44 @@ input[type=range]:disabled {
     opacity: 0.5;
 }
 
+/* --- eroyee add 5kHz/9kHz freq step change button --- */
+
+.openwebrx-stepchangeHz-button {
+
+  background-color: #04AA6D; /* Green */
+/*  border: none; */
+  color: white;
+  height: 16px;
+  width: 16px;
+  border-radius: 3px;
+  border: 1px solid #FFF;
+  font-size: 9px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  bottom: 4px; /* bring up to same level as step buttons */
+}
+/* ----------------------------------------------------- */
+
+/* ----- eroyee add spectrum display enable button ----- */
+
+.openwebrx-spectrum-button {
+
+  background-color: orange; 
+/*  border: none; */
+  color: black;
+  height: 16px;
+  width: 49px;
+  border-radius: 3px;
+  border: 1px solid #FFF;
+  font-size: 9px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  bottom: 4px; /* bring up to same level as step buttons */
+}
+/* ----------------------------------------------------- */
+
 .openwebrx-demodulator-button
 {
 	height: 19px;
