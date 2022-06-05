@@ -34,7 +34,7 @@ on the respective methods.
 
 ## Information
 
-Jakob Ketterl (https://github.com/jketterl/) has done a *lot* of work improving OpenWebRX which was orignally created by András Retzler (https://github.com/ha7ilm). Jakob has formed a group list on:
+[Jakob Ketterl] (https://github.com/jketterl/) has done a *lot* of work improving OpenWebRX which was orignally created by [András Retzler] (https://github.com/ha7ilm). Jakob has formed a group list on:
 
 [our groups.io group](https://groups.io/g/openwebrx).
 
