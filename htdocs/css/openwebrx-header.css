@@ -25,7 +25,19 @@
 
 .openwebrx-description-container.expanded {
     opacity: 1;
-    height: 283px;
+    height: 238px; /* eroyee dropped from 283 to to 238px incase added to spectrum */
+}
+
+/* eroyee add for spectrum display */
+
+.openwebrx-spectrum-container {
+    transition-property: height, opacity;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+    opacity: 1;
+    height: 0px;
+    max-height: 283px; 
+    overflow: hidden;
 }
 
 .webrx-top-bar {
