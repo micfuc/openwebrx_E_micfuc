@@ -51,10 +51,10 @@ if you trial anything, best make a backup beforehand!
 
 Recent changes include:
 
-+Addition of frequency change buttons, allowing the use of click-change to frequency
-+Addition of stepchange button for change from 5kHz to 9kHz steps for broadcast SWL
-+Addition of Spectrum display - this is somewhat new and may well get some changes 
-+Alteration/addition to allow for slower AGC in SSB operation
+*  Addition of frequency change buttons, allowing the use of click-change to frequency
+*  Addition of stepchange button for change from 5kHz to 9kHz steps for broadcast SWL
+*  Addition of Spectrum display - this is somewhat new and may well get some changes 
+*  Alteration/addition to allow for slower AGC in SSB operation
 
 ## Licensing
 
