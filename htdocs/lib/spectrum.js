@@ -26,13 +26,13 @@
     var freqSpectrumCtx;
     var freqSpectrumGradient; 
     var is_on;
-    var fft_size=localStorage.getItem("fft_size"); // we first set fft_size into the browser from openwebrx.js, then collect it here to use with the spectrum canvas width (otherwise need to manually set width to 4096/8192/16384)
+    var fft_size=qs("#webrx-canvas-container").lastElementChild.width; // get fft_size from waterfall setting to use with the spectrum canvas width (otherwise need to manually set width to 4096/8192/16384)
     function display_spectra () {
     //console.log (w);
     if (!is_on) {
     // Create a new DIV for spectrum analyzer canvas (in header.include.html)
         var divFreqSpectrum = '<div id="freq-div-spectrum">'
-                            + '<canvas id="freq-canvas-spectrum" width="fft_size" height="256" style="width:100%;height:256px;left:0px;position:absolute;bottom:0px;">'
+                            + '<canvas id="freq-canvas-spectrum" width="'+(fft_size)+'" height="256" style="width:100%;height:256px;left:0px;position:absolute;bottom:0px;">'
                             + '</div>';
 
         //eroyee below to drop down spectrum container
@@ -44,7 +44,7 @@
     // Canvas context for spectrum analyzer
     // var freqSpectrumCtx;
         freqSpectrumCtx        = qs("#freq-canvas-spectrum").getContext('2d');
-        freqSpectrumCtx.width  = qs("#webrx-canvas-container").lastElementChild.width;
+        freqSpectrumCtx.width  = (fft_size);
         freqSpectrumCtx.height = 255
      
     // Gradient colorsceme for spectrum
