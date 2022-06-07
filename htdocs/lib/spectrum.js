@@ -3,7 +3,7 @@
     This file is part of OpenWebRX, it provides a spectrum display and is
     based on code provided by Ubermood (https://groups.io/g/openwebrx/topic/88626097)
 
-	Copyright (c) 2020-2022 eroyee (https://github.com/eroyee/)
+	Copyright (c) 2022 eroyee (https://github.com/eroyee/)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -19,6 +19,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+
+NOTE: This is a crude way of providing spectral data, it is expensive on CPU and should be (vastly!) improved.
 
 */
 
@@ -46,7 +48,7 @@
         freqSpectrumCtx.width  = (fft_size);
         freqSpectrumCtx.height = 255
      
-    // Gradient colorsceme for spectrum, these are probably weird colours but I have an excuse! You can change to something better...
+    // Gradient color scheme for spectrum, these are probably weird colours but I have an excuse! You can change to something better...
         freqSpectrumGradient = freqSpectrumCtx.createLinearGradient(0, 0, 0, 255);
         freqSpectrumGradient.addColorStop(1.00, 'blue');
         freqSpectrumGradient.addColorStop(0.75, 'green');
@@ -88,8 +90,10 @@
     // Draw spectrum
         for (var i = 0; i < freqSpectrumCtx.width; i++) {
 		y = y+d; // lines
+		freqSpectrumCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
 		freqSpectrumCtx.fillRect(0, y, freqSpectrumCtx.width, 0.5);  // draw lines
-                freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -freqData[i]);  // draw spectra
+                freqSpectrumCtx.fillStyle = freqSpectrumGradient; // remove if colour coded lines req'd
+		freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -freqData[i]);  // draw spectra
         }
     }
      
@@ -100,8 +104,7 @@
     // Get canvas Y position
         var theCanvasY = Math.abs(new WebKitCSSMatrix(window.getComputedStyle(theCanvas).webkitTransform).m42);
     // Grab single row of data from that Y position
-        var theCanvasData = theCanvas.getContext('2d').getImageData(1, theCanvasY - 1, theCanvas.width, 1).data;
-     
+        var theCanvasData = theCanvas.getContext('2d').getImageData(1, theCanvasY - 1, theCanvas.width, 1).data;   
     // Convert row of pixels to spectrum analyser data
         var data = [];
         var x = 0;
