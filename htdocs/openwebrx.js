@@ -219,9 +219,7 @@ function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch
 {
     var logValue = getLogSmeterValue(value);
     setSquelchSliderBackground(logValue);
-    var lowLevel = waterfall_min_level - 20;
-    var highLevel = waterfall_max_level + 20;
-    var percent = (logValue - lowLevel) / (highLevel - lowLevel);
+    var percent = (logValue + 100) / (100);  // waterfall min/max no longer affect s-meter, -0dBm should = 100%
     setSmeterRelativeValue(percent);
     $("#openwebrx-smeter-db").html(logValue.toFixed(1) + " dB");
 }
