@@ -28,7 +28,6 @@
     var is_on;
     var fft_size=qs("#webrx-canvas-container").lastElementChild.width; // get fft_size from waterfall setting to use with the spectrum canvas width (otherwise need to manually set width to 4096/8192/16384)
     function display_spectra () {
-    //console.log (w);
     if (!is_on) {
     // Create a new DIV for spectrum analyzer canvas (in header.include.html)
         var divFreqSpectrum = '<div id="freq-div-spectrum">'
@@ -47,14 +46,13 @@
         freqSpectrumCtx.width  = (fft_size);
         freqSpectrumCtx.height = 255
      
-    // Gradient colorsceme for spectrum
-    //var freqSpectrumGradient;   
+    // Gradient colorsceme for spectrum, these are probably weird colours but I have an excuse! You can change to something better...
         freqSpectrumGradient = freqSpectrumCtx.createLinearGradient(0, 0, 0, 255);
         freqSpectrumGradient.addColorStop(1.00, 'blue');
         freqSpectrumGradient.addColorStop(0.75, 'green');
-        freqSpectrumGradient.addColorStop(0.50, 'yellow');
+        freqSpectrumGradient.addColorStop(0.50, 'red');
         freqSpectrumGradient.addColorStop(0.25, 'orange');
-        freqSpectrumGradient.addColorStop(0.00, 'red');		   
+        freqSpectrumGradient.addColorStop(0.00, 'yellow');		   
     // Update spectrum analyzer
 	setInterval(function() {
             freqSpectrumDraw(getFreqData());
@@ -80,15 +78,18 @@
 	}
     // ----------------------------------------
     }	
-    // Function to draw spectrum
+    // Function to draw spectrum, and include 'd' equidistant lines
     function freqSpectrumDraw(freqData) {
-    // Clear spectrum canvasfunction display_spectra () {
+        var y = 1;
+	const d = (freqSpectrumCtx.height/6);    
         freqSpectrumCtx.fillStyle = "#000";
         freqSpectrumCtx.fillRect(0, 0, freqSpectrumCtx.width, freqSpectrumCtx.height);
         freqSpectrumCtx.fillStyle = freqSpectrumGradient;  
     // Draw spectrum
         for (var i = 0; i < freqSpectrumCtx.width; i++) {
-                freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -freqData[i]);
+		y = y+d; // lines
+		freqSpectrumCtx.fillRect(0, y, freqSpectrumCtx.width, 0.5);  // draw lines
+                freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -freqData[i]);  // draw spectra
         }
     }
      
@@ -110,7 +111,6 @@
                 data[x++] = parseInt(avg) - 38;  // subtract number to lower floor hard level
         }
         return data;
-//	return;
     }
      
    
