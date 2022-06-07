@@ -179,6 +179,7 @@ function waterfallColorsContinuous(levels) {
     }
     waterfallColorsAuto(waterfall_continuous);
 }
+/* Don't need this if using js meter
 
 function setSmeterRelativeValue(value) {
     if (value < 0) value = 0;
@@ -197,6 +198,7 @@ function setSmeterRelativeValue(value) {
         $bar.css({background: 'linear-gradient(to top, #22ff2f , #008908)'});
     }
 }
+*/
 
 function setSquelchSliderBackground(val) {
     var $slider = $('#openwebrx-panel-receiver .openwebrx-squelch-slider');
@@ -214,6 +216,7 @@ function setSquelchSliderBackground(val) {
 function getLogSmeterValue(value) {
     return 10 * Math.log10(value);
 }
+/* eroyee, this is the original function (with mods), for css transform replacement is below
 
 function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
 {
@@ -223,6 +226,47 @@ function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch
     setSmeterRelativeValue(percent);
     $("#openwebrx-smeter-db").html(logValue.toFixed(1) + " dB");
 }
+
+*/
+/* eroyee function to draw smeter with js, is not as smooth, but is a *lot* easier on remote CPU than using CSS transform; 
+   on a reasonable i7 (Linux + Firefox) with css transform the system load was ~3, with this function it is typically < 2.
+
+   Signal should cause bar to rise quickly once timeout has completed, then decay slowly according to the value of decay.
+   This is probably more suited to SSB reception, particularly with the slow AGC as per my mods, although it shouldn't 
+   adversely affect AM/FM in most cases. 
+   
+   SetTimeout is attempted in a probably futile effor to more closely sync bar movement with audio, expect this to vary with 
+   relative CPU speed etc. Quite experimental and prob not be worth the effort...
+*/
+
+var speak = 0;
+var decay = 0.01
+function setSmeterAbsoluteValue(value)
+{
+//    setTimeout(function(){
+    var logValue = getLogSmeterValue(value);
+//    },0.9);
+    setSquelchSliderBackground(logValue);
+    var percent = (logValue + 82) / (82);  // Luke changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
+    if (percent < 0) { 
+        percent = 0;
+    }
+    if (percent > 1.0) { 
+        percent = 1.0;
+    }
+    if (percent > speak) {
+        speak = percent
+    }
+    else { 
+        speak = (speak - decay);
+    }
+    setTimeout(function(){
+    document.getElementById('openwebrx-smeter-bar').style.width = (speak * 100)+"%";
+    },300);
+// console.log(logValue, percent, speak);
+}
+
+/* --------------------------------------------------- */
 
 function typeInAnimation(element, timeout, what, onFinish) {
     if (!what) {
