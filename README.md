@@ -56,6 +56,7 @@ Recent changes include:
 *  Addition of Spectrum display - this is somewhat new and may well get some changes 
 *  Alteration/addition to allow for slower AGC in SSB operation (may need addition to pycsdr)
 *  Addition of 'ghost' mode - makes much of the receiver panel transparent so the waterfall is visible behind
+*  Add smeter scale, decouple smeter from waterfall (now gets value direct from csdr), add js meter for performance benefits
 
 ## Licensing
 
