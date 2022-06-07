@@ -775,12 +775,21 @@ img.openwebrx-mirror-img
 	border-color: #888;
 	border-style: solid;
 	border-width: 0px;
-	width: 255px;
+	width: 259px;  // adjust to fit with scale
 	height: 7px;
-	background-color: #373737;
-	border-radius: 3px;
+	background-color: #FFF;  // same colour as scale
+	border-radius: 0px;  // no rounded corners!
 	overflow: hidden;
 }
+
+/* eroyee, use this for js smeter */
+
+#openwebrx-smeter-bar {
+  width: 15%;
+  height: 100%;
+  background-color: rgba(4, 170, 109, 1);
+}
+/* ------------------------------ */
 
 .openwebrx-smeter-bar {
 	transition-property: transform;
@@ -806,6 +815,103 @@ img.openwebrx-mirror-img
 	margin-top: 24px;
 	font-family: 'roboto-mono';
 }
+
+/* ----- eroyee, makes CSS scale for s-meter ----- */
+/* loosely based on code from Artur Arsalanov 
+      https://codepen.io/pbweb/pen/gMQKEK */
+
+.openwebrx-smeter-scale {
+/* display: inline-block; */
+ margin-left: 25px;
+ float: left;
+ width: 90%;
+/* margin: 2px auto; */
+ margin-top: 22px;  /* distance from icons above */
+ margin-bottom: 4px;
+ height: 1px;
+}
+.openwebrx-smeter-scale .s{
+ position: absolute;
+ border-left: 4px solid #fff; /* width of tick */
+ height: 4px;
+ width: 15%;
+ padding-bottom: 0px;
+ border-bottom: 1px solid rgba(255,255,255,0.9); /* If using CSS smeter make same as smeter-bar to 'fill' border, for js smeter use 1px */
+}
+
+.openwebrx-smeter-scale .s:after {
+ position: absolute;
+ bottom: 8px;
+ font: 11px/1 sans-serif;
+}
+.openwebrx-smeter-scale .s:nth-of-type(1) {
+ left: 10.5px; /* 10px fits best to lhs meter start (was 0%) */
+}
+.openwebrx-smeter-scale .s:nth-of-type(1):after {
+ content: "0";
+ right:95%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(2) {
+ left: 15%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(2):after {
+ content: "S3";
+ right:90%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(3) {
+ left: 25%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(3):after {
+ content: "S5";
+ right:90%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(4) {
+ left: 35%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(4):after {
+ content: "S7";
+ right:90%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(5) {
+ left: 45%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(5):after {
+ content: "S9";
+ right:90%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(6) {
+ left: 55%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(6):after {
+ content: "+10";
+ right:85%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(7) {
+ left: 65%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(7):after {
+ content: "+20";
+ right:85%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(8) {
+ left: 79%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(8):after {
+ content: "+40";
+ right:85%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(9) {
+ left: 95%;
+ width: 0%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(9):after {
+ content: "+60";
+ right: 100%;
+}
+
+/* ----------------------------------------------- */
+
+
 
 .openwebrx-overlay {
     position: absolute;
