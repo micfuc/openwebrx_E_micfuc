@@ -20,7 +20,7 @@
 
 """
 
-NOTE: This is a crude way of providing spectral data, it is expensive on CPU and should be (vastly!) improved.
+NOTE: This remains very experimental, it should be tied into the main code more particularly wrt waterfall settings/data
 
 */
 
@@ -58,7 +58,7 @@ NOTE: This is a crude way of providing spectral data, it is expensive on CPU and
     // Update spectrum analyzer
 	setInterval(function() {
             freqSpectrumDraw(getFreqData());
-        }, 25) 	
+        }, 200) // This is number in milliseconds, need to be no more than fft_fps, eg. if that's 9fps, then this should be ~111
     // Observe zooming of waterfall and copy zoom-width to spectrum also
         var observer = new MutationObserver(function(mutations) {
             mutations.forEach(function(mutationRecord) {
@@ -108,12 +108,43 @@ NOTE: This is a crude way of providing spectral data, it is expensive on CPU and
     // Convert row of pixels to spectrum analyser data
         var data = [];
         var x = 0;
+//        const k = 2/(2 + 1)  // For ema filter
+        const k = 2; // for iir filter
+        var iir  =0; // for iir filter
+	    
         for (var i = 0; i < theCanvasData.length; i += 4) {
     // RGB data to Grayscale
-                var avg = (theCanvasData[i] + theCanvasData[i + 2] + theCanvasData[i + 1]) / 3;  // mess with these numbers to get desired output
-                data[x++] = parseInt(avg) - 38;  // subtract number to lower floor hard level
+// ----------------- Ubermood filter -------------- //
+        var avg = (theCanvasData[i] + theCanvasData[i + 2] + theCanvasData[i + 1]) / 3;  // mess with these numbers to get desired output
+        data[x++] = parseInt(avg) - 38;  // subtract number to lower floor hard level
         }
-        return data;
+    return data;
+	    
+// ------------------------------------------------ //
+	  
+// --------------------- EMA ---------------------- //
+//
+//        var ema = (theCanvasData[i] * k) + (theCanvasData[i-1] * (1-k));
+//        if (ema < 0) ema = 0;
+//        if (avg > 255) avg = 255;
+//         data[x++] = parseInt(iir) - 150;  // subtract number to lower floor hard level
+//        }
+//  return data;
+// ------------------------------------------------ //
+
+// ----- IIR (fm https://github.com/jks-prv/) ----- //
+//
+//         var iir_gain = 0.5 - Math.exp(-k * iir/255); // iir gain nominally set to 1
+//         if (iir_gain <= 0.01) iir_gain = 0.01;    // enforce minimum decay rate
+//         var z1 = theCanvasData[i];
+//         z1 = z1 + iir_gain * (iir - z1);
+//         if (z1 > 255) z1 = 255; if (z1 < 0) z1 = 0;
+//         iir = theCanvasData[i] = z1;
+//         data[x++] = parseInt(iir) - 42;  // subtract number to lower floor hard level
+//	 }
+//  return data;
+// ----------------------------------------------- //    
+	    
     }
      
    
