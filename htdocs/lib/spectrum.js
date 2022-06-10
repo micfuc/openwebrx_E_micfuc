@@ -20,7 +20,13 @@
 
 """
 
-NOTE: This remains very experimental, it should be tied into the main code more particularly wrt waterfall settings/data
+NOTE: This file is now redundant. It formed part of my learning about various aspects of owrx code and the iniitial introduction of a spectrum display.
+      While this code did produce a spectra it wasn't really integrated with the rest of owrx, necessarily it was rather inefficient and it 
+      didn't play well with changes to waterfall levels. However it was a good stepping stone and for that reason it can remain for a while.
+      
+      I have now integrated spectrum display facility into openwebrx.js, and am utilising raw data *before* it is converted by a colourmap (which this
+      code then read). I also have a range of filters that appear to be working well, although whether I want to get into user selection of these is 
+      another matter... 
 
 */
 
