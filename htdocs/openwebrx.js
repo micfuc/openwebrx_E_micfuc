@@ -1142,6 +1142,7 @@ function open_websocket() {
     ws.onerror = on_ws_error;
 }
 
+const spec_data_in =[];
 function waterfall_mkcolor(db_value, waterfall_colors_arg) {
     waterfall_colors_arg = waterfall_colors_arg || waterfall_colors;
     var value_percent = (db_value - waterfall_min_level) / (waterfall_max_level - waterfall_min_level);
@@ -1224,6 +1225,29 @@ function waterfall_init() {
     waterfall_setup_done = 1;
 }
 
+// ------------ eroyee add for start/stop spectrum display -------------- //
+
+var spec_start=false;
+function display_spectra ()
+{ 
+    if (!spec_start) {
+	spec_start=true;	  
+    }
+    else {
+    if (spec_start) {
+	spec_start=false;
+    document.getElementById('spectrum_container').style.height = "0px";
+    document.getElementById('spectrum_container').style.opacity = "0";
+    const flush = document.querySelector("#freq-canvas-spectrum");
+    flush.parentNode.removeChild(flush);
+    window.clearInterval(draw);
+    return;
+         }
+    }
+// console.log (spec_start)
+}
+// ------------ eroyee add for start/stop spectrum display -------------- //
+
 function waterfall_add(data) {
     if (!waterfall_setup_done) return;
     var w = fft_size;
@@ -1251,6 +1275,93 @@ function waterfall_add(data) {
         oneline_image.data[x * 4 + 3] = 255;
     }
 
+// eroyee ------------------------------------------------------------------------------------------------SPECTRUM
+
+    var freqSpectrumCtx;
+    var freqSpectrumGradient; 
+    var spec_window_h = 128;
+// console.log (spec_start);
+    if (spec_start) {
+        var divFreqSpectrum = '<div id="freq-div-spectrum">'
+                        + '<canvas id="freq-canvas-spectrum" width="'+(8192)+'" height="128" style="width:100%;height:128px;left:0px;position:absolute;bottom:0px;">'
+                        + '</div>';
+//LUKE below to drop down spectrum container
+        document.getElementById('spectrum_container').style.height = (spec_window_h)+"px";
+        document.getElementById('spectrum_container').style.opacity = "1";
+        var div = document.querySelector(".openwebrx-spectrum-container");
+        div.insertAdjacentHTML('beforeEnd', divFreqSpectrum);
+        var observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutationRecord) {
+            document.querySelector("#freq-canvas-spectrum").style.left  = document.querySelector("#webrx-canvas-container").style.left
+            document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width
+        });    
+    });
+    observer.observe(document.querySelector("#webrx-canvas-container"), { attributes : true, attributeFilter : ['style'] });
+        spec_start = true;
+        }
+        freqSpectrumCtx = document.querySelector("#freq-canvas-spectrum").getContext('2d');
+//        freqSpectrumCtx.width  = document.querySelector("#webrx-canvas-container").lastElementChild.width;
+        freqSpectrumCtx.width  = (fft_size);
+        freqSpectrumCtx.height = (spec_window_h)-1; // one less than canvas height
+        freqSpectrumGradient = freqSpectrumCtx.createLinearGradient(0, 0, 0, freqSpectrumCtx.height);
+        freqSpectrumGradient.addColorStop(0.00, 'yellow');	
+        freqSpectrumGradient.addColorStop(1.00, 'blue');
+
+   if (spec_data_in.length = 8192) {
+        var y = 1;
+	const d = (freqSpectrumCtx.height/6);    
+        freqSpectrumCtx.fillStyle = "#000";
+        freqSpectrumCtx.fillRect(0, 0, freqSpectrumCtx.width, freqSpectrumCtx.height);
+        freqSpectrumCtx.fillStyle = freqSpectrumGradient;  
+
+        const spec_out_data = [];
+        var x = 0;
+//        const k = 2/(2 + 1)  // For ema filter
+        const k = 2; // for iir filter
+        var iir  =0;
+
+        for (var i = 0; i < spec_data_in.length; i += 1) {
+// ----------------- Filter types ----------------- //
+//        var avg = (spec_data_in[i] + spec_data_in[i + 2] + spec_data_in[i + 1]) / 3;
+//        if (avg < 0) avg = 0;
+//        if (avg > 255) avg = 255;
+//        spec_out_data[x++] = parseInt(avg); 
+// --------------------- EMA ---------------------- //
+//        var ema = (spec_data_in[i] * k) + (spec_data_in[i-1] * (1-k));
+//        if (ema < 0) ema = 0;
+//        if (ema > 255) ema = 255;
+//        spec_out_data[x++] = parseInt(ema);  
+//        spec_out_data[x++] = (ema * 128);  
+// ------------------------------------------------ //
+
+// ---- IIR (from https://github.com/jks-prv/) ---- //
+
+         var iir_gain = 1 - Math.exp(-k * iir/255); // iir gain nominally set to 1
+         if (iir_gain <= 0.01) iir_gain = 0.01;    // enforce minimum decay rate
+         var z1 = spec_data_in[i];
+         z1 = z1 + iir_gain * (iir - z1);
+         if (z1 > 255) z1 = 255; if (z1 < 0) z1 = 0;
+         iir = spec_data_in[i] = z1;
+         spec_out_data[x++] = (iir * 128); 
+// ----------------------------------------------- //
+        } 
+
+// Draw spectrum
+//        for (var i = 0; i < freqSpectrumCtx.width; i++) {
+        for (var i = 0; i < 8192; i++) {
+		y = y+d; // reticule lines
+		freqSpectrumCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
+//----------------------- reticule -----------------------------------------------------------
+		freqSpectrumCtx.fillRect(0, y, freqSpectrumCtx.width, 0.5);  // draw lines
+//		freqSpectrumCtx.fillRect(0, y, 8192, 0.5);  // draw lines
+        freqSpectrumCtx.fillStyle = freqSpectrumGradient; // remove if colour coded lines req'd
+//--------------------------------------------------------------------------------------------
+		freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -spec_out_data[i]);  // draw spectra
+        }
+     }
+		
+// eroyee ------------------------------------------------------------------------------------------------SPECTRUM
+	
     //Draw image
     canvas_context.putImageData(oneline_image, 0, --canvas_actual_line);
     shift_canvases();
