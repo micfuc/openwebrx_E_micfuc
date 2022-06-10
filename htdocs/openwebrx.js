@@ -87,6 +87,40 @@ function freqstep(sel) {
 }
 /* ------------------------------------------------------------------------ */
 
+/* eroyee add for keyboard tuning 28 Dec 20, step toggle May 2022 */
+
+function init_key_listener(keypress){
+    document.addEventListener ("keydown", function (keypress) {
+     // End 
+        if (keypress.keyCode == "35") {
+            toggleStepHz();
+        }
+        // PgUp
+        if (keypress.keyCode == "33") {
+            freqstep(5);
+        }
+        // PgDwn
+        if (keypress.keyCode == "34") {
+            freqstep(0);
+        }
+        // Up cursor
+        if (keypress.keyCode == "38") {
+            freqstep(4);
+        }
+        // Down Cursor
+        if (keypress.keyCode == "40") {
+            freqstep(1);
+        }
+        if (keypress.keyCode == "37") {
+            freqstep(2);
+        }
+        // Right Cursor
+        if (keypress.keyCode == "39") {
+  		    freqstep(3);
+        }
+    } );
+}
+/*  -------------------------------------------------------------- */
 
 function zoomInOneStep() {
     zoom_set(zoom_level + 1);
@@ -179,7 +213,7 @@ function waterfallColorsContinuous(levels) {
     }
     waterfallColorsAuto(waterfall_continuous);
 }
-/* Don't need this if using js meter
+/* eroyee; don't need this if using js meter
 
 function setSmeterRelativeValue(value) {
     if (value < 0) value = 0;
@@ -1079,7 +1113,7 @@ function onAudioStart(apiType){
         toggle_panel("openwebrx-panel-log", !!was_error);
     }, 2000);
 	
-    //eroyee added to hide status panel on start
+//eroyee added to hide status panel on start
     window.setTimeout(function () {
         toggle_panel("openwebrx-panel-status", !!was_error);
     }, 500);
@@ -1424,6 +1458,9 @@ function openwebrx_init() {
     window.addEventListener("resize", openwebrx_resize);
     bookmarks = new BookmarkBar();
     initSliders();
+/* eroyee add for keyboard tuning 28 Dec 20 --------------------- */    
+	init_key_listener();
+/* -------------------------------------------------------------- */
 }
 
 function initSliders() {
