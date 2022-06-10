@@ -22,15 +22,11 @@ It has the following features:
 
 ## Setup
 
-The following methods of setting up a receiver are currently available:
+The following methods of setting up this 'E' version of OpenwebRX are available:
 
-- Raspberry Pi SD card images
-- Debian repository
-- Docker images
 - Manual installation
 
-Please checkout the [setup guide on Jakob's wiki](https://github.com/jketterl/openwebrx/wiki/Setup-Guide) for more details
-on the respective methods.
+Jakob Ketterl has gone to some trouble to make it easy to install his build, including productions of pre-built packages and docker images. Please see the [setup guide on Jakob's wiki](https://github.com/jketterl/openwebrx/wiki/Setup-Guide) for more details on these other methods.
 
 ## Information
 
@@ -41,9 +37,7 @@ on the respective methods.
 Jakob has a wealth of knowledge and is usually responsive on his group. This fork is absolutely not intended
 to supercede his work, which should be seen as the primary source for all things good on OWRX. 
 
-What will appear here is a somewhat experimental version of OpenWebRX. It will contain changes that have been implemented 
-following personal request(s), and in the interests of possibly enhancing this great software. I make it public because
-the contributions may be useful to some. 
+What will appear here is a somewhat experimental version of OpenWebRX, which I have dubbed the 'E' version. It will contain changes that have been implemented following personal request(s), and in the interests of possibly enhancing this great software I make these public. Hopefully the contributions will be useful to some, and if you've something to contribute back I'd be pleased to hear from you. 
 
 Any changes you see here should be considered alpha. I only test with Firefox and, other than myself, there is just one other person
 that uses my installation very occasionally. Thus it's quite possible bugs may arise from what I've done - so please bear this in mind 
