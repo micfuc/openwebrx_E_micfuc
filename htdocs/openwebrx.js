@@ -1240,7 +1240,6 @@ function display_spectra ()
     document.getElementById('spectrum_container').style.opacity = "0";
     const flush = document.querySelector("#freq-canvas-spectrum");
     flush.parentNode.removeChild(flush);
-    window.clearInterval(draw);
     return;
          }
     }
@@ -1291,16 +1290,13 @@ function waterfall_add(data) {
         var div = document.querySelector(".openwebrx-spectrum-container");
         div.insertAdjacentHTML('beforeEnd', divFreqSpectrum);
         var observer = new MutationObserver(function(mutations) {
-        mutations.forEach(function(mutationRecord) {
-            document.querySelector("#freq-canvas-spectrum").style.left  = document.querySelector("#webrx-canvas-container").style.left
-            document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width
-        });    
-    });
-    observer.observe(document.querySelector("#webrx-canvas-container"), { attributes : true, attributeFilter : ['style'] });
-        spec_start = true;
-        }
+            mutations.forEach(function(mutationRecord) {
+                document.querySelector("#freq-canvas-spectrum").style.left  = document.querySelector("#webrx-canvas-container").style.left
+                document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width
+                });    
+            });
+        observer.observe(document.querySelector("#webrx-canvas-container"), { attributes : true, attributeFilter : ['style'] });
         freqSpectrumCtx = document.querySelector("#freq-canvas-spectrum").getContext('2d');
-//        freqSpectrumCtx.width  = document.querySelector("#webrx-canvas-container").lastElementChild.width;
         freqSpectrumCtx.width  = (fft_size);
         freqSpectrumCtx.height = (spec_window_h)-1; // one less than canvas height
         freqSpectrumGradient = freqSpectrumCtx.createLinearGradient(0, 0, 0, freqSpectrumCtx.height);
@@ -1357,9 +1353,9 @@ function waterfall_add(data) {
         freqSpectrumCtx.fillStyle = freqSpectrumGradient; // remove if colour coded lines req'd
 //--------------------------------------------------------------------------------------------
 		freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -spec_out_data[i]);  // draw spectra
+            }
         }
-     }
-		
+    }		
 // eroyee ------------------------------------------------------------------------------------------------SPECTRUM
 	
     //Draw image
