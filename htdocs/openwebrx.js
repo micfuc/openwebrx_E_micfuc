@@ -122,6 +122,35 @@ function init_key_listener(keypress){
 }
 /*  -------------------------------------------------------------- */
 
+/* eroyee add for switching transparent (Ghost) RX panel --------- */
+
+function ToggleGhostRX() {
+/*    var div = document.querySelector('div'); */
+//    qs(q) { return document.querySelector(q); }
+    if (GhostRX) {
+	GhostRX = false;
+    document.getElementById('GhostRX').innerHTML = "G";
+    document.getElementById('GhostRX').style.backgroundColor = "rgba(255,255,255,0.3)"; // using rgba, 'a' is opacity value
+    document.getElementById('GhostRX').style.fontWeight = "bold"; 
+    document.getElementById('spectrum').style.backgroundColor = "rgba(255,165,0,0.3)"; // using rgba, 'a' is opacity value
+    document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "rgba(255,255,255,0)"; 
+//    qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,0)";
+    } else {
+        GhostRX = true;
+		document.getElementById('GhostRX').innerHTML = "G";
+	    document.getElementById('GhostRX').style.backgroundColor = "black";
+        document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "black";
+        document.getElementById('GhostRX').style.fontWeight = "normal"; 
+        document.getElementById('spectrum').style.backgroundColor = "orange"; // using rgba, 'a' is opacity value
+//        qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,1)"; 
+    }
+}
+
+/* ---------------------------------------------------------------- */
+
+
+
+
 function zoomInOneStep() {
     zoom_set(zoom_level + 1);
 }
