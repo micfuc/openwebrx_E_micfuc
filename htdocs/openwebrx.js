@@ -1315,7 +1315,8 @@ function display_spectra ()
                 document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width
                 });    
             });
-        observer.observe(document.querySelector("#webrx-canvas-container"), { attributes : true, attributeFilter : ['style'] });   
+        observer.observe(document.querySelector("#webrx-canvas-container"), { attributes : true, attributeFilter : ['style'] });  
+	    for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // initialise the peak data array with 0's
 	    spec_start=true;	  
     }
     else {
@@ -1330,6 +1331,29 @@ function display_spectra ()
          }
     }
 }
+
+// ------- eroyee for starting peak hold display ------------------
+
+const spec_peak_data = []; 
+var peak_start=false;
+function peak_spectra_hold()
+{ 
+    if (!spec_start) {
+        peak_start = false;
+        return;
+        }
+    if (!peak_start) {
+	    peak_start=true;
+        for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // initialise the peak data array with 0's
+        }
+    else if (peak_start) {
+	    peak_start=false;
+        for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // clear the peak data array with 0's
+        return;
+        }
+}
+
+
 
 // ----- eroyee additions to waterfall_add function for spectrum display ----- //
 
@@ -1394,21 +1418,21 @@ function waterfall_add(data) {
 //        if (avg > (freqSpectrumCtx.height)) avg = (freqSpectrumCtx.height);
 //        spec_out_data[x++] = (avg); 
 // --------------------- EMA ---------------------- //
-//        var ema = (spec_data_in[i] * k) + (spec_data_in[i-1] * (1-k));
-//        if (ema < 0) ema = 0;
-//        if (ema > (freqSpectrumCtx.height)) ema = (freqSpectrumCtx.height);
-//        spec_out_data[x++] = (ema * (freqSpectrumCtx.height));  
+        var ema = (spec_data_in[i] * k) + (spec_data_in[i-1] * (1-k));
+        if (ema < 0) ema = 0;
+        if (ema > (freqSpectrumCtx.height)) ema = (freqSpectrumCtx.height);
+        spec_out_data[x++] = (ema * (freqSpectrumCtx.height));  
 // ------------------------------------------------ //
 
 // ---- IIR (from https://github.com/jks-prv/) ---- //
-
-         var iir_gain = 1 - Math.exp(-k * iir/(freqSpectrumCtx.height)); // iir gain nominally set to 1
-         if (iir_gain <= 0.01) iir_gain = 0.01;    // enforce minimum decay rate
-         var z1 = spec_data_in[i];
-         z1 = z1 + iir_gain * (iir - z1);
-         if (z1 > 255) z1 = 255; if (z1 < 0) z1 = 0;
-         iir = spec_data_in[i] = z1;
-         spec_out_data[x++] = (iir * (freqSpectrumCtx.height)); 
+//
+//         var iir_gain = 1 - Math.exp(-k * iir/(freqSpectrumCtx.height)); // iir gain nominally set to 1
+//         if (iir_gain <= 0.01) iir_gain = 0.01;    // enforce minimum decay rate
+//         var z1 = spec_data_in[i];
+//         z1 = z1 + iir_gain * (iir - z1);
+//         if (z1 > 255) z1 = 255; if (z1 < 0) z1 = 0;
+//         iir = spec_data_in[i] = z1;
+//         spec_out_data[x++] = (iir * (freqSpectrumCtx.height)); 
 // ----------------------------------------------- //
         } 
 
@@ -1422,10 +1446,28 @@ function waterfall_add(data) {
 //--------------------------------------------------------------------------------------------
 	    freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -spec_out_data[i]);  // draw spectra
             }
-	spec_data_in.length=0;
-        }
-    }		
 // eroyee ------------------------------------------------------------------------------------------------SPECTRUM
+// eroyee ---------------------------------------------------------------------------------------------- PEAK HOLD
+// This draws a fine spectra line from the peak of the current data. It maintains an array of peak data that is 
+// checked against the current data output (from spec_out_data) on each cycle. If there are any data points in
+// spec_out_data greater than the corresponding data in the spec_peak_data array it will update spec_peak_data,
+// which is then drawn out by a standard routine. Starting and stopping is actioned via the peak_spectra_hold function.
+        if (peak_start){
+            freqSpectrumCtx.lineWidth = 1;
+            freqSpectrumCtx.strokeStyle = 'green';
+            freqSpectrumCtx.beginPath();
+            freqSpectrumCtx.moveTo(0,y);
+            for (var i = 0; i < freqSpectrumCtx.width; i++) {
+                if (spec_out_data[i] > spec_peak_data[i]) spec_peak_data[i] = spec_out_data[i];
+                y = ((1 - spec_peak_data[i]/freqSpectrumCtx.height) * freqSpectrumCtx.height) - 1;
+                freqSpectrumCtx.lineTo(i,y);
+                }
+            freqSpectrumCtx.stroke();
+            }
+        spec_data_in.length=0;
+	    }
+    }
+// eroyee ---------------------------------------------------------------------------------------------- PEAK HOLD
 }
 
 function waterfall_clear() {
