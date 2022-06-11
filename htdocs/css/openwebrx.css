@@ -571,6 +571,28 @@ input[type=range]:disabled {
 }
 
 /* ----------------------------------------------------- */
+/* ---- eroyee add toggle spectrum peak hold button ---- */
+
+.openwebrx-SpectraHold-button {
+
+  background-color: green; 
+/*  border: none; */
+  color: black;
+  height: 16px;
+  width: 16px;
+  border-radius: 3px;
+  border: 1px solid #FFF;
+  font-size: 9px;
+  font-style: bold;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  bottom: 4px; /* bring up to same level as step buttons */
+}
+/* ----------------------------------------------------- */
+
+
+
 
 .openwebrx-demodulator-button
 {
