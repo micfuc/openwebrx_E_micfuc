@@ -23,7 +23,7 @@
 -->
 <html>
     <head>
-        <title>OpenWebRX | Open Source SDR Web App for Everyone!</title>
+        <title>OpenWebRX black version 'E' | Open Source SDR Web App for Everyone!</title>
         <link rel="shortcut icon" type="image/x-icon" href="static/favicon.ico" sizes="16x16 32x32" />
         <link rel="icon" type="image/png" sizes="32x32" href="static/gfx/favicon32.png" />
         <link rel="icon" type="image/png" sizes="44x44" href="static/gfx/favicon44.png" />
@@ -56,9 +56,14 @@
         </div>
         <div id="openwebrx-panels-container">
             <div id="openwebrx-panels-container-left">
-                <div class="openwebrx-panel" data-panel-name="client-under-devel" style="width: 245px; background-color: Red;">
+<!-- eroyee, remove if don't want this <div class="openwebrx-panel" data-panel-name="client-under-devel" style="width: 245px; background-color: Red;">
                     <span style="font-size: 15pt; font-weight: bold;">Under construction</span>
                     <br />We're working on the code right now, so the application might fail.
+                </div>
+-->
+<!-- eroyee added class below to display client info in small box over waterfall  -->
+                <div class="openwebrx-panel" data-panel-name="client-info" style="width: 60px; font-size: 8pt; background-color: Blue;">
+                    <div class="openwebrx-info" id="openwebrx-bar-clients" data-type="clients"></div>
                 </div>
                 <div class="openwebrx-panel" id="openwebrx-panel-digimodes" style="display: none; width: 619px;" data-panel-name="digimodes">
                     <div id="openwebrx-digimode-canvas-container">
@@ -187,7 +192,7 @@
                         <img id="id-step-4" src="static/gfx/openwebrx-stepup-18.png" onclick="freqstep(4)" style="padding-bottom:0px" title="+100">
                         <img id="id-step-5" src="static/gfx/openwebrx-stepup-20.png" onclick="freqstep(5)" title="+5/9k">
                         <button id="GhostRX" class="openwebrx-GhostRX-button" onclick="ToggleGhostRX()" style="margin-left:7px" title="Transparent RX on/off" >G</button>
-                                                <button id="peak" class="openwebrx-SpectraHold-button" onclick="peak_spectra_hold()" style="margin-left:7px" title="Spectrum peak hold on/off" >^</button>
+                        <button id="peak" class="openwebrx-SpectraHold-button" onclick="peak_spectra_hold()" style="margin-left:7px" title="Spectrum peak hold on/off" >^</button>
                         <button id="spectrum" class="openwebrx-spectrum-button" onclick="display_spectra();" style="margin-left:1px" title="Spectrum Display on/off" >Spectrum</button> 
                     </div>
                     <div class="openwebrx-panel-line">
