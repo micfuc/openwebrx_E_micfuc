@@ -834,7 +834,7 @@ img.openwebrx-mirror-img
 	font-size: 10pt;
 	float: right;
 	margin-right: 5px;
-	margin-top: 24px;
+	margin-top: 8px; // eroyee; change to have 'dB' values displayed just under the 'dig' bar in the rx panel.
 	font-family: 'roboto-mono';
 }
 
