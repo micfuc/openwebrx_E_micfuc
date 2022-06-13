@@ -308,9 +308,10 @@ function setSmeterAbsoluteValue(value)
 {
 //    setTimeout(function(){
     var logValue = getLogSmeterValue(value);
+    $("#openwebrx-smeter-db").html(logValue.toFixed(0) + "dB"); // eroyee; re-introduce dB levels for anyone that wants them
 //    },0.9);
     setSquelchSliderBackground(logValue);
-    var percent = (logValue + 82) / (82);  // Luke changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
+    var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
     if (percent < 0) { 
         percent = 0;
     }
