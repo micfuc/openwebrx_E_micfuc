@@ -1283,6 +1283,11 @@ function resize_canvases(zoom) {
         width: waterfallWidth() * zoom_levels[zoom_level] + 'px',
         left: zoom_offset_px + "px"
     });
+	// eroyee; add the spectrum canvas here so it can be 'natively' 'resized, rather than using observe
+    $('#freq-canvas-spectrum').css({
+        width: waterfallWidth() * zoom_levels[zoom_level] + 'px',
+        left: zoom_offset_px + "px"
+    });
 }
 
 function waterfall_init() {
@@ -1309,28 +1314,24 @@ function display_spectra ()
         document.getElementById('spectrum_container').style.opacity = "1";
         var div = document.querySelector(".openwebrx-spectrum-container");
         div.insertAdjacentHTML('beforeEnd', divFreqSpectrum);
-// Use observe for the moment, need to integrate canvas setup/resize etc into the main code in the future, will (non-fatally) error if had been started and spectrum turned off
-        var observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutationRecord) {
-                document.querySelector("#freq-canvas-spectrum").style.left  = document.querySelector("#webrx-canvas-container").style.left
-                document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width
-                });    
-            });
-        observer.observe(document.querySelector("#webrx-canvas-container"), { attributes : true, attributeFilter : ['style'] });  
-	    for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // initialise the peak data array with 0's
-            for (let i=0; i< (fft_size); ++i) spec_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
-	    spec_start=true;	  
+// eroyee; ensure new spectrum canvas is set with the same position and zoom level as the waterfall canvas
+        document.querySelector("#freq-canvas-spectrum").style.left  = document.querySelector("#webrx-canvas-container").style.left
+        document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width 
+// eroyee; initialise the spectrum and peak data arrays
+	for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // initialise the peak data array with 0's
+        for (let i=0; i< (fft_size); ++i) spec_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
+	spec_start=true;	  
     }
     else {
     if (spec_start) {
 	spec_start=false;
-    document.getElementById('spectrum_container').style.height = "0px";
-    document.getElementById('spectrum_container').style.opacity = "0";
-    const flush = document.querySelector("#freq-canvas-spectrum");
-    flush.parentNode.removeChild(flush);
-    spec_start=false;
-    return;
-         }
+        document.getElementById('spectrum_container').style.height = "0px";
+        document.getElementById('spectrum_container').style.opacity = "0";
+        const flush = document.querySelector("#freq-canvas-spectrum");
+        flush.parentNode.removeChild(flush);
+        spec_start=false;
+        return;
+        }
     }
 }
 
