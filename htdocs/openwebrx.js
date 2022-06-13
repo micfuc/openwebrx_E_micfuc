@@ -1297,6 +1297,7 @@ function waterfall_init() {
 
 var spec_start=false;
 const spec_window_h = 130; // sets height of spectrum display
+const spec_out_data = []; 
 function display_spectra ()
 { 
     if (!spec_start) {
@@ -1317,6 +1318,7 @@ function display_spectra ()
             });
         observer.observe(document.querySelector("#webrx-canvas-container"), { attributes : true, attributeFilter : ['style'] });  
 	    for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // initialise the peak data array with 0's
+            for (let i=0; i< (fft_size); ++i) spec_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
 	    spec_start=true;	  
     }
     else {
@@ -1404,24 +1406,24 @@ function waterfall_add(data) {
         freqSpectrumCtx.fillStyle = "#000";
         freqSpectrumCtx.fillRect(0, 0, freqSpectrumCtx.width, freqSpectrumCtx.height);
         freqSpectrumCtx.fillStyle = freqSpectrumGradient;  
-
-        const spec_out_data = [];
-        var x = 0;
-//        const k = 2/(2 + 1)  // For ema filter
-        const k = 2; // for iir filter
-        var iir  =0;
-
+        const k = 0.6; // value to set filter rise/fall time, lower is slower
+        var iir = 0; // use for iir filter
         for (var i = 0; i < spec_data_in.length; i += 1) {
 // ----------------- Filter types ----------------- //
-//        var avg = (spec_data_in[i] + spec_data_in[i + 2] + spec_data_in[i + 1]) / 3;
-//        if (avg < 0) avg = 0;
-//        if (avg > (freqSpectrumCtx.height)) avg = (freqSpectrumCtx.height);
-//        spec_out_data[x++] = (avg); 
+
 // --------------------- EMA ---------------------- //
-        var ema = (spec_data_in[i] * k) + (spec_data_in[i-1] * (1-k));
+// eroyee; we are ultimately dealing with inputs of percent_value, a number between 0 and 1, need to work with 
+// these numbers for *both* input and output data for the ema filter to work correctly ()and multiply the output 
+// to fit the canvas later on).The alternative is to first multiply the input value to canvas height and go from 
+// there. I think this is better as it makes it a little easier to understand and possibly reduces the variable
+// count slightly. Either will work.
+//      var ema = ((spec_data_in[i]) * k) + (spec_out_data[i] * (1-k)); // use if utilising raw value_percent input
+        var ema = (((spec_data_in[i])* freqSpectrumCtx.height) * k) + (spec_out_data[i] * (1-k)); // multiply raw by canvas height
         if (ema < 0) ema = 0;
-        if (ema > (freqSpectrumCtx.height)) ema = (freqSpectrumCtx.height);
-        spec_out_data[x++] = (ema * (freqSpectrumCtx.height));  
+//        if (ema > 1) ema = 1; // needed if using raw value_percent input
+        if (ema > freqSpectrumCtx.height) ema = freqSpectrumCtx.height;
+        spec_out_data[i] = ema;
+//        spec_out_data[i] = ema * ((freqSpectrumCtx.height)-1);
 // ------------------------------------------------ //
 
 // ---- IIR (from https://github.com/jks-prv/) ---- //
@@ -1438,12 +1440,14 @@ function waterfall_add(data) {
 
 // Draw spectrum
         for (var i = 0; i < freqSpectrumCtx.width; i++) {
+//            var temp_h = spec_out_data[i] * (freqSpectrumCtx.height -1); // needed if using raw value_percent input	
 	    y = y+d; // reticule lines
 	    freqSpectrumCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
 //----------------------- reticule -----------------------------------------------------------
 	    freqSpectrumCtx.fillRect(0, y, freqSpectrumCtx.width, 0.5);  // draw lines
             freqSpectrumCtx.fillStyle = freqSpectrumGradient; // remove if colour coded lines req'd
 //--------------------------------------------------------------------------------------------
+//	    freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -temp_h);  // draw spectra // needed if using raw value_percent input
 	    freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -spec_out_data[i]);  // draw spectra
             }
 // eroyee ------------------------------------------------------------------------------------------------SPECTRUM
@@ -1460,6 +1464,7 @@ function waterfall_add(data) {
             for (var i = 0; i < freqSpectrumCtx.width; i++) {
                 if (spec_out_data[i] > spec_peak_data[i]) spec_peak_data[i] = spec_out_data[i];
                 y = ((1 - spec_peak_data[i]/freqSpectrumCtx.height) * freqSpectrumCtx.height) - 1;
+//                y = (1- spec_peak_data[i]/1) * ((freqSpectrumCtx.height) - 1); // needed if using raw value_percent input
                 freqSpectrumCtx.lineTo(i,y);
                 }
             freqSpectrumCtx.stroke();
