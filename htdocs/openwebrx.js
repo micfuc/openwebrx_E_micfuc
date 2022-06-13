@@ -55,6 +55,18 @@ function toggleMute() {
 
 /* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- */
 
+function toggleStepHz() {
+    if (StepHz) {
+	StepHz = false;
+    document.getElementById('stepchangeHz').innerHTML = "5";
+    document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
+    } else {
+        StepHz = true;
+		document.getElementById('stepchangeHz').innerHTML = "9";
+	    document.getElementById('stepchangeHz').style.backgroundColor = "blue";
+    }
+}
+
 function freqstep(sel) {
 	stepsize = 0;
 	switch(sel) {
