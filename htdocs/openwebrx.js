@@ -1400,7 +1400,8 @@ function waterfall_add(data) {
         freqSpectrumCtx.width  = (fft_size);
         freqSpectrumCtx.height = (spec_window_h)-1; // one less than canvas height
         freqSpectrumGradient = freqSpectrumCtx.createLinearGradient(0, 0, 0, freqSpectrumCtx.height);
-        freqSpectrumGradient.addColorStop(0.00, 'yellow');	
+        freqSpectrumGradient.addColorStop(0.00, 'red'); // probably should align these colours with the waterfall...
+	freqSpectrumGradient.addColorStop(0.50, 'yellow');
         freqSpectrumGradient.addColorStop(1.00, 'blue');
    if (spec_data_in.length = (freqSpectrumCtx.width)) {
         var y = 1;
@@ -1430,13 +1431,14 @@ function waterfall_add(data) {
 
 // ---- IIR (from https://github.com/jks-prv/) ---- //
 //
-//         var iir_gain = 1 - Math.exp(-k * iir/(freqSpectrumCtx.height)); // iir gain nominally set to 1
+//         var iir_gain = 1 - Math.exp(-k * spec_out_data[i]/freqSpectrumCtx.height); // iir gain nominally set to 1
 //         if (iir_gain <= 0.01) iir_gain = 0.01;    // enforce minimum decay rate
-//         var z1 = spec_data_in[i];
-//         z1 = z1 + iir_gain * (iir - z1);
-//         if (z1 > 255) z1 = 255; if (z1 < 0) z1 = 0;
-//         iir = spec_data_in[i] = z1;
-//         spec_out_data[x++] = (iir * (freqSpectrumCtx.height)); 
+//         var z1 = (spec_data_in[i] * freqSpectrumCtx.height);
+//         z1 = z1 + iir_gain * (spec_out_data[i] - z1);
+//         if (z1 < 0) z1 = 0;
+//         if (z1 > freqSpectrumCtx.height) z1 = freqSpectrumCtx.height; 
+//         spec_data_in[i] = z1;
+//         spec_out_data[i] = Math.round(spec_data_in[i]);
 // ----------------------------------------------- //
         } 
 
