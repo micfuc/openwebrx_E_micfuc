@@ -802,10 +802,10 @@ img.openwebrx-mirror-img
 	border-color: #888;
 	border-style: solid;
 	border-width: 0px;
-	width: 259px;  // adjust to fit with scale
+	width: 259px;  /* adjust to fit with scale */
 	height: 7px;
-	background-color: #FFF;  // same colour as scale
-	border-radius: 0px;  // no rounded corners!
+	background-color: #FFF;  /* same colour as scale */
+	border-radius: 0px;  /* no rounded corners! */
 	overflow: hidden;
 }
 
