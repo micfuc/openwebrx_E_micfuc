@@ -170,10 +170,10 @@ input[type=range]:disabled {
 }
 
 #openwebrx-frequency-container {
-	background-image: url("../gfx/openwebrx-scale-background.png");
+/*	background-image: url("../gfx/openwebrx-scale-background.png"); eroyee; remove for clear freq bar */
 	background-repeat: repeat-x;
 	background-size: cover;
-    background-color: #444;
+    background-color: #000; /* eroyee; change from #444 for black high-contrast */
     z-index: 1001;
 }
 
@@ -448,12 +448,17 @@ input[type=range]:disabled {
 .openwebrx-panel
 {
 	transform: perspective( 600px ) rotateX( 90deg );
-	background-color: #575757;
+	background-color: #000; /* eroyee; bg colour from 575757, make this #000 for high-contrast black or <000 for transparent panel */
 	padding: 10px;
 	color: white;
 	font-size: 10pt;
-	border-radius: 15px;
-	-moz-border-radius: 15px;
+/* --- do below for transparent mode --- */
+    border-style: solid; 
+    border-color: black;
+    border-width: 1px;
+/* ------------------------------------- */
+	border-radius: 5px; /* eroyee, border-radius to 5 fm 15 */
+	-moz-border-radius: 5px;
 	margin: 5.9px;
 	box-sizing: content-box;
 }
@@ -471,18 +476,20 @@ input[type=range]:disabled {
 	height: 100%;
 }
 
-.openwebrx-button
+.openwebrx-button  /* This changes the mode buttons */
 {
 	background-color: #373737;
-	padding: 4.2px;
+	padding: 2.2px; /* eroyee; change from 4.2px to 2.2px */
 	border-radius: 5px;
 	-moz-border-radius: 5px;
 	color: White;
-	font-weight: bold;
+/*	font-weight: bold; eroyee; remove bold */
 	margin-right: 1px;
 	cursor: pointer;
+/* eroyee; comment below to remove gradient to make it easier for transparent 'Ghost' mode
 	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.0	, #373737), color-stop(1, #4F4F4F) );
 	background:-moz-linear-gradient( center top, #373737 0%, #4F4F4F 100% );
+*/
 	user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -591,13 +598,10 @@ input[type=range]:disabled {
 }
 /* ----------------------------------------------------- */
 
-
-
-
-.openwebrx-demodulator-button
+.openwebrx-demodulator-button /* this is for mode (eg ssb etc) buttons */
 {
-	height: 19px;
-	font-size: 12pt;
+	height: 14px; /* eroyee; changed from 19px to 14 */
+	font-size: 10pt; /* eroyee; changed from 12 to 10pt */
 	text-align: center;
 	flex: 1;
 	margin-right: 5px;
@@ -727,7 +731,7 @@ img.openwebrx-mirror-img
 
 #openwebrx-panel-receiver
 {
-	width:110px;
+	width:100px; /* eroyee; changed from 110px */
 }
 
 
@@ -742,8 +746,8 @@ img.openwebrx-mirror-img
 }
 
 #openwebrx-panel-receiver .openwebrx-bookmark-button {
-    width: 27px;
-    height: 27px;
+    width: 20px; /* eroyee; 27 to 20, alters size of 'bookmark' icon in rx panel */
+    height: 20px; /* eroyee; 27 to 20 */
     text-align: center;
 }
 
@@ -778,7 +782,7 @@ img.openwebrx-mirror-img
 .openwebrx-modes-grid .openwebrx-demodulator-button {
     margin: 0;
     white-space: nowrap;
-    flex: 1 0 38px;
+    flex: 1 0 28px; /* eroyee; change from 38 to 28px - this is for SSB etc mode buttons */
     margin: 5px 5px 0 0;
 }
 
@@ -813,7 +817,7 @@ img.openwebrx-mirror-img
 }
 /* ------------------------------ */
 
-.openwebrx-smeter-bar {
+.openwebrx-smeter-bar-OFF { /* turn '-OFF' when not using this (if using js smeter) */
 	transition-property: transform;
 	transition-duration: 0.2s;
 	transition-timing-function: linear;
@@ -824,7 +828,7 @@ img.openwebrx-mirror-img
 	background: linear-gradient(to top, #ff5939 , #961700);
 	margin: 0;
 	padding: 0;
-	border-radius: 3px;
+	border-radius: 0px; /* eroyee; bradius to 0 from 3 */
 }
 
 #openwebrx-smeter-db
@@ -1003,7 +1007,7 @@ img.openwebrx-mirror-img
 	background-color: #373737;
 	color: White;
 	font-weight: normal;
-	font-size: 13pt;
+	font-size: 10pt; /* eroyee; 13pt to 10pt */
 	margin-right: 1px;
 	background:linear-gradient(#373737, #4F4F4F);
 	border-color: transparent;
@@ -1036,7 +1040,7 @@ img.openwebrx-mirror-img
 
 .openwebrx-secondary-demod-listbox {
 	width: 173px;
-	height: 27px;
+	height: 18px; /* eroyee; change height from 27 to 18px */
 	padding-left:3px;
 	flex: 4;
 }
@@ -1044,7 +1048,7 @@ img.openwebrx-mirror-img
 #openwebrx-sdr-profiles-listbox {
     width: 100%;
     font-size: 10pt;
-    height: 27px;
+    height: 25px; /* eroyee; change height from 27 to 25px */
 }
 
 #openwebrx-cursor-blink
@@ -1483,7 +1487,7 @@ img.openwebrx-mirror-img
 }
 
 .openwebrx-zoom-button svg {
-    height: 27px;
+    height: 20px; /* eroyee; change from 27 to 20px */
 }
 
 .openwebrx-slider-button svg {
