@@ -1,9 +1,8 @@
 .webrx-top-container {
     position: relative;
     z-index:1000;
-    background-color: #575757;
-
-    background-image: url(../gfx/openwebrx-top-photo.jpg);
+    background-color: #000; /* eroyee; black scheme */
+/*    background-image: url(../gfx/openwebrx-top-photo.jpg); eroyee; black scheme */
     background-position-x: center;
     background-position-y: top;
     background-repeat: no-repeat;
@@ -36,7 +35,7 @@
     transition-timing-function: ease-out;
     opacity: 1;
     height: 0px;
-    max-height: 283px; 
+    max-height: 238px; 
     overflow: hidden;
 }
 
