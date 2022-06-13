@@ -71,22 +71,32 @@ function freqstep(sel) {
 	stepsize = 0;
 	switch(sel) {
     case 0:
-        stepsize = -5000;
+        if (StepHz) {
+            stepsize = -9000;
+            break;
+        } else {
+            stepsize = -5000;
+        }
         break;
     case 1:
         stepsize = -100;
         break;
     case 2:
-        stepsize = -10; // Will only work if 10Hz resolution is set
+        stepsize = -10;  // Will only work if 10Hz resolution is set
         break;
     case 3:
-        stepsize = 10; // Will only work if 10Hz resolution is set
+        stepsize = 10;  // Will only work if 10Hz resolution is set
         break;
     case 4:
         stepsize = 100;
         break;
     case 5:
-        stepsize = 5000;
+        if (StepHz) {
+            stepsize = 9000;
+            break;
+        } else {
+            stepsize = 5000;
+        }
         break;
     default:
         stepsize = 0;
