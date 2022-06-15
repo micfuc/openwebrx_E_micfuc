@@ -1427,7 +1427,10 @@ function waterfall_add(data) {
         freqSpectrumGradient.addColorStop(1.00, 'blue');
    if (spec_data_in.length = (freqSpectrumCtx.width)) {
         var y = 1;
-	const d = (freqSpectrumCtx.height/6); // gives d lines for relative strength assessment, should be aligned to dB at some stage
+// eroyee; spectrum height in pixels / dB range between wfmax & wfmin gives num pixels to draw first & subsequent reticule lines 10dB apart
+// eg. If spec is 128px high, wft max is -19, wf min is -69 (ie.range is 50dB), then 128/(50/10) = 25.6 pixels to the first 10dB line
+// Should probably round the outcome but that may use more CPU...
+        const d = (freqSpectrumCtx.height/((Math.abs(waterfall_min_level - waterfall_max_level))/10)); 
         freqSpectrumCtx.fillStyle = "#000";
         freqSpectrumCtx.fillRect(0, 0, freqSpectrumCtx.width, freqSpectrumCtx.height);
         freqSpectrumCtx.fillStyle = freqSpectrumGradient;  
