@@ -1,27 +1,27 @@
 /*
-
-	This file is part of OpenWebRX,
-	an open-source SDR receiver software with a web UI.
-	Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
-	Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
-	Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-"""
-
-*/
+ 
+ This file is part of OpenWebRX,
+ an open-source SDR receiver software with a web UI.
+ Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
+ Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
+ Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
+ 
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+ 
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+ 
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ 
+ """
+ 
+ */
 
 is_firefox = navigator.userAgent.indexOf("Firefox") >= 0;
 
@@ -38,6 +38,7 @@ function updateVolume() {
     audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
 }
 
+
 function toggleMute() {
     var $muteButton = $('.openwebrx-mute-button');
     var $volumePanel = $('#openwebrx-panel-volume');
@@ -49,71 +50,71 @@ function toggleMute() {
         volumeBeforeMute = $volumePanel.val();
         $volumePanel.prop('disabled', true).val(0);
     }
-
     updateVolume();
 }
 
-/* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- */
-
+/* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- 
+ - note this is optimised for tuning precision of 10Hz. Furture improvement to 
+   include that variable and adjust accordingly -----------------------------*/
 function toggleStepHz() {
     if (StepHz) {
-	StepHz = false;
-    document.getElementById('stepchangeHz').innerHTML = "5";
-    document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
+        StepHz = false;
+        document.getElementById('stepchangeHz').innerHTML = "5";
+        document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
     } else {
         StepHz = true;
-		document.getElementById('stepchangeHz').innerHTML = "9";
-	    document.getElementById('stepchangeHz').style.backgroundColor = "blue";
+        document.getElementById('stepchangeHz').innerHTML = "9";
+        document.getElementById('stepchangeHz').style.backgroundColor = "blue";
     }
 }
 
 function freqstep(sel) {
-	stepsize = 0;
-	switch(sel) {
-    case 0:
-        if (StepHz) {
-            stepsize = -9000;
+    var stepsize = 0;
+    var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
+    var new_offset = offset_frequency + stepsize;
+    switch (sel) {
+        case 0:
+            if (StepHz) {
+                stepsize = -9000;
+            } 
+            else {
+                stepsize = -5000;
+            }
             break;
-        } else {
-            stepsize = -5000;
-        }
-        break;
-    case 1:
-        stepsize = -100;
-        break;
-    case 2:
-        stepsize = -10;  // Will only work if 10Hz resolution is set
-        break;
-    case 3:
-        stepsize = 10;  // Will only work if 10Hz resolution is set
-        break;
-    case 4:
-        stepsize = 100;
-        break;
-    case 5:
-        if (StepHz) {
-            stepsize = 9000;
+        case 1:
+            stepsize = -100;
             break;
-        } else {
-            stepsize = 5000;
-        }
-        break;
-    default:
-        stepsize = 0;
-}
-    offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
-    new_offset = offset_frequency + stepsize;
+        case 2:
+            stepsize = -10;  // Will only work if 10Hz resolution is set
+            break;
+        case 3:
+            stepsize = 10;  // Will only work if 10Hz resolution is set
+            break;
+        case 4:
+            stepsize = 100;
+            break;
+        case 5:
+            if (StepHz) {
+                stepsize = 9000;
+            } 
+            else {
+                stepsize = 5000;
+            }
+            break;
+        default:
+            stepsize = 0;
+    }
     if (new_offset !== offset_frequency) {
         $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset);
     }
 }
-/* ------------------------------------------------------------------------ */
+/* -------------------------------------------------------------------------- */
 
 /* eroyee add for keyboard tuning 28 Dec 20, step toggle May 2022 */
 
-function init_key_listener(keypress){
-    document.addEventListener ("keydown", function (keypress) {
-     // End 
+function init_key_listener(keypress) {
+    document.addEventListener("keydown", function (keypress) {
+        // End 
         if (keypress.keyCode == "35") {
             toggleStepHz();
         }
@@ -138,37 +139,36 @@ function init_key_listener(keypress){
         }
         // Right Cursor
         if (keypress.keyCode == "39") {
-  		    freqstep(3);
+            freqstep(3);
         }
-    } );
+    });
 }
-/*  -------------------------------------------------------------- */
+/*  ------------------------------------------------------------------------- */
 
-/* eroyee add for switching transparent (Ghost) RX panel --------- */
+/* --------- eroyee add for switching transparent (Ghost) RX panel ---------- */
 
+var GhostRX = true;
 function ToggleGhostRX() {
-/*    var div = document.querySelector('div'); */
-//    qs(q) { return document.querySelector(q); }
     if (GhostRX) {
-	GhostRX = false;
-    document.getElementById('GhostRX').innerHTML = "G";
-    document.getElementById('GhostRX').style.backgroundColor = "rgba(255,255,255,0.3)"; // using rgba, 'a' is opacity value
-    document.getElementById('GhostRX').style.fontWeight = "bold"; 
-    document.getElementById('spectrum').style.backgroundColor = "rgba(255,165,0,0.3)"; // using rgba, 'a' is opacity value
-    document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "rgba(255,255,255,0)"; 
+        GhostRX = false;
+        document.getElementById('GhostRX').innerHTML = "G";
+        document.getElementById('GhostRX').style.backgroundColor = "rgba(255,255,255,0.3)"; // using rgba, 'a' is opacity value
+        document.getElementById('GhostRX').style.fontWeight = "bold";
+        document.getElementById('spectrum').style.backgroundColor = "rgba(255,165,0,0.3)"; // using rgba, 'a' is opacity value
+        document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "rgba(255,255,255,0)";
 //    qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,0)";
     } else {
         GhostRX = true;
-		document.getElementById('GhostRX').innerHTML = "G";
-	    document.getElementById('GhostRX').style.backgroundColor = "black";
+        document.getElementById('GhostRX').innerHTML = "G";
+        document.getElementById('GhostRX').style.backgroundColor = "black";
         document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "black";
-        document.getElementById('GhostRX').style.fontWeight = "normal"; 
+        document.getElementById('GhostRX').style.fontWeight = "normal";
         document.getElementById('spectrum').style.backgroundColor = "orange"; // using rgba, 'a' is opacity value
 //        qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,1)"; 
     }
 }
 
-/* ---------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
 
 
@@ -198,7 +198,7 @@ var waterfall_auto_levels;
 var waterfall_auto_min_range;
 
 function buildWaterfallColors(input) {
-    return chroma.scale(input).colors(256, 'rgb')
+    return chroma.scale(input).colors(256, 'rgb');
 }
 
 function updateWaterfallColors(which) {
@@ -208,7 +208,7 @@ function updateWaterfallColors(which) {
     waterfall_min_level = parseInt($wfmin.val());
     if (waterfall_min_level >= waterfall_max_level) {
         if (!which) {
-            waterfall_min_level = waterfall_max_level -1;
+            waterfall_min_level = waterfall_max_level - 1;
         } else {
             waterfall_max_level = waterfall_min_level + 1;
         }
@@ -218,11 +218,11 @@ function updateWaterfallColors(which) {
 
 function updateWaterfallSliders() {
     $('#openwebrx-waterfall-color-max')
-        .val(waterfall_max_level)
-        .attr('title', 'Waterfall maximum level (' + Math.round(waterfall_max_level) + ' dB)');
+            .val(waterfall_max_level)
+            .attr('title', 'Waterfall maximum level (' + Math.round(waterfall_max_level) + ' dB)');
     $('#openwebrx-waterfall-color-min')
-        .val(waterfall_min_level)
-        .attr('title', 'Waterfall minimum level (' + Math.round(waterfall_min_level) + ' dB)');
+            .val(waterfall_min_level)
+            .attr('title', 'Waterfall minimum level (' + Math.round(waterfall_min_level) + ' dB)');
 }
 
 function waterfallColorsDefault() {
@@ -255,35 +255,35 @@ function waterfallColorsContinuous(levels) {
     if (levels.max > waterfall_continuous.max + 1) {
         waterfall_continuous.max += 1;
     } else if (levels.max < waterfall_continuous.max - 1) {
-        waterfall_continuous.max -= .1;
+        waterfall_continuous.max -= 0.1;
     }
     if (levels.min < waterfall_continuous.min - 1) {
         waterfall_continuous.min -= 1;
     } else if (levels.min > waterfall_continuous.min + 1) {
-        waterfall_continuous.min += .1;
+        waterfall_continuous.min += 0.1;
     }
     waterfallColorsAuto(waterfall_continuous);
 }
 /* eroyee; don't need this if using js meter
-
-function setSmeterRelativeValue(value) {
-    if (value < 0) value = 0;
-    if (value > 1.0) value = 1.0;
-    var $meter = $("#openwebrx-smeter");
-    var $bar = $meter.find(".openwebrx-smeter-bar");
-    $bar.css({transform: 'translate(' + ((value - 1) * 100) + '%) translateZ(0)'});
-    if (value > 0.9) {
-        // red
-        $bar.css({background: 'linear-gradient(to top, #ff5939 , #961700)'});
-    } else if (value > 0.7) {
-        // yellow
-        $bar.css({background: 'linear-gradient(to top, #fff720 , #a49f00)'});
-    } else {
-        // red
-        $bar.css({background: 'linear-gradient(to top, #22ff2f , #008908)'});
-    }
-}
-*/
+ 
+ function setSmeterRelativeValue(value) {
+ if (value < 0) value = 0;
+ if (value > 1.0) value = 1.0;
+ var $meter = $("#openwebrx-smeter");
+ var $bar = $meter.find(".openwebrx-smeter-bar");
+ $bar.css({transform: 'translate(' + ((value - 1) * 100) + '%) translateZ(0)'});
+ if (value > 0.9) {
+ // red
+ $bar.css({background: 'linear-gradient(to top, #ff5939 , #961700)'});
+ } else if (value > 0.7) {
+ // yellow
+ $bar.css({background: 'linear-gradient(to top, #fff720 , #a49f00)'});
+ } else {
+ // red
+ $bar.css({background: 'linear-gradient(to top, #22ff2f , #008908)'});
+ }
+ }
+ */
 
 function setSquelchSliderBackground(val) {
     var $slider = $('#openwebrx-panel-receiver .openwebrx-squelch-slider');
@@ -301,58 +301,64 @@ function setSquelchSliderBackground(val) {
 function getLogSmeterValue(value) {
     return 10 * Math.log10(value);
 }
-/* eroyee, this is the original function (with mods), for css transform replacement is below
+/* eroyee, this is the original function (with mods) for css transform,
+   replacement using js is below this block. CSS *should* be better but it 
+   seems to increase CPU load considerably on low power machines:
+ 
+ function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
+ {
+ var logValue = getLogSmeterValue(value);
+ setSquelchSliderBackground(logValue);
+ var percent = (logValue + 100) / (100);  // waterfall min/max no longer affect s-meter, -0dBm should = 100%
+ setSmeterRelativeValue(percent);
+ $("#openwebrx-smeter-db").html(logValue.toFixed(1) + " dB");
+ }
+ 
+ */
+/* eroyee function to draw smeter with js, is not as smooth, but is a *lot* 
+   easier on remote CPU than using CSS transform; on a reasonable i7 
+   (Linux + Firefox) with css transform the system load was ~3, with this 
+   function it is typically < 2.
+ 
+ Signal should cause bar to rise quickly once timeout has completed, then decay 
+ slowly according to the value of decay.
+                            
+ This is probably more suited to SSB reception, particularly with the slow AGC 
+ as per my mods, although it shouldn't adversely affect AM/FM in most cases. 
+ 
+ SetTimeout is attempted in a probably futile effor to more closely sync bar
+ movement with audio, expect this to vary with relative CPU speed etc. Quite 
+ experimental and prob not be worth the effort...
+ */
 
-function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
-{
-    var logValue = getLogSmeterValue(value);
-    setSquelchSliderBackground(logValue);
-    var percent = (logValue + 100) / (100);  // waterfall min/max no longer affect s-meter, -0dBm should = 100%
-    setSmeterRelativeValue(percent);
-    $("#openwebrx-smeter-db").html(logValue.toFixed(1) + " dB");
-}
 
-*/
-/* eroyee function to draw smeter with js, is not as smooth, but is a *lot* easier on remote CPU than using CSS transform; 
-   on a reasonable i7 (Linux + Firefox) with css transform the system load was ~3, with this function it is typically < 2.
-
-   Signal should cause bar to rise quickly once timeout has completed, then decay slowly according to the value of decay.
-   This is probably more suited to SSB reception, particularly with the slow AGC as per my mods, although it shouldn't 
-   adversely affect AM/FM in most cases. 
-   
-   SetTimeout is attempted in a probably futile effor to more closely sync bar movement with audio, expect this to vary with 
-   relative CPU speed etc. Quite experimental and prob not be worth the effort...
-*/
-
-var speak = 0;
-var decay = 0.01
 function setSmeterAbsoluteValue(value)
 {
-//    setTimeout(function(){
-    var logValue = getLogSmeterValue(value);
+var speak = 0;
+var decay = 0.01;
+var logValue = getLogSmeterValue(value);
+var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
+    //    setTimeout(function(){
     $("#openwebrx-smeter-db").html(logValue.toFixed(0) + "dB"); // eroyee; re-introduce dB levels for anyone that wants them
 //    },0.9);
     setSquelchSliderBackground(logValue);
-    var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
-    if (percent < 0) { 
+    if (percent < 0) {
         percent = 0;
     }
-    if (percent > 1.0) { 
+    if (percent > 1.0) {
         percent = 1.0;
     }
     if (percent > speak) {
-        speak = percent
-    }
-    else { 
+        speak = percent;
+    } else {
         speak = (speak - decay);
     }
-    setTimeout(function(){
-    document.getElementById('openwebrx-smeter-bar').style.width = (speak * 100)+"%";
-    },300);
+    setTimeout(function () {
+        document.getElementById('openwebrx-smeter-bar').style.width = (speak * 100) + "%";
+    }, 300);
 // console.log(logValue, percent, speak);
 }
-
-/* --------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
 function typeInAnimation(element, timeout, what, onFinish) {
     if (!what) {
@@ -373,7 +379,7 @@ function typeInAnimation(element, timeout, what, onFinish) {
 function getDemodulators() {
     return [
         $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator()
-    ].filter(function(d) {
+    ].filter(function (d) {
         return !!d;
     });
 }
@@ -382,7 +388,7 @@ function mkenvelopes(visible_range) //called from mkscale
 {
     var demodulators = getDemodulators();
     scale_ctx.clearRect(0, 0, scale_ctx.canvas.width, 22); //clear the upper part of the canvas (where filter envelopes reside)
-    for (var i = 0; i < demodulators.length; i++) {
+    for (i = 0; i < demodulators.length; i++) {
         demodulators[i].envelope.draw(visible_range);
     }
     if (demodulators.length) {
@@ -432,7 +438,9 @@ function scale_canvas_mousedown(evt) {
 }
 
 function scale_offset_freq_from_px(x, visible_range) {
-    if (typeof visible_range === "undefined") visible_range = get_visible_freq_range();
+    if (typeof visible_range === "undefined"){
+        visible_range = get_visible_freq_range();
+    }
     return (visible_range.start + visible_range.bw * (x / waterfallWidth())) - center_freq;
 }
 
@@ -441,17 +449,22 @@ function scale_canvas_mousemove(evt) {
     var i;
     var demodulators = getDemodulators();
     if (scale_canvas_drag_params.mouse_down && !scale_canvas_drag_params.drag && Math.abs(evt.pageX - scale_canvas_drag_params.start_x) > canvas_drag_min_delta)
-    //we can use the main drag_min_delta thing of the main canvas
-    {
-        scale_canvas_drag_params.drag = true;
-        //call the drag_start for all demodulators (and they will decide if they're dragged, based on X coordinate)
-        for (i = 0; i < demodulators.length; i++) event_handled |= demodulators[i].envelope.drag_start(evt.pageX, scale_canvas_drag_params.key_modifiers);
-        scale_canvas.style.cursor = "move";
-    }
-    else if (scale_canvas_drag_params.drag) {
+            //we can use the main drag_min_delta thing of the main canvas
+            {
+                scale_canvas_drag_params.drag = true;
+                //call the drag_start for all demodulators (and they will decide if they're dragged, based on X coordinate)
+                for (i = 0; i < demodulators.length; i++){
+                    event_handled |= demodulators[i].envelope.drag_start(evt.pageX, scale_canvas_drag_params.key_modifiers);
+                scale_canvas.style.cursor = "move";
+                }
+            } else if (scale_canvas_drag_params.drag) {
         //call the drag_move for all demodulators (and they will decide if they're dragged)
-        for (i = 0; i < demodulators.length; i++) event_handled |= demodulators[i].envelope.drag_move(evt.pageX);
-        if (!event_handled) demodulators[0].set_offset_frequency(scale_offset_freq_from_px(evt.pageX));
+        for (i = 0; i < demodulators.length; i++){
+            event_handled |= demodulators[i].envelope.drag_move(evt.pageX);
+        }
+        if (!event_handled){
+            demodulators[0].set_offset_frequency(scale_offset_freq_from_px(evt.pageX));
+        }
     }
 
 }
@@ -462,13 +475,18 @@ function frequency_container_mousemove(evt) {
 }
 
 function scale_canvas_end_drag(x) {
+    var i = 0;
     scale_canvas.style.cursor = "default";
     scale_canvas_drag_params.drag = false;
     scale_canvas_drag_params.mouse_down = false;
     var event_handled = false;
     var demodulators = getDemodulators();
-    for (var i = 0; i < demodulators.length; i++) event_handled |= demodulators[i].envelope.drag_end();
-    if (!event_handled) demodulators[0].set_offset_frequency(scale_offset_freq_from_px(x));
+    for (i = 0; i < demodulators.length; i++){
+        event_handled |= demodulators[i].envelope.drag_end();
+    }
+    if (!event_handled){
+        demodulators[0].set_offset_frequency(scale_offset_freq_from_px(x));
+    }
 }
 
 function scale_canvas_mouseup(evt) {
@@ -480,7 +498,9 @@ function scale_px_from_freq(f, range) {
 }
 
 function get_visible_freq_range() {
-    if (!bandwidth) return false;
+    if (!bandwidth){
+        return false;
+    }
     var fcalc = function (x) {
         var canvasWidth = waterfallWidth() * zoom_levels[zoom_level];
         return Math.round(((-zoom_offset_px + x) / canvasWidth) * bandwidth) + (center_freq - bandwidth / 2);
@@ -567,10 +587,12 @@ function get_scale_mark_spacing(range) {
     var out = {};
     var fcalc = function (freq) {
         out.numlarge = (range.bw / freq);
-        out.large = waterfallWidth() / out.numlarge; 	//distance between large markers (these have text)
-        out.ratio = 5; 														//(ratio-1) small markers exist per large marker
-        out.small = out.large / out.ratio; 								//distance between small markers
-        if (out.small < scale_min_space_bw_small_markers) return false;
+        out.large = waterfallWidth() / out.numlarge; //distance between large markers (these have text)
+        out.ratio = 5; //(ratio-1) small markers exist per large marker
+        out.small = out.large / out.ratio; //distance between small markers
+        if (out.small < scale_min_space_bw_small_markers){
+            return false;
+        }
         if (out.small / 2 >= scale_min_space_bw_small_markers && freq.toString()[0] !== "5") {
             out.small /= 2;
             out.ratio *= 2;
@@ -578,12 +600,16 @@ function get_scale_mark_spacing(range) {
         out.smallbw = freq / out.ratio;
         return true;
     };
-    for (var i = scale_markers_levels.length - 1; i >= 0; i--) {
+    for (i = scale_markers_levels.length - 1; i >= 0; i--) {
         var mp = scale_markers_levels[i];
-        if (!fcalc(mp.large_marker_per_hz)) continue;
+        if (!fcalc(mp.large_marker_per_hz)){
+            continue;
+        }
         //console.log(mp.large_marker_per_hz);
         //console.log(out);
-        if (out.large - mp.estimated_text_width > scale_min_space_bw_texts) break;
+        if (out.large - mp.estimated_text_width > scale_min_space_bw_texts){
+            break;
+        }
     }
     out.params = mp;
     return out;
@@ -594,7 +620,9 @@ var range;
 function mkscale() {
     //clear the lower part of the canvas (where frequency scale resides; the upper part is used by filter envelopes):
     range = get_visible_freq_range();
-    if (!range) return;
+    if (!range){
+        return;
+    }
     mkenvelopes(range); //when scale changes we will always have to redraw filter envelopes, too
     scale_ctx.clearRect(0, 22, scale_ctx.canvas.width, scale_ctx.canvas.height - 22);
     scale_ctx.strokeStyle = "#fff";
@@ -615,7 +643,9 @@ function mkscale() {
         scale_ctx.beginPath();
         scale_ctx.moveTo(x, 22);
         if (marker_hz % spacing.params.large_marker_per_hz === 0) {  //large marker
-            if (typeof first_large === "undefined") var first_large = marker_hz;
+            if (typeof first_large === "undefined"){
+                var first_large = marker_hz;
+            }
             last_large = marker_hz;
             scale_ctx.lineWidth = 3.5;
             scale_ctx.lineTo(x, 22 + 11);
@@ -628,16 +658,16 @@ function mkscale() {
                     scale_ctx.textAlign = "left";
                     scale_ctx.fillText(text_to_draw, 0, text_h_pos);
                 }
-            }
-            else if (zoom_level === 0 && (range.end - spacing.smallbw * spacing.ratio < marker_hz) && (x > window.innerWidth - text_measured.width / 2)) { //     if this is the last overall marker when zoomed out...                 and if it would be clipped off the screen...
+            } else if (zoom_level === 0 && (range.end - spacing.smallbw * spacing.ratio < marker_hz) && (x > window.innerWidth - text_measured.width / 2)) { //     if this is the last overall marker when zoomed out...                 and if it would be clipped off the screen...
                 if (window.innerWidth - text_measured.width - scale_px_from_freq(marker_hz - spacing.smallbw * spacing.ratio, range) >= scale_min_space_bw_texts) { //and if we have enough space to draw it correctly without clipping
                     scale_ctx.textAlign = "right";
                     scale_ctx.fillText(text_to_draw, window.innerWidth, text_h_pos);
                 }
+            } 
+            else{
+                scale_ctx.fillText(text_to_draw, x, text_h_pos); //draw text normally
             }
-            else scale_ctx.fillText(text_to_draw, x, text_h_pos); //draw text normally
-        }
-        else {  //small marker
+        } else {  //small marker
             scale_ctx.lineWidth = 2;
             scale_ctx.lineTo(x, 22 + 8);
         }
@@ -651,13 +681,17 @@ function mkscale() {
         x = scale_px_from_freq(f, range);
         ftext(f);
         var w = scale_ctx.measureText(text_to_draw).width;
-        if (x + w / 2 > 0) scale_ctx.fillText(text_to_draw, x, 22 + 10);
+        if (x + w / 2 > 0){
+            scale_ctx.fillText(text_to_draw, x, 22 + 10);
+        }
         // on the right side
         f = last_large + spacing.smallbw * spacing.ratio;
         x = scale_px_from_freq(f, range);
         ftext(f);
         w = scale_ctx.measureText(text_to_draw).width;
-        if (x - w / 2 < window.innerWidth) scale_ctx.fillText(text_to_draw, x, 22 + 10);
+        if (x - w / 2 < window.innerWidth){
+            scale_ctx.fillText(text_to_draw, x, 22 + 10);
+        }
     }
 }
 
@@ -714,7 +748,9 @@ function canvas_mousedown(evt) {
 }
 
 function canvas_mousemove(evt) {
-    if (!waterfall_setup_done) return;
+    if (!waterfall_setup_done){
+        return;
+    }
     var relativeX = get_relative_x(evt);
     if (canvas_mouse_down) {
         if (!canvas_drag && Math.abs(evt.pageX - canvas_drag_start_x) > canvas_drag_min_delta) {
@@ -725,9 +761,9 @@ function canvas_mousemove(evt) {
             var deltaX = canvas_drag_last_x - evt.pageX;
             var dpx = range.hps * deltaX;
             if (
-                !(zoom_center_rel + dpx > (bandwidth / 2 - waterfallWidth() * (1 - zoom_center_where) * range.hps)) &&
-                !(zoom_center_rel + dpx < -bandwidth / 2 + waterfallWidth() * zoom_center_where * range.hps)
-            ) {
+                    !(zoom_center_rel + dpx > (bandwidth / 2 - waterfallWidth() * (1 - zoom_center_where) * range.hps)) &&
+                    !(zoom_center_rel + dpx < -bandwidth / 2 + waterfallWidth() * zoom_center_where * range.hps)
+                    ) {
                 zoom_center_rel += dpx;
             }
             resize_canvases(false);
@@ -746,13 +782,13 @@ function canvas_container_mouseleave() {
 }
 
 function canvas_mouseup(evt) {
-    if (!waterfall_setup_done) return;
-    var relativeX = get_relative_x(evt);
-
+var relativeX = get_relative_x(evt);
+    if (!waterfall_setup_done){
+        return;
+    }
     if (!canvas_drag) {
         $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(canvas_get_freq_offset(relativeX));
-    }
-    else {
+    } else {
         canvas_end_drag();
     }
     canvas_mouse_down = false;
@@ -769,18 +805,23 @@ function zoom_center_where_calc(screenposX) {
 
 function get_relative_x(evt) {
     var relativeX = evt.offsetX || evt.layerX;
-    if ($(evt.target).closest(canvas_container).length) return relativeX;
+    if ($(evt.target).closest(canvas_container).length){
+        return relativeX;
+    }
     // compensate for the frequency scale, since that is not resized by the browser.
-    var relatives = $(evt.target).closest('#openwebrx-frequency-container').map(function(){
+    var relatives = $(evt.target).closest('#openwebrx-frequency-container').map(function () {
         return evt.pageX - this.offsetLeft;
     });
-    if (relatives.length) relativeX = relatives[0];
-
+    if (relatives.length){
+        relativeX = relatives[0];
+    }
     return relativeX - zoom_offset_px;
 }
 
 function canvas_mousewheel(evt) {
-    if (!waterfall_setup_done) return;
+    if (!waterfall_setup_done){
+        return;
+    }
     var relativeX = get_relative_x(evt);
     var dir = (evt.deltaY / Math.abs(evt.deltaY)) > 0;
     zoom_step(dir, relativeX, zoom_center_where_calc(evt.pageX));
@@ -807,18 +848,26 @@ var smeter_level = 0;
 function mkzoomlevels() {
     zoom_levels = [1];
     var maxc = get_zoom_coeff_from_hps(zoom_max_level_hps);
-    if (maxc < 1) return;
+    if (maxc < 1){
+        return;
+    }
     // logarithmic interpolation
     var zoom_ratio = Math.pow(maxc, 1 / zoom_levels_count);
-    for (var i = 1; i < zoom_levels_count; i++)
+    for (i = 1; i < zoom_levels_count; i++){
         zoom_levels.push(Math.pow(zoom_ratio, i));
+    }
 }
 
 function zoom_step(out, where, onscreen) {
-    if ((out && zoom_level === 0) || (!out && zoom_level >= zoom_levels_count - 1)) return;
-    if (out) --zoom_level;
-    else ++zoom_level;
-
+    if ((out && zoom_level === 0) || (!out && zoom_level >= zoom_levels_count - 1)){
+        return;
+    }
+    if (out){
+        --zoom_level;
+    }
+    else{
+        ++zoom_level;
+    }
     zoom_center_rel = canvas_get_freq_offset(where);
     //console.log("zoom_step || zlevel: "+zoom_level.toString()+" zlevel_val: "+zoom_levels[zoom_level].toString()+" zoom_center_rel: "+zoom_center_rel.toString());
     zoom_center_where = onscreen;
@@ -829,7 +878,9 @@ function zoom_step(out, where, onscreen) {
 }
 
 function zoom_set(level) {
-    if (!(level >= 0 && level <= zoom_levels.length - 1)) return;
+    if (!(level >= 0 && level <= zoom_levels.length - 1)){
+        return;
+    }
     level = parseInt(level);
     zoom_level = level;
     //zoom_center_rel=canvas_get_freq_offset(-canvases[0].offsetLeft+waterfallWidth()/2); //zoom to screen center instead of demod envelope
@@ -844,14 +895,17 @@ function zoom_calc() {
     var winsize = waterfallWidth();
     var canvases_new_width = winsize * zoom_levels[zoom_level];
     zoom_offset_px = -((canvases_new_width * (0.5 + zoom_center_rel / bandwidth)) - (winsize * zoom_center_where));
-    if (zoom_offset_px > 0) zoom_offset_px = 0;
-    if (zoom_offset_px < winsize - canvases_new_width)
+    if (zoom_offset_px > 0){
+        zoom_offset_px = 0;
+    }
+    if (zoom_offset_px < winsize - canvases_new_width){
         zoom_offset_px = winsize - canvases_new_width;
+    }
 }
 
 var networkSpeedMeasurement;
 var currentprofile = {
-    toString: function() {
+    toString: function () {
         return this['sdr_id'] + '|' + this['profile_id'];
     }
 };
@@ -865,11 +919,11 @@ function on_ws_recv(evt) {
 
         if (evt.data.substr(0, 16) === "CLIENT DE SERVER") {
             params = Object.fromEntries(
-                evt.data.slice(17).split(' ').map(function(param) {
-                    var args = param.split('=');
-                    return [args[0], args.slice(1).join('=')]
-                })
-            );
+                    evt.data.slice(17).split(' ').map(function (param) {
+                var args = param.split('=');
+                return [args[0], args.slice(1).join('=')];
+            })
+                    );
             var versionInfo = 'Unknown server';
             if (params.server && params.server === 'openwebrx' && params.version) {
                 versionInfo = 'OpenWebRX version: ' + params.version;
@@ -881,30 +935,36 @@ function on_ws_recv(evt) {
                 switch (json.type) {
                     case "config":
                         var config = json['value'];
-                        if ('waterfall_colors' in config)
+                        if ('waterfall_colors' in config){
                             waterfall_colors = buildWaterfallColors(config['waterfall_colors']);
+                        }
                         if ('waterfall_levels' in config) {
                             waterfall_min_level_default = config['waterfall_levels']['min'];
                             waterfall_max_level_default = config['waterfall_levels']['max'];
                         }
-                        if ('waterfall_auto_levels' in config)
+                        if ('waterfall_auto_levels' in config){
                             waterfall_auto_levels = config['waterfall_auto_levels'];
-                        if ('waterfall_auto_min_range' in config)
+                        }
+                        if ('waterfall_auto_min_range' in config){
                             waterfall_auto_min_range = config['waterfall_auto_min_range'];
-                        waterfallColorsDefault();
-
+                        }
+                            waterfallColorsDefault();
                         var initial_demodulator_params = {};
-                        if ('start_mod' in config)
+                        if ('start_mod' in config){
                             initial_demodulator_params['mod'] = config['start_mod'];
-                        if ('start_offset_freq' in config)
+                        }
+                        if ('start_offset_freq' in config){
                             initial_demodulator_params['offset_frequency'] = config['start_offset_freq'];
-                        if ('initial_squelch_level' in config)
+                        }
+                        if ('initial_squelch_level' in config){
                             initial_demodulator_params['squelch_level'] = Number.isInteger(config['initial_squelch_level']) ? config['initial_squelch_level'] : -150;
-
-                        if ('samp_rate' in config)
+                        }
+                        if ('samp_rate' in config){
                             bandwidth = config['samp_rate'];
-                        if ('center_freq' in config)
+                        }
+                        if ('center_freq' in config){
                             center_freq = config['center_freq'];
+                        }
                         if ('fft_size' in config) {
                             fft_size = config['fft_size'];
                             waterfall_clear();
@@ -918,16 +978,17 @@ function on_ws_recv(evt) {
                             fft_compression = config['fft_compression'];
                             divlog("FFT stream is " + ((fft_compression === "adpcm") ? "compressed" : "uncompressed") + ".");
                         }
-                        if ('max_clients' in config)
+                        if ('max_clients' in config){
                             $('#openwebrx-bar-clients').progressbar().setMaxClients(config['max_clients']);
-
+                        }
                         waterfall_init();
 
-                        var demodulatorPanel = $('#openwebrx-panel-receiver').demodulatorPanel();
+                                var demodulatorPanel = $('#openwebrx-panel-receiver').demodulatorPanel();
                         demodulatorPanel.setCenterFrequency(center_freq);
                         demodulatorPanel.setInitialParams(initial_demodulator_params);
-                        if ('squelch_auto_margin' in config)
+                        if ('squelch_auto_margin' in config){
                             demodulatorPanel.setSquelchMargin(config['squelch_auto_margin']);
+                        }
                         bookmarks.loadLocalBookmarks();
 
                         if ('sdr_id' in config || 'profile_id' in config) {
@@ -938,16 +999,18 @@ function on_ws_recv(evt) {
                             waterfall_clear();
                         }
 
-                        if ('tuning_precision' in config)
+                        if ('tuning_precision' in config){
                             $('#openwebrx-panel-receiver').demodulatorPanel().setTuningPrecision(config['tuning_precision']);
-
+                        }
                         break;
                     case "secondary_config":
                         var s = json['value'];
                         secondary_fft_size = s['secondary_fft_size'] || secondary_fft_size;
                         secondary_bw = s['secondary_bw'] || secondary_bw;
                         if_samp_rate = s['if_samp_rate'] || if_samp_rate;
-                        if (if_samp_rate) secondary_demod_init_canvases();
+                        if (if_samp_rate){
+                            secondary_demod_init_canvases();
+                        }
                         break;
                     case "receiver_details":
                         $('.webrx-top-container').header().setDetails(json['value']);
@@ -979,7 +1042,7 @@ function on_ws_recv(evt) {
                         Modes.setFeatures(json['value']);
                         break;
                     case "metadata":
-                        $('.openwebrx-meta-panel').metaPanel().each(function(){
+                        $('.openwebrx-meta-panel').metaPanel().each(function () {
                             this.update(json['value']);
                         });
                         break;
@@ -1014,8 +1077,10 @@ function on_ws_recv(evt) {
                             $('#openwebrx-panel-pocsag-message').pocsagMessagePanel(),
                             $("#openwebrx-panel-js8-message").js8()
                         ];
-                        if (!panels.some(function(panel) {
-                            if (!panel.supportsMessage(value)) return false;
+                        if (!panels.some(function (panel) {
+                            if (!panel.supportsMessage(value)){
+                                return false;
+                            }
                             panel.pushMessage(value);
                             return true;
                         })) {
@@ -1041,7 +1106,7 @@ function on_ws_recv(evt) {
                 }
             } catch (e) {
                 // don't lose exception
-                console.error(e)
+                console.error(e);
             }
         }
     } else if (evt.data instanceof ArrayBuffer) {
@@ -1065,7 +1130,9 @@ function on_ws_recv(evt) {
 
                     waterfall_i16 = fft_codec.decode(new Uint8Array(data));
                     waterfall_f32 = new Float32Array(waterfall_i16.length - COMPRESS_FFT_PAD_N);
-                    for (i = 0; i < waterfall_i16.length; i++) waterfall_f32[i] = waterfall_i16[i + COMPRESS_FFT_PAD_N] / 100;
+                    for (i = 0; i < waterfall_i16.length; i++){
+                        waterfall_f32[i] = waterfall_i16[i + COMPRESS_FFT_PAD_N] / 100;
+                    }
                     waterfall_add(waterfall_f32);
                 }
                 break;
@@ -1082,7 +1149,9 @@ function on_ws_recv(evt) {
 
                     waterfall_i16 = fft_codec.decode(new Uint8Array(data));
                     waterfall_f32 = new Float32Array(waterfall_i16.length - COMPRESS_FFT_PAD_N);
-                    for (i = 0; i < waterfall_i16.length; i++) waterfall_f32[i] = waterfall_i16[i + COMPRESS_FFT_PAD_N] / 100;
+                    for (i = 0; i < waterfall_i16.length; i++){
+                        waterfall_f32[i] = waterfall_i16[i + COMPRESS_FFT_PAD_N] / 100;
+                    }
                     secondary_demod_waterfall_add(waterfall_f32);
                 }
                 break;
@@ -1091,7 +1160,7 @@ function on_ws_recv(evt) {
                 audioEngine.pushHdAudio(data);
                 break;
             default:
-                console.warn('unknown type of binary message: ' + type)
+                console.warn('unknown type of binary message: ' + type);
         }
     }
 }
@@ -1101,7 +1170,7 @@ var waterfall_measure_minmax_continuous = false;
 
 function waterfall_measure_minmax_do(what) {
     // this is based on an oversampling factor of about 1,25
-    var ignored = .1 * what.length;
+    var ignored = 0.1 * what.length;
     var data = what.slice(ignored, -ignored);
     return {
         min: Math.min.apply(Math, data),
@@ -1115,7 +1184,7 @@ function on_ws_opened() {
     divlog("WebSocket opened to " + ws.url);
     if (!networkSpeedMeasurement) {
         networkSpeedMeasurement = new Measurement();
-        networkSpeedMeasurement.report(60000, 1000, function(rate){
+        networkSpeedMeasurement.report(60000, 1000, function (rate) {
             $('#openwebrx-bar-network-speed').progressbar().setSpeed(rate);
         });
     } else {
@@ -1152,8 +1221,8 @@ var mute = false;
 // Optimalise these if audio lags or is choppy:
 var audio_buffer_maximal_length_sec = 1; //actual number of samples are calculated from sample rate
 
-function onAudioStart(apiType){
-    divlog('Web Audio API succesfully initialized, using ' + apiType  + ' API, sample rate: ' + audioEngine.getSampleRate() + " Hz");
+function onAudioStart(apiType) {
+    divlog('Web Audio API succesfully initialized, using ' + apiType + ' API, sample rate: ' + audioEngine.getSampleRate() + " Hz");
 
     hideOverlay();
 
@@ -1164,7 +1233,7 @@ function onAudioStart(apiType){
     window.setTimeout(function () {
         toggle_panel("openwebrx-panel-log", !!was_error);
     }, 2000);
-	
+
 //eroyee added to hide status panel on start
     window.setTimeout(function () {
         toggle_panel("openwebrx-panel-status", !!was_error);
@@ -1213,8 +1282,9 @@ function open_websocket() {
     }
     var ws_url = href + "ws/";
 
-    if (!("WebSocket" in window))
+    if (!("WebSocket" in window)){
         divlog("Your browser does not support WebSocket, which is required for WebRX to run. Please upgrade to a HTML5 compatible browser.");
+    }
     ws = new WebSocket(ws_url);
     ws.onopen = on_ws_opened;
     ws.onmessage = on_ws_recv;
@@ -1228,12 +1298,12 @@ function open_websocket() {
     ws.onerror = on_ws_error;
 }
 
-// --------------------------------------------------------------------------------------------
-// eroyee; create an array to take percent raw data as inputted to waterfall_mkcolour function
-// This is for eventual use by the spectrum display, it gives data adjusted by waterfall levels
-// but prior to colourmap interpretation.
-const spec_data_in =[];
-// --------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+// eroyee; create an array to take percent raw data as inputted to 
+// waterfall_mkcolour function. For eventual use by the spectrum display, it 
+// gives data adjusted by waterfall levels but prior to colourmap interpretation.
+const spec_data_in = [];
+// -----------------------------------------------------------------------------
 function waterfall_mkcolor(db_value, waterfall_colors_arg) {
     waterfall_colors_arg = waterfall_colors_arg || waterfall_colors;
     var value_percent = (db_value - waterfall_min_level) / (waterfall_max_level - waterfall_min_level);
@@ -1242,8 +1312,11 @@ function waterfall_mkcolor(db_value, waterfall_colors_arg) {
     spec_data_in.push(value_percent); // insert value_percent into array
     var index = Math.floor(scaled);
     var remain = scaled - index;
-    if (remain === 0) return waterfall_colors_arg[index];
-    return color_between(waterfall_colors_arg[index], waterfall_colors_arg[index + 1], remain);}
+    if (remain === 0){
+        return waterfall_colors_arg[index];
+    }
+    return color_between(waterfall_colors_arg[index], waterfall_colors_arg[index + 1], remain);
+}
 
 function color_between(first, second, percent) {
     return [
@@ -1272,7 +1345,9 @@ function add_canvas() {
     canvases.push(new_canvas);
     while (canvas_container && canvas_container.clientHeight + canvas_default_height * 2 < canvases.length * canvas_default_height) {
         var c = canvases.shift();
-        if (!c) break;
+        if (!c){
+            break;
+        }
         canvas_container.removeChild(c);
     }
 }
@@ -1299,14 +1374,18 @@ function shift_canvases() {
 }
 
 function resize_canvases(zoom) {
-    if (typeof zoom === "undefined") zoom = false;
-    if (!zoom) mkzoomlevels();
+    if (typeof zoom === "undefined"){
+        zoom = false;
+    }
+    if (!zoom){
+        mkzoomlevels();
+    }
     zoom_calc();
     $('#webrx-canvas-container').css({
         width: waterfallWidth() * zoom_levels[zoom_level] + 'px',
         left: zoom_offset_px + "px"
     });
-	// eroyee; add the spectrum canvas here so it can be 'natively' 'resized, rather than using observe
+    // eroyee; add the spectrum canvas here so it can be 'natively' 'resized, rather than using observe
     $('#freq-canvas-spectrum').css({
         width: waterfallWidth() * zoom_levels[zoom_level] + 'px',
         left: zoom_offset_px + "px"
@@ -1323,70 +1402,78 @@ function waterfall_init() {
 
 // ------------ eroyee add for start/stop spectrum display -------------- //
 
-var spec_start=false;
+var spec_start = false;
 const spec_window_h = 130; // sets height of spectrum display
-const spec_out_data = []; 
-function display_spectra ()
-{ 
+const spec_out_data = [];
+function display_spectra()
+{
     if (!spec_start) {
         var divFreqSpectrum = '<div id="freq-div-spectrum">'
-                        + '<canvas id="freq-canvas-spectrum" width="'+(fft_size)+'" height="'+(spec_window_h)+'" style="width:100%;height:'+(spec_window_h)+'px;left:0px;position:absolute;bottom:0px;">' 
-                        + '</div>';
+                + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
+                + '</div>';
 //eroyee; below to drop down spectrum container
-        document.getElementById('spectrum_container').style.height = (spec_window_h)+"px";
+        document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
         document.getElementById('spectrum_container').style.opacity = "1";
         var div = document.querySelector(".openwebrx-spectrum-container");
         div.insertAdjacentHTML('beforeEnd', divFreqSpectrum);
 // eroyee; ensure new spectrum canvas is set with the same position and zoom level as the waterfall canvas
-        document.querySelector("#freq-canvas-spectrum").style.left  = document.querySelector("#webrx-canvas-container").style.left
-        document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width 
+        document.querySelector("#freq-canvas-spectrum").style.left = document.querySelector("#webrx-canvas-container").style.left;
+        document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width;
 // eroyee; initialise the spectrum and peak data arrays
-	for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // initialise the peak data array with 0's
-        for (let i=0; i< (fft_size); ++i) spec_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
-	spec_start=true;	  
-    }
-    else {
-    if (spec_start) {
-	spec_start=false;
-        document.getElementById('spectrum_container').style.height = "0px";
-        document.getElementById('spectrum_container').style.opacity = "0";
-        const flush = document.querySelector("#freq-canvas-spectrum");
-        flush.parentNode.removeChild(flush);
-        spec_start=false;
-        return;
+        for (i = 0; i < (fft_size); ++i){
+            spec_peak_data[i] = 0; // initialise the peak data array with 0's
+        }
+        for (i = 0; i < (fft_size); ++i){
+            spec_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
+        }
+        spec_start = true;
+    } else {
+        if (spec_start) {
+            spec_start = false;
+            document.getElementById('spectrum_container').style.height = "0px";
+            document.getElementById('spectrum_container').style.opacity = "0";
+            const flush = document.querySelector("#freq-canvas-spectrum");
+            flush.parentNode.removeChild(flush);
+            spec_start = false;
+            return;
         }
     }
 }
 
-// ------- eroyee for starting peak hold display ------------------
+// ----------------- eroyee for starting peak hold display ---------------------
 
-const spec_peak_data = []; 
-var peak_start=false;
+const spec_peak_data = [];
+var peak_start = false;
 function peak_spectra_hold()
-{ 
+{
     if (!spec_start) {
         peak_start = false;
         return;
-        }
+    }
     if (!peak_start) {
-	    peak_start=true;
-        for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // initialise the peak data array with 0's
+        peak_start = true;
+        for (i = 0; i < (fft_size); ++i){
+            spec_peak_data[i] = 0; // initialise the peak data array with 0's
         }
+    }
     else if (peak_start) {
-	    peak_start=false;
-        for (let i=0; i< (fft_size); ++i) spec_peak_data[i] = 0; // clear the peak data array with 0's
-        return;
+        peak_start = false;
+        for (i = 0; i < (fft_size); ++i){
+            spec_peak_data[i] = 0; // clear the peak data array with 0's
         }
+    return;
+    }
 }
 
 
 
-// ----- eroyee additions to waterfall_add function for spectrum display ----- //
+// ---- eroyee additions to waterfall_add function for spectrum display ----- //
 
 function waterfall_add(data) {
-    if (!waterfall_setup_done) return;
-    var w = fft_size;
-
+var w = fft_size;
+    if (!waterfall_setup_done){
+        return;
+    }
     if (waterfall_measure_minmax_now) {
         var levels = waterfall_measure_minmax_do(data);
         waterfall_measure_minmax_now = false;
@@ -1400,108 +1487,108 @@ function waterfall_add(data) {
     }
 
     // create new canvas if the current one is full (or there isn't one)
-    if (canvas_actual_line <= 0) add_canvas();
-
+    if (canvas_actual_line <= 0){
+        add_canvas();
+        }
     //Add line to waterfall image
     var oneline_image = canvas_context.createImageData(w, 1);
-    for (var x = 0; x < w; x++) {
+    for (x = 0; x < w; x++) {
         var color = waterfall_mkcolor(data[x]);
-        for (i = 0; i < 3; i++) oneline_image.data[x * 4 + i] = color[i];
+        for (i = 0; i < 3; i++){
+            oneline_image.data[x * 4 + i] = color[i];
+        }
         oneline_image.data[x * 4 + 3] = 255;
     }
     //Draw image
     canvas_context.putImageData(oneline_image, 0, --canvas_actual_line);
     shift_canvases();
 
-// eroyee ------------------------------------------------------------------------------------------------SPECTRUM
+// eroyee --------------------------------------------------------------SPECTRUM
     if (spec_start) {
         var freqSpectrumCtx;
-        var freqSpectrumGradient; 
+        var freqSpectrumGradient;
 // console.log (spec_start);
         freqSpectrumCtx = document.querySelector("#freq-canvas-spectrum").getContext('2d');
-        freqSpectrumCtx.width  = (fft_size);
-        freqSpectrumCtx.height = (spec_window_h)-1; // one less than canvas height
+        freqSpectrumCtx.width = (fft_size);
+        freqSpectrumCtx.height = (spec_window_h) - 1; // one less than canvas height
         freqSpectrumGradient = freqSpectrumCtx.createLinearGradient(0, 0, 0, freqSpectrumCtx.height);
         freqSpectrumGradient.addColorStop(0.00, 'red'); // probably should align these colours with the waterfall...
-	freqSpectrumGradient.addColorStop(0.50, 'yellow');
+        freqSpectrumGradient.addColorStop(0.50, 'yellow');
         freqSpectrumGradient.addColorStop(1.00, 'blue');
-   if (spec_data_in.length = (freqSpectrumCtx.width)) {
+//        if (spec_data_in.length = (freqSpectrumCtx.width)) {
         var y = 1;
 // eroyee; spectrum height in pixels / dB range between wfmax & wfmin gives num pixels to draw first & subsequent reticule lines 10dB apart
 // eg. If spec is 128px high, wft max is -19, wf min is -69 (ie.range is 50dB), then 128/(50/10) = 25.6 pixels to the first 10dB line
 // Should probably round the outcome but that may use more CPU...
-        const d = (freqSpectrumCtx.height/((Math.abs(waterfall_min_level - waterfall_max_level))/10)); 
+        const d = (freqSpectrumCtx.height / ((Math.abs(waterfall_min_level - waterfall_max_level)) / 10));
         freqSpectrumCtx.fillStyle = "#000";
         freqSpectrumCtx.fillRect(0, 0, freqSpectrumCtx.width, freqSpectrumCtx.height);
-        freqSpectrumCtx.fillStyle = freqSpectrumGradient;  
+        freqSpectrumCtx.fillStyle = freqSpectrumGradient;
         const k = 0.6; // value to set filter rise/fall time, lower is slower
-        var iir = 0; // use for iir filter
-        for (var i = 0; i < spec_data_in.length; i += 1) {
-// ----------------- Filter types ----------------- //
-
-// --------------------- EMA ---------------------- //
-// eroyee; we are ultimately dealing with inputs of percent_value, a number between 0 and 1, need to work with 
-// these numbers for *both* input and output data for the ema filter to work correctly ()and multiply the output 
-// to fit the canvas later on).The alternative is to first multiply the input value to canvas height and go from 
-// there. I think this is better as it makes it a little easier to understand and possibly reduces the variable
-// count slightly. Either will work.
+        for (i = 0; i < spec_data_in.length; i += 1) {
+// ----------------------------- Filter types ------------------------------- //
+// Other filter types, is it worth the hassle? Tried IIR and not that much 
+// different from EMA....
+// --------------------- EMA ------------------------------------------------ //
+// eroyee; we are ultimately dealing with inputs of percent_value, a number 
+// between 0 and 1, need to work with these numbers for *both* input and output 
+// data for the ema filter to work correctly ()and multiply the output to fit 
+// the canvas later on).The alternative is to first multiply the input value to
+//  canvas height and go from there. I think this is better as it makes it a 
+//  little easier to understand and possibly reduces the variable count slightly. 
+//  Either should work.
 //      var ema = ((spec_data_in[i]) * k) + (spec_out_data[i] * (1-k)); // use if utilising raw value_percent input
-        var ema = (((spec_data_in[i])* freqSpectrumCtx.height) * k) + (spec_out_data[i] * (1-k)); // multiply raw by canvas height
-        if (ema < 0) ema = 0;
+            var ema = (((spec_data_in[i]) * freqSpectrumCtx.height) * k) + (spec_out_data[i] * (1 - k)); // multiply raw by canvas height
+            if (ema < 0){
+                ema = 0;
+            }
 //        if (ema > 1) ema = 1; // needed if using raw value_percent input
-        if (ema > freqSpectrumCtx.height) ema = freqSpectrumCtx.height;
-        spec_out_data[i] = ema;
+                if (ema > freqSpectrumCtx.height){
+                ema = freqSpectrumCtx.height;
+            }
+                spec_out_data[i] = ema;
 //        spec_out_data[i] = ema * ((freqSpectrumCtx.height)-1);
-// ------------------------------------------------ //
-
-// ---- IIR (from https://github.com/jks-prv/) ---- //
-//
-//         var iir_gain = 1 - Math.exp(-k * spec_out_data[i]/freqSpectrumCtx.height); // iir gain nominally set to 1
-//         if (iir_gain <= 0.01) iir_gain = 0.01;    // enforce minimum decay rate
-//         var z1 = (spec_data_in[i] * freqSpectrumCtx.height);
-//         z1 = z1 + iir_gain * (spec_out_data[i] - z1);
-//         if (z1 < 0) z1 = 0;
-//         if (z1 > freqSpectrumCtx.height) z1 = freqSpectrumCtx.height; 
-//         spec_data_in[i] = z1;
-//         spec_out_data[i] = Math.round(spec_data_in[i]);
-// ----------------------------------------------- //
-        } 
-
-// Draw spectrum
-        for (var i = 0; i < freqSpectrumCtx.width; i++) {
-//            var temp_h = spec_out_data[i] * (freqSpectrumCtx.height -1); // needed if using raw value_percent input	
-	    y = y+d; // reticule lines
-	    freqSpectrumCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
-//----------------------- reticule -----------------------------------------------------------
-	    freqSpectrumCtx.fillRect(0, y, freqSpectrumCtx.width, 0.5);  // draw lines
+            }
+// -------------------------------------------------------------------------- //
+// 
+// -------------------------- Draw spectrum --------------------------------- //
+        for (i = 0; i < freqSpectrumCtx.width; i++) {
+//        var temp_h = spec_out_data[i] * (freqSpectrumCtx.height -1); // needed if using raw value_percent input	
+            y = y + d; // reticule lines
+            freqSpectrumCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
+//---------------------------- reticule ----------------------------------------
+            freqSpectrumCtx.fillRect(0, y, freqSpectrumCtx.width, 0.5);  // draw lines
             freqSpectrumCtx.fillStyle = freqSpectrumGradient; // remove if colour coded lines req'd
-//--------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 //	    freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -temp_h);  // draw spectra // needed if using raw value_percent input
-	    freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -spec_out_data[i]);  // draw spectra
+            freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -spec_out_data[i]);  // draw spectra
+        }
+// eroyee --------------------------------------------------------------SPECTRUM
+// eroyee ------------------------------------------------------------ PEAK HOLD
+// This draws a fine spectra line from the peak of the current data. It 
+// maintains an array of peak data that is checked against the current data 
+// output (from spec_out_data) on each cycle. If there are any data points in
+// spec_out_data greater than the corresponding data in the spec_peak_data array 
+// it will update spec_peak_data, which is then drawn out by a standard routine. 
+// Starting and stopping is actioned via the peak_spectra_hold function.
+    if (peak_start) {
+        freqSpectrumCtx.lineWidth = 1;
+        freqSpectrumCtx.strokeStyle = 'green';
+        freqSpectrumCtx.beginPath();
+        freqSpectrumCtx.moveTo(0, y);
+        for (i = 0; i < freqSpectrumCtx.width; i++) {
+            if (spec_out_data[i] > spec_peak_data[i]){
+                spec_peak_data[i] = spec_out_data[i];
             }
-// eroyee ------------------------------------------------------------------------------------------------SPECTRUM
-// eroyee ---------------------------------------------------------------------------------------------- PEAK HOLD
-// This draws a fine spectra line from the peak of the current data. It maintains an array of peak data that is 
-// checked against the current data output (from spec_out_data) on each cycle. If there are any data points in
-// spec_out_data greater than the corresponding data in the spec_peak_data array it will update spec_peak_data,
-// which is then drawn out by a standard routine. Starting and stopping is actioned via the peak_spectra_hold function.
-        if (peak_start){
-            freqSpectrumCtx.lineWidth = 1;
-            freqSpectrumCtx.strokeStyle = 'green';
-            freqSpectrumCtx.beginPath();
-            freqSpectrumCtx.moveTo(0,y);
-            for (var i = 0; i < freqSpectrumCtx.width; i++) {
-                if (spec_out_data[i] > spec_peak_data[i]) spec_peak_data[i] = spec_out_data[i];
-                y = ((1 - spec_peak_data[i]/freqSpectrumCtx.height) * freqSpectrumCtx.height) - 1;
+            y = ((1 - spec_peak_data[i] / freqSpectrumCtx.height) * freqSpectrumCtx.height) - 1;
 //                y = (1- spec_peak_data[i]/1) * ((freqSpectrumCtx.height) - 1); // needed if using raw value_percent input
-                freqSpectrumCtx.lineTo(i,y);
-                }
-            freqSpectrumCtx.stroke();
+            freqSpectrumCtx.lineTo(i, y);
             }
-        spec_data_in.length=0;
-	    }
+            freqSpectrumCtx.stroke();
+        }
+            spec_data_in.length = 0;    
     }
-// eroyee ---------------------------------------------------------------------------------------------- PEAK HOLD
+// eroyee ------------------------------------------------------------ PEAK HOLD
 }
 
 function waterfall_clear() {
@@ -1519,24 +1606,24 @@ function openwebrx_resize() {
 }
 
 function initProgressBars() {
-    $(".openwebrx-progressbar").each(function(){
+    $(".openwebrx-progressbar").each(function () {
         var bar = $(this).progressbar();
         if ('setSampleRate' in bar) {
             bar.setSampleRate(audioEngine.getSampleRate());
         }
-    })
+    });
 }
 
 function audioReporter(stats) {
-    if (typeof(stats.buffersize) !== 'undefined') {
-         $('#openwebrx-bar-audio-buffer').progressbar().setBuffersize(stats.buffersize);
+    if (typeof (stats.buffersize) !== 'undefined') {
+        $('#openwebrx-bar-audio-buffer').progressbar().setBuffersize(stats.buffersize);
     }
 
-    if (typeof(stats.audioByteRate) !== 'undefined') {
+    if (typeof (stats.audioByteRate) !== 'undefined') {
         $('#openwebrx-bar-audio-speed').progressbar().setSpeed(stats.audioByteRate * 8);
     }
 
-    if (typeof(stats.audioRate) !== 'undefined') {
+    if (typeof (stats.audioRate) !== 'undefined') {
         $('#openwebrx-bar-audio-output').progressbar().setAudioRate(stats.audioRate);
     }
 }
@@ -1547,7 +1634,7 @@ var audioEngine;
 function openwebrx_init() {
     audioEngine = new AudioEngine(audio_buffer_maximal_length_sec, audioReporter);
     var $overlay = $('#openwebrx-autoplay-overlay');
-    $overlay.on('click', function(){
+    $overlay.on('click', function () {
         audioEngine.resume();
     });
     audioEngine.onStart(onAudioStart);
@@ -1565,15 +1652,17 @@ function openwebrx_init() {
     window.addEventListener("resize", openwebrx_resize);
     bookmarks = new BookmarkBar();
     initSliders();
-/* eroyee add for keyboard tuning 28 Dec 20 --------------------- */    
-	init_key_listener();
-/* -------------------------------------------------------------- */
+    /* ----- --eroyee add for keyboard tuning 28 Dec 20 --------------------- */
+    init_key_listener();
+    /* ---------------------------------------------------------------------- */
 }
 
 function initSliders() {
-    $('#openwebrx-panel-receiver').on('wheel', 'input[type=range]', function(ev){
+    $('#openwebrx-panel-receiver').on('wheel', 'input[type=range]', function (ev) {
         var $slider = $(this);
-        if (!$slider.attr('step')) return;
+        if (!$slider.attr('step')){
+            return;
+        }
         var val = Number($slider.val());
         var step = Number($slider.attr('step'));
         if (ev.originalEvent.deltaY > 0) {
@@ -1584,9 +1673,9 @@ function initSliders() {
     });
 
     var waterfallAutoButton = $('#openwebrx-waterfall-colors-auto');
-    waterfallAutoButton.on('click', function() {
-        waterfall_measure_minmax_now=true;
-    }).on('contextmenu', function(){
+    waterfallAutoButton.on('click', function () {
+        waterfall_measure_minmax_now = true;
+    }).on('contextmenu', function () {
         waterfall_measure_minmax_continuous = !waterfall_measure_minmax_continuous;
         waterfallColorsContinuousReset();
         waterfallAutoButton[waterfall_measure_minmax_continuous ? 'addClass' : 'removeClass']('highlighted');
@@ -1601,8 +1690,8 @@ function digimodes_init() {
     $('.openwebrx-dmr-timeslot-panel').click(function (e) {
         $(e.currentTarget).toggleClass("muted");
         update_dmr_timeslot_filtering();
-    // don't mute when the location icon is clicked
-    }).find('.location').click(function(e) {
+        // don't mute when the location icon is clicked
+    }).find('.location').click(function (e) {
         e.stopPropagation();
     });
 
@@ -1621,7 +1710,7 @@ function update_dmr_timeslot_filtering() {
 function hideOverlay() {
     var $overlay = $('#openwebrx-autoplay-overlay');
     $overlay.css('opacity', 0);
-    $overlay.on('transitionend', function() {
+    $overlay.on('transitionend', function () {
         $overlay.hide();
     });
 }
@@ -1636,13 +1725,15 @@ var rt = function (s, n) {
 // =======================  PANELS  =======================
 // ========================================================
 
-function panel_displayed(el){
+function panel_displayed(el) {
     return !(el.style && el.style.display && el.style.display === 'none') && !(el.movement && el.movement === 'collapse');
 }
 
 function toggle_panel(what, on) {
     var item = $('#' + what)[0];
-    if (!item) return;
+    if (!item){
+        return;
+    }
     var displayed = panel_displayed(item);
     if (typeof on !== "undefined" && displayed === on) {
         return;
@@ -1654,7 +1745,7 @@ function toggle_panel(what, on) {
     } else {
         item.movement = 'expand';
         item.style.display = null;
-        setTimeout(function(){
+        setTimeout(function () {
             item.style.transitionProperty = 'transform';
             item.style.transform = 'perspective(600px) rotateX(0deg)';
         }, 20);
@@ -1673,9 +1764,11 @@ function first_show_panel(panel) {
         rotx = roty;
         roty = rottemp;
     }
-    if (rotx !== 0 && Math.random() > 0.5) rotx = 270;
+    if (rotx !== 0 && Math.random() > 0.5){
+        rotx = 270;
+    }
     panel.style.transform = "perspective(600px) rotateX(%1deg) rotateY(%2deg)"
-        .replace("%1", rotx.toString()).replace("%2", roty.toString());
+            .replace("%1", rotx.toString()).replace("%2", roty.toString());
     window.setTimeout(function () {
         panel.style.transitionDuration = "600ms";
         panel.style.transitionDelay = (Math.floor(Math.random() * 500)).toString() + "ms";
@@ -1684,11 +1777,13 @@ function first_show_panel(panel) {
 }
 
 function initPanels() {
-    $('#openwebrx-panels-container').find('.openwebrx-panel').each(function(){
+    $('#openwebrx-panels-container').find('.openwebrx-panel').each(function () {
         var el = this;
         el.openwebrxPanelTransparent = (!!el.dataset.panelTransparent);
-        el.addEventListener('transitionend', function(ev){
-            if (ev.target !== el) return;
+        el.addEventListener('transitionend', function (ev) {
+            if (ev.target !== el){
+                return;
+            }
             el.style.transitionDuration = null;
             el.style.transitionDelay = null;
             el.style.transitionProperty = null;
@@ -1697,20 +1792,22 @@ function initPanels() {
             }
             delete el.movement;
         });
-        if (panel_displayed(el)) first_show_panel(el);
+        if (panel_displayed(el)){
+            first_show_panel(el);
+        }
     });
 }
 
 /*
-  _____  _       _                     _
+ _____  _       _                     _
  |  __ \(_)     (_)                   | |
  | |  | |_  __ _ _ _ __ ___   ___   __| | ___  ___
  | |  | | |/ _` | | '_ ` _ \ / _ \ / _` |/ _ \/ __|
  | |__| | | (_| | | | | | | | (_) | (_| |  __/\__ \
  |_____/|_|\__, |_|_| |_| |_|\___/ \__,_|\___||___/
-            __/ |
-           |___/
-*/
+ __/ |
+ |___/
+ */
 
 var secondary_demod_fft_offset_db = 18; //need to calculate that later
 var secondary_demod_canvases_initialized = false;
@@ -1760,7 +1857,7 @@ function secondary_demod_init_canvases() {
 }
 
 function secondary_demod_canvases_update_top() {
-    for (var i = 0; i < 2; i++) {
+    for (i = 0; i < 2; i++) {
         secondary_demod_canvases[i].style.transform = 'translate(0, ' + secondary_demod_canvases[i].openwebrx_top + 'px)';
     }
 }
@@ -1775,11 +1872,11 @@ function secondary_demod_swap_canvases() {
 function secondary_demod_init() {
     secondary_demod_canvas_container = $("#openwebrx-digimode-canvas-container")[0];
     $(secondary_demod_canvas_container)
-        .mousemove(secondary_demod_canvas_container_mousemove)
-        .mouseup(secondary_demod_canvas_container_mouseup)
-        .mousedown(secondary_demod_canvas_container_mousedown)
-        .mouseenter(secondary_demod_canvas_container_mousein)
-        .mouseleave(secondary_demod_canvas_container_mouseleave);
+            .mousemove(secondary_demod_canvas_container_mousemove)
+            .mouseup(secondary_demod_canvas_container_mouseup)
+            .mousedown(secondary_demod_canvas_container_mousedown)
+            .mouseenter(secondary_demod_canvas_container_mousein)
+            .mouseleave(secondary_demod_canvas_container_mouseleave);
     $('#openwebrx-panel-wsjt-message').wsjtMessagePanel();
     $('#openwebrx-panel-packet-message').packetMessagePanel();
     $('#openwebrx-panel-pocsag-message').pocsagMessagePanel();
@@ -1791,12 +1888,21 @@ function secondary_demod_push_data(x) {
         var c = y.charCodeAt(0);
         return (c === 10 || (c >= 32 && c <= 126));
     }).map(function (y) {
-        if (y === "&")
+        if (y === "&"){
             return "&amp;";
-        if (y === "<") return "&lt;";
-        if (y === ">") return "&gt;";
-        if (y === " ") return "&nbsp;";
-        if (y === "\n") return "<br />";
+        }
+        if (y === "<"){
+            return "&lt;";
+        }
+        if (y === ">"){
+            return "&gt;";
+        }
+        if (y === " "){
+            return "&nbsp;";
+        }
+        if (y === "\n"){
+            return "<br />";
+        }
         return y;
     }).join("");
     $("#openwebrx-cursor-blink").before(x);
@@ -1807,9 +1913,11 @@ function secondary_demod_waterfall_add(data) {
 
     //Add line to waterfall image
     var oneline_image = secondary_demod_current_canvas_context.createImageData(w, 1);
-    for (var x = 0; x < w; x++) {
+    for (x = 0; x < w; x++) {
         var color = waterfall_mkcolor(data[x] + secondary_demod_fft_offset_db);
-        for (var i = 0; i < 3; i++) oneline_image.data[x * 4 + i] = color[i];
+        for (i = 0; i < 3; i++){
+            oneline_image.data[x * 4 + i] = color[i];
+        }
         oneline_image.data[x * 4 + 3] = 255;
     }
 
@@ -1818,33 +1926,35 @@ function secondary_demod_waterfall_add(data) {
     secondary_demod_canvases.map(function (x) {
         x.openwebrx_top += 1;
     })
-    ;
+            ;
     secondary_demod_canvases_update_top();
-    if (secondary_demod_current_canvas_actual_line < 0) secondary_demod_swap_canvases();
+    if (secondary_demod_current_canvas_actual_line < 0){
+        secondary_demod_swap_canvases();
+    }
 }
 
 function secondary_demod_update_marker() {
     var width = Math.max((secondary_bw / if_samp_rate) * secondary_demod_canvas_width, 5);
     var center_at = ((secondary_demod_channel_freq - secondary_demod_low_cut) / if_samp_rate) * secondary_demod_canvas_width;
     var left = center_at - width / 2;
-    $("#openwebrx-digimode-select-channel").width(width).css("left", left + "px")
+    $("#openwebrx-digimode-select-channel").width(width).css("left", left + "px");
 }
 
 function secondary_demod_update_channel_freq_from_event(evt) {
     if (typeof evt !== "undefined") {
         var relativeX = (evt.offsetX) ? evt.offsetX : evt.layerX;
         secondary_demod_channel_freq = secondary_demod_low_cut +
-            (relativeX / $(secondary_demod_canvas_container).width()) * (secondary_demod_high_cut - secondary_demod_low_cut);
+                (relativeX / $(secondary_demod_canvas_container).width()) * (secondary_demod_high_cut - secondary_demod_low_cut);
     }
     if (!secondary_demod_waiting_for_set) {
         secondary_demod_waiting_for_set = true;
         window.setTimeout(function () {
-                $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_secondary_offset_freq(Math.floor(secondary_demod_channel_freq));
-                secondary_demod_waiting_for_set = false;
-            },
-            50
-        )
-        ;
+            $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_secondary_offset_freq(Math.floor(secondary_demod_channel_freq));
+            secondary_demod_waiting_for_set = false;
+        },
+                50
+                )
+                ;
     }
     secondary_demod_update_marker();
 }
@@ -1858,21 +1968,29 @@ function secondary_demod_canvas_container_mouseleave() {
 }
 
 function secondary_demod_canvas_container_mousemove(evt) {
-    if (secondary_demod_mousedown) secondary_demod_update_channel_freq_from_event(evt);
+    if (secondary_demod_mousedown){
+        secondary_demod_update_channel_freq_from_event(evt);
+    }
 }
 
 function secondary_demod_canvas_container_mousedown(evt) {
-    if (evt.which === 1) secondary_demod_mousedown = true;
+    if (evt.which === 1){
+        secondary_demod_mousedown = true;
+    }
 }
 
 function secondary_demod_canvas_container_mouseup(evt) {
-    if (evt.which === 1) secondary_demod_mousedown = false;
+    if (evt.which === 1){
+        secondary_demod_mousedown = false;
+    }
     secondary_demod_update_channel_freq_from_event(evt);
 }
 
 
 function secondary_demod_waterfall_set_zoom(low_cut, high_cut) {
-    if (!secondary_demod_canvases_initialized) return;
+    if (!secondary_demod_canvases_initialized){
+        return;
+    }
     secondary_demod_low_cut = low_cut;
     secondary_demod_high_cut = high_cut;
     var shown_bw = high_cut - low_cut;
