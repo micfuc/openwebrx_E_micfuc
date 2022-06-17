@@ -23,7 +23,7 @@
 -->
 <html>
     <head>
-        <title>OpenWebRX black version 'E' | Open Source SDR Web App for Everyone!</title>
+        <title>OpenWebRX black version 'E'</title>
         <link rel="shortcut icon" type="image/x-icon" href="static/favicon.ico" sizes="16x16 32x32" />
         <link rel="icon" type="image/png" sizes="32x32" href="static/gfx/favicon32.png" />
         <link rel="icon" type="image/png" sizes="44x44" href="static/gfx/favicon44.png" />
@@ -156,7 +156,7 @@
                         <div class="nano-content">
                             <div id="openwebrx-client-log-title">OpenWebRX client log</div>
                             <div>
-<!-- eroyee, this is an experimental version, Jakob is not the authour of the mods and should not be contacted regarding them
+<!-- eroyee, this is an experimental version, Jakob is not the author of the mods and should not be contacted regarding them
                                 Author contact: <a href="http://www.justjakob.de/" target="_blank">Jakob Ketterl, DD5JFK</a> |
                                 <a href="https://www.openwebrx.de" target="_blank">OpenWebRX homepage</a>
 -->
@@ -186,15 +186,15 @@
                             <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#bookmark"></use></svg>
                         </div>
                     </div>
-                    <div id="id-step-freq" class="bal">
-                        <img id="id-step-0" src="static/gfx/openwebrx-stepdn-20.png" onclick="freqstep(0)" title="-5/9k">
-                        <img id="id-step-1" src="static/gfx/openwebrx-stepdn-18.png" onclick="freqstep(1)" style="padding-bottom:0px" title="-100">
-                        <img id="id-step-2" src="static/gfx/openwebrx-stepdn-16.png" onclick="freqstep(2)" style="padding-bottom:0px" title="-10">
+                    <div id="id-step-freq">
+                        <img id="id-step-0" src="static/gfx/openwebrx-stepdn-20.png" onclick="freqstep(0)" title="-5kHz/9kHz">
+                        <img id="id-step-1" src="static/gfx/openwebrx-stepdn-18.png" onclick="freqstep(1)" style="padding-bottom:0px" title="-100Hz">
+                        <img id="id-step-2" src="static/gfx/openwebrx-stepdn-16.png" onclick="freqstep(2)" style="padding-bottom:0px" title="-10Hz">
                         <!-- Luke add stepchangeHz button 30May -->
-					    <button id="stepchangeHz" class="openwebrx-stepchangeHz-button" onclick="toggleStepHz()" style="padding-bottom:0px" title="9 or 5 KHz" >5</button>
-                        <img id="id-step-3" src="static/gfx/openwebrx-stepup-16.png" onclick="freqstep(3)" style="padding-bottom:0px" title="+10">
-                        <img id="id-step-4" src="static/gfx/openwebrx-stepup-18.png" onclick="freqstep(4)" style="padding-bottom:0px" title="+100">
-                        <img id="id-step-5" src="static/gfx/openwebrx-stepup-20.png" onclick="freqstep(5)" title="+5/9k">
+			<button id="stepchangeHz" class="openwebrx-stepchangeHz-button" onclick="toggleStepHz()" style="padding-bottom:0px" title="5KHz or 9kHz step" >5</button>
+                        <img id="id-step-3" src="static/gfx/openwebrx-stepup-16.png" onclick="freqstep(3)" style="padding-bottom:0px" title="+10Hz">
+                        <img id="id-step-4" src="static/gfx/openwebrx-stepup-18.png" onclick="freqstep(4)" style="padding-bottom:0px" title="+100Hz">
+                        <img id="id-step-5" src="static/gfx/openwebrx-stepup-20.png" onclick="freqstep(5)" title="+5kHz/9kHz">
                         <button id="GhostRX" class="openwebrx-GhostRX-button" onclick="ToggleGhostRX()" style="margin-left:7px" title="Transparent RX on/off" >G</button>
                         <button id="peak" class="openwebrx-SpectraHold-button" onclick="peak_spectra_hold()" style="margin-left:7px" title="Spectrum peak hold on/off" >^</button>
                         <button id="spectrum" class="openwebrx-spectrum-button" onclick="display_spectra();" style="margin-left:1px" title="Spectrum Display on/off" >Spectrum</button> 

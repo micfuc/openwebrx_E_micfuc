@@ -70,8 +70,6 @@ function toggleStepHz() {
 
 function freqstep(sel) {
     var stepsize = 0;
-    var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
-    var new_offset = offset_frequency + stepsize;
     switch (sel) {
         case 0:
             if (StepHz) {
@@ -104,8 +102,10 @@ function freqstep(sel) {
         default:
             stepsize = 0;
     }
+    var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
+    var new_offset = offset_frequency + stepsize;
     if (new_offset !== offset_frequency) {
-        $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset);
+        $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset); 
     }
 }
 /* -------------------------------------------------------------------------- */
