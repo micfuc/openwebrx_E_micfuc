@@ -1400,6 +1400,37 @@ function waterfall_init() {
     waterfall_setup_done = 1;
 }
 
+// - eroyee add for timeseries display, using spectrum container for present - //
+
+var timeseries_start = false;
+const timeseries_window_h = 130;
+const timeseries_data = [];  // array for data, this will need to be a proper ringbuffer
+function display_timeseries()
+{
+    if (!timeseries_start && !spec_start) {
+        var divTimeseries = '<div id="signal-div-timeseries">'
+                + '<canvas id="signal-canvas-timeseries" width="' + (screen.availWidth) + '" height="' + (timeseries_window_h) + '" style="width:100%;height:' + (timeseries_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
+                + '</div>';
+//eroyee; below to drop down time series container
+        document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
+        document.getElementById('spectrum_container').style.opacity = "1";
+        var div = document.querySelector(".openwebrx-spectrum-container");
+        div.insertAdjacentHTML('beforeEnd', divTimeseries);
+        timeseries_start = true;
+    } else {
+        if (timeseries_start) {
+            timeseries_start = false;
+            document.getElementById('spectrum_container').style.height = "0px";
+            document.getElementById('spectrum_container').style.opacity = "0";
+            const flush = document.querySelector("#signal-canvas-timeseries");
+            flush.parentNode.removeChild(flush);
+            timeseries_start = false;
+            timeseries_data.length = 0; // re-initialise the array to zero elements
+            return;
+        }
+    }
+}
+
 // ------------ eroyee add for start/stop spectrum display -------------- //
 
 var spec_start = false;
@@ -1407,10 +1438,10 @@ const spec_window_h = 130; // sets height of spectrum display
 const spec_out_data = [];
 function display_spectra()
 {
-    if (!spec_start) {
+    if (!spec_start && !timeseries_start) {
         var divFreqSpectrum = '<div id="freq-div-spectrum">'
-                + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
-                + '</div>';
+            + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
+            + '</div>';
 //eroyee; below to drop down spectrum container
         document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
         document.getElementById('spectrum_container').style.opacity = "1";
@@ -1446,7 +1477,7 @@ const spec_peak_data = [];
 var peak_start = false;
 function peak_spectra_hold()
 {
-    if (!spec_start) {
+    if (!spec_start && !timeseries_start) {
         peak_start = false;
         return;
     }
@@ -1502,6 +1533,53 @@ var w = fft_size;
     //Draw image
     canvas_context.putImageData(oneline_image, 0, --canvas_actual_line);
     shift_canvases();
+    
+// ------------------------------------------------------------------ TIMESERIES
+// eroyee; Implements plotting of signal level over time. Data is plotted from
+// left (oldest) to right (newest), and will 'scroll' once plotwidth is filled.
+// Plotwidth is set at client screenwidth. Plots/sec depend upon fft_fps, signal
+// level is plotted from 0dBm to down Waterfall Min Level. Reticule lines are
+// similarly scaled and drawn at ~10dB intervals. 
+// 
+    if (timeseries_start) {
+        var timeSeriesCtx;
+        var y = 1;
+        timeSeriesCtx = document.querySelector("#signal-canvas-timeseries").getContext('2d');
+        timeSeriesCtx.width = (screen.availWidth);
+        timeSeriesCtx.height = (spec_window_h); // one less than canvas height
+        let scaling = timeSeriesCtx.height/(Math.abs(waterfall_min_level));
+        const d = scaling * 10; // reticule line every 10dB of set window height
+        timeSeriesCtx.fillStyle = "#000";
+        timeSeriesCtx.fillRect(0, 0, timeSeriesCtx.width, timeSeriesCtx.height);
+        timeSeriesCtx.fillStyle = "#FFF";
+        timeSeriesCtx.font ="16px";
+        timeSeriesCtx.fillText("Lines @ ~10dB", 10,timeSeriesCtx.height-10);
+//        timeseries_data.push(Math.abs((sig_data)*scaling)); // take the raw s-meter value then push to timeseries array
+        timeseries_data.push(Math.abs(sig_data));
+        if (timeseries_data.length >= timeSeriesCtx.width) {
+            timeseries_data.shift();
+        }
+//---------------------------- reticule ----------------------------------------
+        for (let i = 0; i < timeSeriesCtx.width; i++) {
+            y = y + d; // reticule lines
+//            timeSeriesCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
+            timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width, 0.5);  // draw lines
+        }
+//---------------------------- end reticule ----------------------------------------
+        timeSeriesCtx.lineWidth = 1;
+        timeSeriesCtx.strokeStyle = 'yellow';
+        timeSeriesCtx.beginPath();
+        timeSeriesCtx.moveTo(timeSeriesCtx.lineWidth,timeseries_data[i]-1); 
+//---------------------------- plot data  ----------------------------------------
+        for (let i = 0; i < timeseries_data.length -1; i++) {
+//        for (let i = timeseries_data.length -1; i >= 0; --i) {
+            y = (timeseries_data[i]*scaling); // scale the data now so changes in min_waterfall and reticule are reflected
+            timeSeriesCtx.lineTo(i-1, y); // -1 helps with rogue trace at LHS
+// console.log(fft_size,timeSeriesCtx.width-timeseries_data.length);
+            }
+            timeSeriesCtx.stroke();
+        }
+// -------------------------------------------------------------------TIMESERIES
 
 // eroyee --------------------------------------------------------------SPECTRUM
     if (spec_start) {
