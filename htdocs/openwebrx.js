@@ -1554,7 +1554,6 @@ var w = fft_size;
         timeSeriesCtx.fillStyle = "#FFF";
         timeSeriesCtx.font ="16px";
         timeSeriesCtx.fillText("Lines @ ~10dB", 10,timeSeriesCtx.height-10);
-//        timeseries_data.push(Math.abs((sig_data)*scaling)); // take the raw s-meter value then push to timeseries array
         timeseries_data.push(Math.abs(sig_data));
         if (timeseries_data.length >= timeSeriesCtx.width) {
             timeseries_data.shift();
@@ -1562,20 +1561,17 @@ var w = fft_size;
 //---------------------------- reticule ----------------------------------------
         for (let i = 0; i < timeSeriesCtx.width; i++) {
             y = y + d; // reticule lines
-//            timeSeriesCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
             timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width, 0.5);  // draw lines
         }
 //---------------------------- end reticule ----------------------------------------
         timeSeriesCtx.lineWidth = 1;
         timeSeriesCtx.strokeStyle = 'yellow';
         timeSeriesCtx.beginPath();
-        timeSeriesCtx.moveTo(timeSeriesCtx.lineWidth,timeseries_data[i]-1); 
+        timeSeriesCtx.moveTo(timeSeriesCtx.lineWidth -2,timeseries_data[i]); 
 //---------------------------- plot data  ----------------------------------------
         for (let i = 0; i < timeseries_data.length -1; i++) {
-//        for (let i = timeseries_data.length -1; i >= 0; --i) {
             y = (timeseries_data[i]*scaling); // scale the data now so changes in min_waterfall and reticule are reflected
             timeSeriesCtx.lineTo(i-1, y); // -1 helps with rogue trace at LHS
-// console.log(fft_size,timeSeriesCtx.width-timeseries_data.length);
             }
             timeSeriesCtx.stroke();
         }
