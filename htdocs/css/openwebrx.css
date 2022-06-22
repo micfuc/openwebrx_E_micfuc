@@ -545,6 +545,24 @@ input[type=range]:disabled {
 }
 /* ----------------------------------------------------- */
 
+/* ----- eroyee add timeseries display enable button ----- */
+
+.openwebrx-timeseries-button {
+
+    background-color: yellow;
+    /*  border: none; */
+    color: black;
+    height: 16px;
+    width: 16px;
+    border-radius: 3px;
+    border: 1px solid #FFF;
+    font-size: 9px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    bottom: 4px; /* bring up to same level as step buttons */
+}
+
 /* ----- eroyee add spectrum display enable button ----- */
 
 .openwebrx-spectrum-button {
@@ -553,7 +571,7 @@ input[type=range]:disabled {
     /*  border: none; */
     color: black;
     height: 16px;
-    width: 49px;
+    width: 35px;  /* was 49 and full word 'spectrum' before TIMESERIES intro'd */
     border-radius: 3px;
     border: 1px solid #FFF;
     font-size: 9px;
