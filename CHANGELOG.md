@@ -1,3 +1,18 @@
+
+**1.2.0-dev_E**
+
+- Add plotting of signal level over time
+- Add peak hold to spectrum display
+- Add frequency spectrum display
+- Add 'ghost mode' for viewing waterfall through RX panel
+- Rewrite s-meter bar update to reduce system load on some client machines
+- Add s-meter scale, decouple from variability due to waterfall levels
+- Add/alter to new 'very slow' option for SSB AGC
+- Add toggling of major stepchange value (5kHz/9kHz)
+- Add frequency step change buttons
+- Add keyboard tuning of receiver
+
+
 **unreleased**
 - Major rewrite of all demodulation components to make use of the new csdr/pycsdr and digiham/pydigiham demodulator
   modules
