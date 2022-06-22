@@ -13,7 +13,7 @@ It has the following features:
 - it works in Google Chrome, Chromium and Mozilla Firefox
 - supports a wide range of [SDR hardware](https://github.com/jketterl/openwebrx/wiki/Supported-Hardware#sdr-devices)
 - Multiple SDR devices can be used simultaneously
-- A wide range of digital decoding options are available [Background Decoding] (https://github.com/jketterl/openwebrx/wiki/Background-decoding)
+- A wide range of digital decoding options are available [Background Decoding](https://github.com/jketterl/openwebrx/wiki/Background-decoding)
 - Frequency spectrum display
 - Plotting of signal level over time (timeseries)
 
