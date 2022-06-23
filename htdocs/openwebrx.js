@@ -331,12 +331,13 @@ function getLogSmeterValue(value) {
  experimental and prob not be worth the effort...
  */
 
-
+var sig_data; // EROYEE FOR TIMESERIES
 function setSmeterAbsoluteValue(value)
 {
 var speak = 0;
 var decay = 0.01;
 var logValue = getLogSmeterValue(value);
+sig_data = logValue; // EROYEE FOR TIMESERIES
 var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
     //    setTimeout(function(){
     $("#openwebrx-smeter-db").html(logValue.toFixed(0) + "dB"); // eroyee; re-introduce dB levels for anyone that wants them
