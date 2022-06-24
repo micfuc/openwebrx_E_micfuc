@@ -1299,18 +1299,11 @@ function open_websocket() {
     ws.onerror = on_ws_error;
 }
 
-// -----------------------------------------------------------------------------
-// eroyee; create an array to take percent raw data as inputted to 
-// waterfall_mkcolour function. For eventual use by the spectrum display, it 
-// gives data adjusted by waterfall levels but prior to colourmap interpretation.
-const spec_data_in = [];
-// -----------------------------------------------------------------------------
 function waterfall_mkcolor(db_value, waterfall_colors_arg) {
     waterfall_colors_arg = waterfall_colors_arg || waterfall_colors;
     var value_percent = (db_value - waterfall_min_level) / (waterfall_max_level - waterfall_min_level);
     value_percent = Math.max(0, Math.min(1, value_percent));
     var scaled = value_percent * (waterfall_colors_arg.length - 1);
-    spec_data_in.push(value_percent); // insert value_percent into array
     var index = Math.floor(scaled);
     var remain = scaled - index;
     if (remain === 0){
@@ -1433,7 +1426,7 @@ function display_timeseries()
 }
 
 // ------------ eroyee add for start/stop spectrum display -------------- //
-
+const spec_data_in = [];
 var spec_start = false;
 const spec_window_h = 130; // sets height of spectrum display
 const spec_out_data = [];
@@ -1524,9 +1517,15 @@ var w = fft_size;
         }
     //Add line to waterfall image
     var oneline_image = canvas_context.createImageData(w, 1);
-    for (x = 0; x < w; x++) {
+    var wfmax_min = (waterfall_max_level - waterfall_min_level);
+    for (let x = 0; x < w; x++) {
+        if (spec_start) {
+//      eroyee for spectrum display; this 2nd formula is ok, and should use less cpu than 1st (which is same as mkcolor value percent)
+//            spec_data_in.push(Math.max(0, Math.min(1,(data[x] - waterfall_min_level) / (waterfall_max_level - waterfall_min_level))));
+            spec_data_in.push((data[x] - waterfall_min_level) / wfmax_min);  
+        }
         var color = waterfall_mkcolor(data[x]);
-        for (i = 0; i < 3; i++){
+        for (let i = 0; i < 3; i++){
             oneline_image.data[x * 4 + i] = color[i];
         }
         oneline_image.data[x * 4 + 3] = 255;
@@ -1570,7 +1569,8 @@ var w = fft_size;
         timeSeriesCtx.beginPath();
         timeSeriesCtx.moveTo(timeSeriesCtx.lineWidth -2,timeseries_data[i]); 
 //---------------------------- plot data  ----------------------------------------
-        for (let i = 0; i < timeseries_data.length -1; i++) {
+        var tslen = timeseries_data.length; // put the .length calc outside the for loop to speed up
+        for (let i = 0; i < tslen -1; i++) {
             y = (timeseries_data[i]*scaling); // scale the data now so changes in min_waterfall and reticule are reflected
             timeSeriesCtx.lineTo(i-1, y); // -1 helps with rogue trace at LHS
             }
@@ -1600,7 +1600,8 @@ var w = fft_size;
         freqSpectrumCtx.fillRect(0, 0, freqSpectrumCtx.width, freqSpectrumCtx.height);
         freqSpectrumCtx.fillStyle = freqSpectrumGradient;
         const k = 0.6; // value to set filter rise/fall time, lower is slower
-        for (i = 0; i < spec_data_in.length; i += 1) {
+        var speclen = spec_data_in.length;
+        for (let i = 0; i < speclen; i += 1) {
 // ----------------------------- Filter types ------------------------------- //
 // Other filter types, is it worth the hassle? Tried IIR and not that much 
 // different from EMA....
@@ -1627,7 +1628,7 @@ var w = fft_size;
 // -------------------------------------------------------------------------- //
 // 
 // -------------------------- Draw spectrum --------------------------------- //
-        for (i = 0; i < freqSpectrumCtx.width; i++) {
+        for (let i = 0; i < freqSpectrumCtx.width; i++) {
 //        var temp_h = spec_out_data[i] * (freqSpectrumCtx.height -1); // needed if using raw value_percent input	
             y = y + d; // reticule lines
             freqSpectrumCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
@@ -1651,7 +1652,7 @@ var w = fft_size;
         freqSpectrumCtx.strokeStyle = 'green';
         freqSpectrumCtx.beginPath();
         freqSpectrumCtx.moveTo(0, y);
-        for (i = 0; i < freqSpectrumCtx.width; i++) {
+        for (let i = 0; i < freqSpectrumCtx.width; i++) {
             if (spec_out_data[i] > spec_peak_data[i]){
                 spec_peak_data[i] = spec_out_data[i];
             }
