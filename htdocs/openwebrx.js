@@ -1553,26 +1553,28 @@ var w = fft_size;
         timeSeriesCtx.fillRect(0, 0, timeSeriesCtx.width, timeSeriesCtx.height);
         timeSeriesCtx.fillStyle = "#FFF";
         timeSeriesCtx.font ="16px";
-        timeSeriesCtx.fillText("Lines @ ~10dB", 10,timeSeriesCtx.height-10);
         timeseries_data.push(Math.abs(sig_data));
-        if (timeseries_data.length >= timeSeriesCtx.width) {
+        var dBnum = 0;
+        if (timeseries_data.length >= timeSeriesCtx.width -33) { // subtract to stop trace & RHS text interacting
             timeseries_data.shift();
         }
 //---------------------------- reticule ----------------------------------------
         for (let i = 0; i < timeSeriesCtx.width; i++) {
             y = y + d; // reticule lines
+            dBnum = dBnum - 10;
             timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width, 0.5);  // draw lines
+            timeSeriesCtx.fillText(dBnum +"dB", timeSeriesCtx.width - 33,y); // write -dB values @RHS
         }
 //---------------------------- end reticule ----------------------------------------
         timeSeriesCtx.lineWidth = 1;
         timeSeriesCtx.strokeStyle = 'yellow';
         timeSeriesCtx.beginPath();
-        timeSeriesCtx.moveTo(timeSeriesCtx.lineWidth -2,timeseries_data[i]); 
+        timeSeriesCtx.moveTo(timeSeriesCtx.lineWidth -2,timeseries_data[0]); // -2 helps with rogue trace at LHS
 //---------------------------- plot data  ----------------------------------------
         var tslen = timeseries_data.length; // put the .length calc outside the for loop to speed up
         for (let i = 0; i < tslen -1; i++) {
             y = (timeseries_data[i]*scaling); // scale the data now so changes in min_waterfall and reticule are reflected
-            timeSeriesCtx.lineTo(i-1, y); // -1 helps with rogue trace at LHS
+            timeSeriesCtx.lineTo(i, y);
             }
             timeSeriesCtx.stroke();
         }
@@ -1601,7 +1603,6 @@ var w = fft_size;
         freqSpectrumCtx.fillStyle = freqSpectrumGradient;
         const k = 0.6; // value to set filter rise/fall time, lower is slower
         var speclen = spec_data_in.length;
-        for (let i = 0; i < speclen; i += 1) {
 // ----------------------------- Filter types ------------------------------- //
 // Other filter types, is it worth the hassle? Tried IIR and not that much 
 // different from EMA....
@@ -1614,17 +1615,18 @@ var w = fft_size;
 //  little easier to understand and possibly reduces the variable count slightly. 
 //  Either should work.
 //      var ema = ((spec_data_in[i]) * k) + (spec_out_data[i] * (1-k)); // use if utilising raw value_percent input
+        for (let i = 0; i < speclen; i += 1) {
             var ema = (((spec_data_in[i]) * freqSpectrumCtx.height) * k) + (spec_out_data[i] * (1 - k)); // multiply raw by canvas height
             if (ema < 0){
                 ema = 0;
             }
 //        if (ema > 1) ema = 1; // needed if using raw value_percent input
-                if (ema > freqSpectrumCtx.height){
+            if (ema > freqSpectrumCtx.height){
                 ema = freqSpectrumCtx.height;
             }
                 spec_out_data[i] = ema;
 //        spec_out_data[i] = ema * ((freqSpectrumCtx.height)-1);
-            }
+        }
 // -------------------------------------------------------------------------- //
 // 
 // -------------------------- Draw spectrum --------------------------------- //
@@ -1662,7 +1664,7 @@ var w = fft_size;
             }
             freqSpectrumCtx.stroke();
         }
-            spec_data_in.length = 0;    
+    spec_data_in.length = 0;    
     }
 // eroyee ------------------------------------------------------------ PEAK HOLD
 }
