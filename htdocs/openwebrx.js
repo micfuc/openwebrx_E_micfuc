@@ -1562,7 +1562,7 @@ var w = fft_size;
         for (let i = 0; i < timeSeriesCtx.width; i++) {
             y = y + d; // reticule lines
             dBnum = dBnum - 10;
-            timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width, 0.5);  // draw lines
+            timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width -35, 0.5);  // draw lines
             timeSeriesCtx.fillText(dBnum +"dB", timeSeriesCtx.width - 33,y); // write -dB values @RHS
         }
 //---------------------------- end reticule ----------------------------------------
