@@ -16,7 +16,8 @@
     transition-duration: 1s;
     transition-timing-function: ease-out;
     opacity: 0;
-    height: 0;
+    height: 0px;
+    margin-top: 0px;
     /* originally, top-bar + description was 350px */
     max-height: 283px;
     overflow: hidden;
@@ -30,12 +31,10 @@
 /* eroyee add for spectrum display */
 
 .openwebrx-spectrum-container {
-    transition-property: height, opacity;
-    transition-duration: 0.5s;
-    transition-timing-function: ease-out;
-    opacity: 1;
+    display: flex;
+    width: 100%;
     height: 0px;
-    max-height: 238px; 
+    max-height: 256px;
     overflow: hidden;
 }
 
