@@ -1428,20 +1428,22 @@ function display_timeseries()
 // ------------ eroyee add for start/stop spectrum display -------------- //
 const spec_data_in = [];
 var spec_start = false;
-const spec_window_h = 130; // sets height of spectrum display
+const spec_window_h = 130; // sets height of spectrum + timeseries display
+const label_w = 34; // sets width of label column (ie. dB values)
 const spec_out_data = [];
 function display_spectra()
 {
     if (!spec_start && !timeseries_start) {
         var divFreqSpectrum = '<div id="freq-div-spectrum">'
-            + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
+            + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;"></canvas>'
+            + '<canvas id="freq-canvas-spectrum-label" width="' + (label_w) + '" height="' + (spec_window_h) + '" style="width:' + (label_w) + ';height:' + (spec_window_h) + 'px;right:0px;position:absolute;bottom:0px"></canvas>'
             + '</div>';
 //eroyee; below to drop down spectrum container
         document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
         document.getElementById('spectrum_container').style.opacity = "1";
         var div = document.querySelector(".openwebrx-spectrum-container");
         div.insertAdjacentHTML('beforeEnd', divFreqSpectrum);
-// eroyee; ensure new spectrum canvas is set with the same position and zoom level as the waterfall canvas
+// eroyee; ensure new spectrum canvas is set with the same position and zoom level as the waterfall canvas (the label canvas is fixed and divorced from this)
         document.querySelector("#freq-canvas-spectrum").style.left = document.querySelector("#webrx-canvas-container").style.left;
         document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width;
 // eroyee; initialise the spectrum and peak data arrays
@@ -1457,7 +1459,7 @@ function display_spectra()
             spec_start = false;
             document.getElementById('spectrum_container').style.height = "0px";
             document.getElementById('spectrum_container').style.opacity = "0";
-            const flush = document.querySelector("#freq-canvas-spectrum");
+            const flush = document.getElementById("freq-div-spectrum");
             flush.parentNode.removeChild(flush);
             spec_start = false;
             return;
@@ -1547,23 +1549,27 @@ var w = fft_size;
         timeSeriesCtx = document.querySelector("#signal-canvas-timeseries").getContext('2d');
         timeSeriesCtx.width = (screen.availWidth);
         timeSeriesCtx.height = (spec_window_h); // one less than canvas height
-        let scaling = timeSeriesCtx.height/(Math.abs(waterfall_min_level));
-        const d = scaling * 10; // reticule line every 10dB of set window height
+//        let scaling = timeSeriesCtx.height/(Math.abs(waterfall_min_level)); // use for scale of 0dBm - wf_min_level
+//        const d = scaling * 10; // reticule line every 10dB of set window height // use for scale of 0dBm - wf_min_level
+        let scaling = timeSeriesCtx.height/(Math.abs(waterfall_min_level - waterfall_max_level)); // scale from wf_min - wf_max
+        const d = (scaling * 10); // scale from wf_min - wf_max
         timeSeriesCtx.fillStyle = "#000";
         timeSeriesCtx.fillRect(0, 0, timeSeriesCtx.width, timeSeriesCtx.height);
         timeSeriesCtx.fillStyle = "#FFF";
         timeSeriesCtx.font ="16px";
-        timeseries_data.push(Math.abs(sig_data));
-        var dBnum = 0;
-        if (timeseries_data.length >= timeSeriesCtx.width -33) { // subtract to stop trace & RHS text interacting
+//        timeseries_data.push(Math.abs(sig_data)); // use for scale of 0dBm - wf_min_level
+        timeseries_data.push(sig_data); // scale from wf_min - wf_max
+//        var dBnum = 0; // use for scale of 0dBm - wf_min_level
+        var dBnum = Math.round(waterfall_max_level); // scale from wf_min - wf_max
+        if (timeseries_data.length >= timeSeriesCtx.width -(label_w)) { // subtract to stop trace & RHS text interacting
             timeseries_data.shift();
         }
 //---------------------------- reticule ----------------------------------------
         for (let i = 0; i < timeSeriesCtx.width; i++) {
             y = y + d; // reticule lines
             dBnum = dBnum - 10;
-            timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width -35, 0.5);  // draw lines
-            timeSeriesCtx.fillText(dBnum +"dB", timeSeriesCtx.width - 33,y); // write -dB values @RHS
+            timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width -(label_w), 0.5);  // draw lines
+            timeSeriesCtx.fillText(dBnum +"dB", timeSeriesCtx.width -(label_w),y); // write -dB values @RHS
         }
 //---------------------------- end reticule ----------------------------------------
         timeSeriesCtx.lineWidth = 1;
@@ -1572,19 +1578,20 @@ var w = fft_size;
         timeSeriesCtx.moveTo(timeSeriesCtx.lineWidth -2,timeseries_data[0]); // -2 helps with rogue trace at LHS
 //---------------------------- plot data  ----------------------------------------
         var tslen = timeseries_data.length; // put the .length calc outside the for loop to speed up
-        for (let i = 0; i < tslen -1; i++) {
-            y = (timeseries_data[i]*scaling); // scale the data now so changes in min_waterfall and reticule are reflected
+        for (let i = 0; i < tslen; i++) {
+            y = timeSeriesCtx.height-(((timeseries_data[i]-waterfall_min_level)/wfmax_min)*timeSeriesCtx.height); // scale the data now so changes in min_waterfall+max_waterfall and reticule are reflected
+//            y = (timeseries_data[i]*scaling); // scale the data so changes in min_waterfall and reticule are reflected - use if scale is 0dBm - wf_min
             timeSeriesCtx.lineTo(i, y);
-            }
-            timeSeriesCtx.stroke();
         }
-// -------------------------------------------------------------------TIMESERIES
+            timeSeriesCtx.stroke();
+    }
+// ------------------------------------------------------------------/TIMESERIES
 
 // eroyee --------------------------------------------------------------SPECTRUM
     if (spec_start) {
+// setup spectrum window ready to draw spectra
         var freqSpectrumCtx;
         var freqSpectrumGradient;
-// console.log (spec_start);
         freqSpectrumCtx = document.querySelector("#freq-canvas-spectrum").getContext('2d');
         freqSpectrumCtx.width = (fft_size);
         freqSpectrumCtx.height = (spec_window_h) - 1; // one less than canvas height
@@ -1592,15 +1599,22 @@ var w = fft_size;
         freqSpectrumGradient.addColorStop(0.00, 'red'); // probably should align these colours with the waterfall...
         freqSpectrumGradient.addColorStop(0.50, 'yellow');
         freqSpectrumGradient.addColorStop(1.00, 'blue');
-//        if (spec_data_in.length = (freqSpectrumCtx.width)) {
-        var y = 1;
-// eroyee; spectrum height in pixels / dB range between wfmax & wfmin gives num pixels to draw first & subsequent reticule lines 10dB apart
-// eg. If spec is 128px high, wft max is -19, wf min is -69 (ie.range is 50dB), then 128/(50/10) = 25.6 pixels to the first 10dB line
-// Should probably round the outcome but that may use more CPU...
-        const d = (freqSpectrumCtx.height / ((Math.abs(waterfall_min_level - waterfall_max_level)) / 10));
         freqSpectrumCtx.fillStyle = "#000";
         freqSpectrumCtx.fillRect(0, 0, freqSpectrumCtx.width, freqSpectrumCtx.height);
         freqSpectrumCtx.fillStyle = freqSpectrumGradient;
+// setup lable window ready to draw labels
+        var screenCtx;
+        screenCtx = document.querySelector("#freq-canvas-spectrum-label").getContext('2d');
+        screenCtx.width = (label_w);
+        screenCtx.height = (spec_window_h) - 1;
+        screenCtx.fillStyle = "#000";
+        screenCtx.fillRect(0, 0, screenCtx.width, screenCtx.height+1); // need the +1 otherwise get an artifact at the bottom of the label list
+
+// eroyee; spectrum height in pixels / dB range between wfmax & wfmin gives num pixels to draw first & subsequent reticule lines 10dB apart
+// eg. If spec is 128px high, wft max is -19, wf min is -69 (ie.range is 50dB), then 128/(50/10) = 25.6 pixels to the first 10dB line
+// Should probably round the outcome but that may use more CPU...
+        var y = 1;
+        const d = (freqSpectrumCtx.height / ((Math.abs(waterfall_min_level - waterfall_max_level)) / 10));
         const k = 0.6; // value to set filter rise/fall time, lower is slower
         var speclen = spec_data_in.length;
 // ----------------------------- Filter types ------------------------------- //
@@ -1620,28 +1634,29 @@ var w = fft_size;
             if (ema < 0){
                 ema = 0;
             }
-//        if (ema > 1) ema = 1; // needed if using raw value_percent input
             if (ema > freqSpectrumCtx.height){
                 ema = freqSpectrumCtx.height;
             }
-                spec_out_data[i] = ema;
-//        spec_out_data[i] = ema * ((freqSpectrumCtx.height)-1);
+        spec_out_data[i] = ema;
         }
 // -------------------------------------------------------------------------- //
-// 
+
 // -------------------------- Draw spectrum --------------------------------- //
+        var dBnum = Math.round(waterfall_max_level);
         for (let i = 0; i < freqSpectrumCtx.width; i++) {
-//        var temp_h = spec_out_data[i] * (freqSpectrumCtx.height -1); // needed if using raw value_percent input	
             y = y + d; // reticule lines
-            freqSpectrumCtx.fillStyle = "#FFF"; // white, remove this for colour coded lines
+            dBnum = dBnum - 10; // label values
 //---------------------------- reticule ----------------------------------------
+//            freqSpectrumCtx.fillStyle = "#FFF"; // white, comment out for colour coded lines
             freqSpectrumCtx.fillRect(0, y, freqSpectrumCtx.width, 0.5);  // draw lines
-            freqSpectrumCtx.fillStyle = freqSpectrumGradient; // remove if colour coded lines req'd
 //------------------------------------------------------------------------------
-//	    freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -temp_h);  // draw spectra // needed if using raw value_percent input
+            freqSpectrumCtx.fillStyle = freqSpectrumGradient; // for coloured spectra gradient
             freqSpectrumCtx.fillRect(i, freqSpectrumCtx.height, 1, -spec_out_data[i]);  // draw spectra
+            screenCtx.fillStyle = freqSpectrumGradient; // remove comment for coloured labelling
+//            screenCtx.fillStyle = "#FFF";  // white labelling, comment out for same colour as spectra
+            screenCtx.fillText(dBnum +"dB",0,y+1); // + or - moves the number alignment relative to line
         }
-// eroyee --------------------------------------------------------------SPECTRUM
+// eroyee -------------------------------------------------------------/SPECTRUM
 // eroyee ------------------------------------------------------------ PEAK HOLD
 // This draws a fine spectra line from the peak of the current data. It 
 // maintains an array of peak data that is checked against the current data 
@@ -1666,7 +1681,7 @@ var w = fft_size;
         }
     spec_data_in.length = 0;    
     }
-// eroyee ------------------------------------------------------------ PEAK HOLD
+// eroyee ------------------------------------------------------------/PEAK HOLD
 }
 
 function waterfall_clear() {
