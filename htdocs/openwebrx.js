@@ -838,6 +838,32 @@ function get_zoom_coeff_from_hps(hps) {
     return bandwidth / shown_bw;
 }
 
+// eroyee, clickbutton shift waterfall, apparently useful for mobile browsers // 
+
+function canLeft()
+    {
+    if ((zoom_center_rel > (-bandwidth / 2 + waterfallWidth() * zoom_center_where * range.hps)))
+        {
+        zoom_center_rel -= range.hps * screen.availWidth;
+        resize_canvases(false);
+        mkscale();
+        bookmarks.position();  
+        }
+    }
+
+function canRight()
+    {
+    if(!(zoom_center_rel > (bandwidth / 2 - waterfallWidth() * (1 - zoom_center_where) * range.hps)))
+        {
+        zoom_center_rel += range.hps * screen.availWidth;
+        resize_canvases(false);
+        mkscale();
+        bookmarks.position();
+        }
+    }
+
+// -------------------------------------------------------------------------- //
+
 var zoom_levels = [1];
 var zoom_level = 0;
 var zoom_offset_px = 0;
