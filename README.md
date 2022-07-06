@@ -42,6 +42,7 @@ to supercede his work, which should be seen as the primary source for all things
 
 Recent changes include:
 
+*  Addition of < > buttons to shift zoomed display up to max allowable extent
 *  Addition of frequency change buttons, allowing the use of click-change to frequency
 *  Addition of stepchange button for change from 5kHz to 9kHz steps for broadcast SWL
 *  Addition of Spectrum display - this is somewhat new and may well get some changes 
