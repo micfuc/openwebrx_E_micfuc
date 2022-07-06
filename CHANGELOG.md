@@ -1,6 +1,7 @@
 
 **1.2.0-dev_E**
 
+- Add panning of zoomed display via RX panel buttons
 - Add value labels for timeseries plot and spectra
 - Add plotting of signal level over time
 - Add peak hold to spectrum display
