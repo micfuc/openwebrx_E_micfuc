@@ -332,11 +332,11 @@ function getLogSmeterValue(value) {
 var sig_data; // EROYEE FOR TIMESERIES
 function setSmeterAbsoluteValue(value)
 {
-    var speak = 0;
-    var decay = 0.01;
-    var logValue = getLogSmeterValue(value);
-    sig_data = logValue; // EROYEE FOR TIMESERIES
-    var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
+var speak = 0;
+var decay = 0.01;
+var logValue = getLogSmeterValue(value);
+sig_data = logValue; // EROYEE FOR TIMESERIES
+var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
     //    setTimeout(function(){
     $("#openwebrx-smeter-db").html(logValue.toFixed(0) + "dB"); // eroyee; re-introduce dB levels for anyone that wants them
 //    },0.9);
@@ -780,7 +780,7 @@ function canvas_container_mouseleave() {
 }
 
 function canvas_mouseup(evt) {
-    var relativeX = get_relative_x(evt);
+var relativeX = get_relative_x(evt);
     if (!waterfall_setup_done) {
         return;
     }
@@ -826,7 +826,6 @@ function canvas_mousewheel(evt) {
     evt.preventDefault();
 }
 
-
 var zoom_max_level_hps = 33; //Hz/pixel
 var zoom_levels_count = 14;
 
@@ -840,17 +839,17 @@ function get_zoom_coeff_from_hps(hps) {
 function canLeft()
 {
     if ((zoom_center_rel > (-bandwidth / 2 + waterfallWidth() * zoom_center_where * range.hps)))
-    {
+        {
         zoom_center_rel -= range.hps * screen.availWidth;
         resize_canvases(false);
         mkscale();
         bookmarks.position();
-    }
+        }
 }
 
 function canRight()
 {
-    if (!(zoom_center_rel > (bandwidth / 2 - waterfallWidth() * (1 - zoom_center_where) * range.hps)))
+    if(!(zoom_center_rel > (bandwidth / 2 - waterfallWidth() * (1 - zoom_center_where) * range.hps)))
     {
         zoom_center_rel += range.hps * screen.availWidth;
         resize_canvases(false);
@@ -1424,29 +1423,54 @@ function dispSelect(evt) {
     var sel = (change_display.value);
     switch (sel) {
         case '1':
-            display_timeseries('start');
+            if (timeseries_start) {
+                display_timeseries('stop'); 
+                setTimeout(function() {  // gets its tits in a tangle if restarted too quickly (when swapping between functions)
+                ts_ticks = false;
+                display_timeseries('start');
+                }, 100);
+            } else {
+                ts_ticks = false;
+                display_timeseries('start');
+            }
             break;
         case '2':
-            spec_start = false;
-            display_spectra('start', 'line');
+            if (timeseries_start) {
+                display_timeseries('stop'); 
+                setTimeout(function() {
+                ts_ticks = true;
+                display_timeseries('start');
+                }, 100);
+            } else {
+                ts_ticks = true;
+                display_timeseries('start');
+            }
             break;
         case '3':
             spec_start = false;
-            display_spectra('start', 'fill');
+            display_spectra('start','line');
             break;
         case '4':
+            spec_start = false;
+            display_spectra('start','fill');
+            break;
+        case '5':
             if (wfStart) {
                 wfStart = false;
-            } else {
+            } 
+            break;
+        case '6':
+            if (!wfStart) {
                 wfStart = true;
-            }
+            } 
             break;
         default:
-            if (timeseries_start) {
+            if (timeseries_start){
+                ts_ticks = false;
                 display_timeseries('stop');
             }
-            if (spec_start) {
-                display_spectra('stop', 0);
+            if (spec_start){
+                display_spectra('stop',0);
             }
     }
 }
@@ -1456,12 +1480,17 @@ function dispSelect(evt) {
 var timeSeriesCtx;
 var timeseries_start = false;
 const timeseries_window_h = 130;
-const timeseries_data = [];  // array for data, this will need to be a proper ringbuffer
+//const timeseries_data = new Array(screen.availWidth-34); // do we want to start at the RHS?
+//const timeseries_ticks = new Array(screen.availWidth-34).fill(0); // Follows from RHS
+const timeseries_data = [];
+const timeseries_ticks = [];
+var ts_time;
+var ts_ticks = false;
 const ts_out_data = [0];
 function display_timeseries(status)
 {
     if (spec_start) {
-        display_spectra('stop', 0);
+    display_spectra('stop');
     }
     if ((!timeseries_start) && (status = 'start')) {
         var divTimeseries = '<div id="signal-div-timeseries">'
@@ -1472,23 +1501,28 @@ function display_timeseries(status)
         document.getElementById('spectrum_container').style.opacity = "1";
         var div = document.querySelector(".openwebrx-spectrum-container");
         div.insertAdjacentHTML('beforeEnd', divTimeseries);
-//        for (i = 0; i < (screen.availWidth); ++i){
-//            ts_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
-//        }
 //eroyee; setup the canvas and start timeseries display
         timeSeriesCtx = document.querySelector("#signal-canvas-timeseries").getContext('2d');
         timeSeriesCtx.width = (screen.availWidth);
         timeSeriesCtx.height = (spec_window_h); // one less than canvas height
+        if (ts_ticks) {
+            let date = new Date();
+            ts_time = date.getTime();
+            timeseries_ticks.push(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds());
+        }
         timeseries_start = true;
     } else {
         if (status = 'stop') {
             timeseries_start = false;
+            ts_ticks = false;
             document.getElementById('spectrum_container').style.height = "0px";
             document.getElementById('spectrum_container').style.opacity = "0";
             const flush = document.querySelector("#signal-canvas-timeseries");
             flush.parentNode.removeChild(flush);
             timeseries_start = false;
-            timeseries_data.length = 0; // re-initialise the array to zero elements
+            timeseries_data.length = 0;
+            timeseries_ticks.length = 0;
+            ts_out_data.length = 0;
             return;
         }
     }
@@ -1505,17 +1539,18 @@ var spec_start = false;
 const spec_window_h = 130; // sets height of spectrum + timeseries display
 const label_w = 34; // sets width of label column (ie. dB values)
 const spec_out_data = [];
-function display_spectra(status, style)
+function display_spectra(status,style)
 {
     if (timeseries_start) {
         display_timeseries('stop');
+        ts_ticks = false;
     }
     if ((!spec_start) && (status = 'start')) {
 //console.log(status);
         var divspectrum = '<div id="freq-div-spectrum">'
-                + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;"></canvas>'
-                + '<canvas id="freq-canvas-spectrum-label" width="' + (label_w) + '" height="' + (spec_window_h) + '" style="width:' + (label_w) + ';height:' + (spec_window_h) + 'px;right:0px;position:absolute;bottom:0px"></canvas>'
-                + '</div>';
+            + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;"></canvas>'
+            + '<canvas id="freq-canvas-spectrum-label" width="' + (label_w) + '" height="' + (spec_window_h) + '" style="width:' + (label_w) + ';height:' + (spec_window_h) + 'px;right:0px;position:absolute;bottom:0px"></canvas>'
+            + '</div>';
 //eroyee; below to drop down spectrum container
         document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
         document.getElementById('spectrum_container').style.opacity = "1";
@@ -1587,8 +1622,8 @@ function peak_spectra_hold()
 // ---- eroyee additions to waterfall_add function for spectrum display ----- //
 
 function waterfall_add(data) {
-    var w = fft_size;
-    if (!waterfall_setup_done) {
+var w = fft_size;
+    if (!waterfall_setup_done){
         return;
     }
     if (waterfall_measure_minmax_now) {
@@ -1639,29 +1674,45 @@ function waterfall_add(data) {
 // 
     if (timeseries_start) {
         var y = 1;
+        const date = new Date();
+        var current = date.getTime();
 //        let scaling = timeSeriesCtx.height/(Math.abs(waterfall_min_level)); // use for scale of 0dBm - wf_min_level
 //        const d = scaling * 10; // reticule line every 10dB of set window height // use for scale of 0dBm - wf_min_level
-        let scaling = timeSeriesCtx.height / (Math.abs(waterfall_min_level - waterfall_max_level)); // scale from wf_min - wf_max
+        let scaling = timeSeriesCtx.height/(Math.abs(waterfall_min_level - waterfall_max_level)); // scale from wf_min - wf_max
         const d = (scaling * 10); // scale from wf_min - wf_max
         timeSeriesCtx.fillStyle = "#000";
         timeSeriesCtx.fillRect(0, 0, timeSeriesCtx.width, timeSeriesCtx.height);
         timeSeriesCtx.fillStyle = "#FFF";
         timeSeriesCtx.font = "16px";
 //        timeseries_data.push(Math.abs(sig_data)); // use for scale of 0dBm - wf_min_level
-        timeseries_data.push(sig_data); // scale from wf_min - wf_max
 //        var dBnum = 0; // use for scale of 0dBm - wf_min_level
+        timeseries_data.push(sig_data); // scale from wf_min - wf_max
+        if (ts_ticks) { 
+            timeseries_ticks.push(0);
+            if (current >= ts_time + 30000) {  // division interval in milliseconds
+                ts_time = current;
+                let mins = date.getMinutes();
+                let secs = date.getSeconds();
+//                timeseries_ticks.push(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()); // pushes time string without leading 0's for nums < 10
+            timeseries_ticks.push(date.getHours() + ":" + (mins = mins <= 9 ? '0' + mins : mins) + ":" + (secs = secs <= 9 ? '0' + secs : secs)); // gives leading 0's
+            }
+        }
         var dBnum = Math.round(waterfall_max_level); // scale from wf_min - wf_max
-        if (timeseries_data.length >= timeSeriesCtx.width - (label_w)) { // subtract to stop trace & RHS text interacting
-            timeseries_data.shift();
+        if (timeseries_data.length >= timeSeriesCtx.width -(label_w)) { // subtract to stop trace & RHS text interacting
+            timeseries_data.shift();  // yes this is a slow op but it doesn't appear to badly affect... 
+            if (ts_ticks) { 
+                timeseries_ticks.shift();
+            }
         }
 //---------------------------- reticule ----------------------------------------
         for (let i = 0; i < timeSeriesCtx.height; i++) {
             y = y + d; // reticule lines
             dBnum = dBnum - 10;
-            timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width - (label_w), 0.5);  // draw lines
-            timeSeriesCtx.fillText(dBnum + "dB", timeSeriesCtx.width - (label_w), y); // write -dB values @RHS
+            timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width -(label_w), 0.5);  // draw lines
+            timeSeriesCtx.fillText(dBnum +"dB", timeSeriesCtx.width -(label_w),y); // write -dB values @RHS
         }
 //---------------------------- end reticule ----------------------------------------
+        timeSeriesCtx.fillStyle = "grey"; // lighten up the time ticks
         timeSeriesCtx.lineWidth = 1;
         timeSeriesCtx.strokeStyle = 'yellow';
         timeSeriesCtx.beginPath();
@@ -1669,7 +1720,13 @@ function waterfall_add(data) {
 //---------------------------- plot data  ----------------------------------------
         var tslen = timeseries_data.length; // put the .length calc outside the for loop to speed up
         for (let i = 0; i < tslen; i++) {
-            y = timeSeriesCtx.height - (((timeseries_data[i] - waterfall_min_level) / wfmax_min) * timeSeriesCtx.height); // scale the data now so changes in min_waterfall+max_waterfall and reticule are reflected
+            if (ts_ticks) {  
+                if (timeseries_ticks[i]) {  // time ticks turned on?
+                    timeSeriesCtx.fillRect(i, 0, 1, timeSeriesCtx.height); // draw vertical line at specified interval
+                    timeSeriesCtx.fillText(timeseries_ticks[i],i+3,timeSeriesCtx.height - 2) // write time alongside line
+                }
+            }
+            y = timeSeriesCtx.height-(((timeseries_data[i]-waterfall_min_level)/wfmax_min)*timeSeriesCtx.height); // scale the data now so changes in min_waterfall+max_waterfall and reticule are reflected
 //            y = (timeseries_data[i]*scaling); // scale the data so changes in min_waterfall and reticule are reflected - use if scale is 0dBm - wf_min
             timeSeriesCtx.lineTo(i, y);
         }
