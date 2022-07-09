@@ -570,7 +570,7 @@ input[type=range]:disabled {
 
     background-color: green;
     /*  border: none; */
-    color: black;
+    color: white;
     height: 18px;
     width: 16px;
     border-radius: 3px;
