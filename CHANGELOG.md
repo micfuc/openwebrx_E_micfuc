@@ -1,6 +1,12 @@
 
 **1.2.0-dev_E**
 
+
+- Add ability to toggle waterfall display via menu
+- Add timestamp and tick lines for Timeseries (selectable from menu)
+- Add new spectra line display option (in addition to fill)
+- Add new Display selection menu for spectrum and timeseries displays
+- Remove of spectrum and timeseries buttons, shift other button positions
 - Add panning of zoomed display via RX panel buttons
 - Add value labels for timeseries plot and spectra
 - Add plotting of signal level over time
