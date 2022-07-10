@@ -101,7 +101,12 @@ function freqstep(sel) {
             stepsize = 0;
     }
     var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
-    var new_offset = offset_frequency + stepsize;
+//    var new_offset = offset_frequency + stepsize;
+    if (Math.abs(stepsize) > 100) {
+        var new_offset = (Math.round((offset_frequency + stepsize)/1000)*1000);  // eroyee; 'snap' the largest stepsize to nearest 1kHz
+    } else {
+        var new_offset = (offset_frequency + stepsize);
+    }
     if (new_offset !== offset_frequency) {
         $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset);
     }
