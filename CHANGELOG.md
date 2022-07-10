@@ -1,7 +1,7 @@
 
 **1.2.0-dev_E**
 
-
+- Add 'snap to nearest 1000Hz' for outer frequency step buttons
 - Add ability to toggle waterfall display via menu
 - Add timestamp and tick lines for Timeseries (selectable from menu)
 - Add new spectra line display option (in addition to fill)
