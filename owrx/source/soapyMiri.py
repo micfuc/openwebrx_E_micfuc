@@ -28,8 +28,10 @@ class SoapymiriSource(SoapyConnectorSource):
         mappings.update(
             {
                 "bias_tee": "biasT_ctrl",
-                "offset_tune": "offset_tune_ctrl",
+                "offset_tune": "offset_tune",
                 "bufflen": "bufflen",
+                "buffers": "buffers",
+                "asyncbuffers": "asyncBuffs",
             }
         )
         return mappings
@@ -45,30 +47,52 @@ class BuffLenOptions(DropdownEnum):
     def __str__(self):
         return self.value
 
+class BuffersOptions(DropdownEnum):
+    BUFFERS_8 = "8"
+    BUFFERS_15 = "15"
+    BUFFERS_24 = "24"
+
+    def __str__(self):
+        return self.value
+
+class AsyncBuffsOptions(DropdownEnum):
+    ASYNCBUFF_0 = "0"
+    ASYNCBUFF_2 = "2"
+    ASYNCBUFF_4 = "4"
+
+    def __str__(self):
+        return self.value
+
 class SoapymiriDeviceDescription(SoapyConnectorDeviceDescription):
     def getName(self):
         return "Miric-based device (via SoapySDR)"
-
-#    def getGainStages(self):  # Nope, these won't work!?
-#        return ["RFGR", "IFGR"]
 
     def getInputs(self) -> List[Input]:
         return super().getInputs() + [
             BiasTeeInput(),
             CheckboxInput(
                 "offset_tune",
-                "Enable Offset Tuning Mode",
+                "Offset Tuning Mode, default=off",
             ),
             DropdownInput(
                 "bufflen",
-                "Buffer Length",
+                "Bufferlength in 512byte multiples, default=36864",
                 BuffLenOptions,
+            ),
+            DropdownInput(
+                "buffers",
+                "Buffers in ring, default=15",
+                BuffersOptions,
+            ),
+            DropdownInput(
+                "asyncbuffers",
+                "Async USB buffers, default=0",
+                AsyncBuffsOptions,
             ),
         ]
 
     def getDeviceOptionalKeys(self):
-        return super().getDeviceOptionalKeys() + ["bias_tee", "offset_tune", "bufflen"]
+        return super().getDeviceOptionalKeys() + ["bias_tee", "offset_tune", "bufflen", "buffers", "asyncbuffers"]
 
     def getProfileOptionalKeys(self):
-        return super().getProfileOptionalKeys() + ["bias_tee", "offset_tune", "bufflen"]
-
+        return super().getProfileOptionalKeys() + ["bias_tee", "offset_tune", "bufflen" "buffers", "asyncbuffers"]
