@@ -865,12 +865,6 @@ function get_zoom_coeff_from_hps(hps) {
 
 function canLeft()
 {
-	console.log("zoom_center_rel: " + zoom_center_rel);
-	console.log("bandwidth: " + bandwidth);
-	console.log("waterfallWidth: " + waterfallWidth());
-	console.log("zoom_center_where: " + zoom_center_where);
-	console.log("range.hps: " + range.hps);
-
     if ((zoom_center_rel > (-bandwidth / 1.5 + waterfallWidth() * zoom_center_where * range.hps)))
     {
         zoom_center_rel -= (range.hps * screen.availWidth) * 0.5;
