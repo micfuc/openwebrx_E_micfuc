@@ -4,14 +4,14 @@
 # Edouard here: https://github.com/f4exb/libmirisdr-4
 #
 # This is quite alpha, I've tested it with just one device which seems to work,
-# but there seem to be some spurious signals, and in some cases it won't receive
-# dead on the centre frequency. This could be simply a matter of settling on the best
-# settings, or there could be something else more fundamental. Help welcome!
+# but there may be some spurious signals, and in some cases it won't receive
+# dead on the centre frequency. This should be addressable by setting an offset.
+# 
+# Help to improve this is welcome, and there may be other settings to implement
+# in time, just not yet.
 #
-# There may be other settings to implement in time, just not yet.
-#
-# Best sampling rate for me is 8MHz, other rates I tried seemed to give errors after a 
-# short time.
+# Sampling rate should be set at specified values such as 2, 5, 8 MHz, other rates 
+# can give errors.
 #
 # If present you will need to blacklist the msi2500 device drivers. 
 # See : https://www.radiosrs.net/msi2500_driver_conflicts.html
@@ -28,8 +28,8 @@ class SoapymiriSource(SoapyConnectorSource):
         mappings.update(
             {
                 "bias_tee": "biasT_ctrl",
-#                "device_type": "device_type", yet to be implemented?
-                "if_mode": "if_mode",
+                "offset_tune": "offset_tune_ctrl",
+                "bufflen": "bufflen",
             }
         )
         return mappings
@@ -37,27 +37,17 @@ class SoapymiriSource(SoapyConnectorSource):
     def getDriver(self):
         return "soapyMiri"
 
-
-class IfModeOptions(DropdownEnum):
-    IFMODE_ZERO_IF = "0"
-    IFMODE_450 = "450000"
-    IFMODE_1620 = "1620000"
-    IFMODE_2048 = "2048000"
+class BuffLenOptions(DropdownEnum):
+    BUFFLEN_15872 = "15872"
+    BUFFLEN_36864 = "36864"
+    BUFFLEN_73728 = "73728"
 
     def __str__(self):
         return self.value
 
-# class DeviceTypeOptions(DropdownEnum):
-#    DEVICE_TYPE_MIRI = "0"
-#    DEVICE_TYPE_SDRPLAY = "1"
-#
-#    def __str__(self):
-#        return self.value
-
-
 class SoapymiriDeviceDescription(SoapyConnectorDeviceDescription):
     def getName(self):
-        return "Miric-based device"
+        return "Miric-based device (via SoapySDR)"
 
 #    def getGainStages(self):  # Nope, these won't work!?
 #        return ["RFGR", "IFGR"]
@@ -65,16 +55,20 @@ class SoapymiriDeviceDescription(SoapyConnectorDeviceDescription):
     def getInputs(self) -> List[Input]:
         return super().getInputs() + [
             BiasTeeInput(),
+            CheckboxInput(
+                "offset_tune",
+                "Enable Offset Tuning Mode",
+            ),
             DropdownInput(
-                "if_mode",
-                "IF Mode",
-                IfModeOptions,
+                "bufflen",
+                "Buffer Length",
+                BuffLenOptions,
             ),
         ]
 
     def getDeviceOptionalKeys(self):
-        return super().getDeviceOptionalKeys() + ["bias_tee", "if_mode"]
+        return super().getDeviceOptionalKeys() + ["bias_tee", "offset_tune", "bufflen"]
 
     def getProfileOptionalKeys(self):
-        return super().getProfileOptionalKeys() + ["bias_tee", "if_mode"]
+        return super().getProfileOptionalKeys() + ["bias_tee", "offset_tune", "bufflen"]
 
