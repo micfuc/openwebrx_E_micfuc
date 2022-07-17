@@ -32,7 +32,7 @@ var fft_compression = "none";
 var fft_codec;
 var waterfall_setup_done = 0;
 var secondary_fft_size;
-var StepHz = false; //eroyee - for 5 / 9 kHz stepchange
+var StepHz = 5000        // tuxtiger: for 1 / 5 / 9 kHz stepchange
 
 function updateVolume() {
     audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
@@ -57,14 +57,18 @@ function toggleMute() {
  - note this is optimised for tuning precision of 10Hz. Furture improvement to 
  include that variable and adjust accordingly -----------------------------*/
 function toggleStepHz() {
-    if (StepHz) {
-        StepHz = false;
+    if (StepHz == 1000) {
+        StepHz = 5000;
         document.getElementById('stepchangeHz').innerHTML = "5";
         document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
-    } else {
-        StepHz = true;
+    } else if (StepHz == 5000) {
+        StepHz = 9000;
         document.getElementById('stepchangeHz').innerHTML = "9";
         document.getElementById('stepchangeHz').style.backgroundColor = "blue";
+    } else if (StepHz == 9000) {
+        StepHz = 1000;
+        document.getElementById('stepchangeHz').innerHTML = "1";
+        document.getElementById('stepchangeHz').style.backgroundColor = "red";
     }
 }
 
@@ -72,11 +76,7 @@ function freqstep(sel) {
     var stepsize = 0;
     switch (sel) {
         case 0:
-            if (StepHz) {
-                stepsize = -9000;
-            } else {
-                stepsize = -5000;
-            }
+            stepsize = -StepHz;
             break;
         case 1:
             stepsize = -100;
@@ -91,24 +91,46 @@ function freqstep(sel) {
             stepsize = 100;
             break;
         case 5:
-            if (StepHz) {
-                stepsize = 9000;
-            } else {
-                stepsize = 5000;
-            }
+            stepsize = StepHz;
             break;
         default:
             stepsize = 0;
     }
     var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
-//    var new_offset = offset_frequency + stepsize;
+    var tuned_freq = offset_frequency + center_freq;
+    var new_offset = 0;
     if (Math.abs(stepsize) > 100) {
-        var new_offset = (Math.round((offset_frequency + stepsize)/1000)*1000);  // eroyee; 'snap' the largest stepsize to nearest 1kHz
+        var HzFraction = tuned_freq - (Math.trunc(tuned_freq/1000)*1000);
+        if (HzFraction > 0) {
+            // tuxtiger: do not use the full step size but first snap to the nearest kHz value
+            if (stepsize < 0) {
+                new_offset = offset_frequency - HzFraction;
+            } else {
+                new_offset = offset_frequency + (1000 - HzFraction);
+            }
+        } else {
+            new_offset = (Math.round((offset_frequency + stepsize)/1000)*1000);  // eroyee; 'snap' the largest stepsize to nearest 1kHz
+        }
     } else {
-        var new_offset = (offset_frequency + stepsize);
+        new_offset = (offset_frequency + stepsize);
     }
     if (new_offset !== offset_frequency) {
         $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset);
+        // check to see if we need to scroll
+        tuned_freq = new_offset + center_freq;
+        var visible_freq_range = get_visible_freq_range();
+        if (stepsize > 0) {
+            var range_plus = visible_freq_range.end - visible_freq_range.center;
+            if ((tuned_freq - visible_freq_range.center) / range_plus > 0.7) {
+                canRight();
+            }
+	} else {
+            var range_min = visible_freq_range.center - visible_freq_range.start;
+            if ((visible_freq_range.center - tuned_freq) / range_min > 0.7) {
+                canLeft();
+            }
+	}
+
     }
 }
 /* -------------------------------------------------------------------------- */
@@ -843,9 +865,15 @@ function get_zoom_coeff_from_hps(hps) {
 
 function canLeft()
 {
-    if ((zoom_center_rel > (-bandwidth / 2 + waterfallWidth() * zoom_center_where * range.hps)))
+	console.log("zoom_center_rel: " + zoom_center_rel);
+	console.log("bandwidth: " + bandwidth);
+	console.log("waterfallWidth: " + waterfallWidth());
+	console.log("zoom_center_where: " + zoom_center_where);
+	console.log("range.hps: " + range.hps);
+
+    if ((zoom_center_rel > (-bandwidth / 1.5 + waterfallWidth() * zoom_center_where * range.hps)))
     {
-        zoom_center_rel -= range.hps * screen.availWidth;
+        zoom_center_rel -= (range.hps * screen.availWidth) * 0.5;
         resize_canvases(false);
         mkscale();
         bookmarks.position();
@@ -854,9 +882,9 @@ function canLeft()
 
 function canRight()
 {
-    if (!(zoom_center_rel > (bandwidth / 2 - waterfallWidth() * (1 - zoom_center_where) * range.hps)))
+    if (!(zoom_center_rel > (bandwidth / 1.5 - waterfallWidth() * (1 - zoom_center_where) * range.hps)))
     {
-        zoom_center_rel += range.hps * screen.availWidth;
+        zoom_center_rel += (range.hps * screen.availWidth * 0.5);
         resize_canvases(false);
         mkscale();
         bookmarks.position();
