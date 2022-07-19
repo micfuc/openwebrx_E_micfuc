@@ -526,7 +526,7 @@ input[type=range]:disabled {
     opacity: 0.5;
 }
 
-/* --- eroyee add 5kHz/9kHz freq step change button --- */
+/* --- eroyee add 1kHz/5kHz/9kHz freq step change button --- */
 
 .openwebrx-stepchangeHz-button {
 
