@@ -99,10 +99,10 @@ function freqstep(sel) {
     var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
     var tuned_freq = offset_frequency + center_freq;
     var new_offset = 0;
-    if (Math.abs(stepsize) > 100) {
+    if (Math.abs(stepsize) > 100) {    // do the 'snap' to kHz only for large step ranges
         var HzFraction = tuned_freq - (Math.trunc(tuned_freq/1000)*1000);
         if (HzFraction > 0) {
-            // tuxtiger: do not use the full step size but first snap to the nearest kHz value
+            // not snapped to kHz, do not use the full stepsize but first snap to the nearest kHz value
             if (stepsize < 0) {
                 new_offset = offset_frequency - HzFraction;
             } else {
@@ -159,6 +159,7 @@ function init_key_listener(keypress) {
         if (keypress.keyCode == "40") {
             freqstep(1);
         }
+        // Left Cursor
         if (keypress.keyCode == "37") {
             freqstep(2);
         }
@@ -863,22 +864,18 @@ function get_zoom_coeff_from_hps(hps) {
 
 // eroyee, clickbutton shift waterfall, apparently useful for mobile browsers // 
 
-function canLeft()
-{
-    if ((zoom_center_rel > (-bandwidth / 1.5 + waterfallWidth() * zoom_center_where * range.hps)))
-    {
-        zoom_center_rel -= (range.hps * screen.availWidth) * 0.5;
+function canLeft() {
+    if (zoom_center_rel > (-bandwidth / 1.5 + waterfallWidth() * zoom_center_where * range.hps)) {
+        zoom_center_rel -= range.hps * screen.availWidth * 0.5;    // 0.5 = scroll left for 50% of waterfall width
         resize_canvases(false);
         mkscale();
         bookmarks.position();
     }
 }
 
-function canRight()
-{
-    if (!(zoom_center_rel > (bandwidth / 1.5 - waterfallWidth() * (1 - zoom_center_where) * range.hps)))
-    {
-        zoom_center_rel += (range.hps * screen.availWidth * 0.5);
+function canRight() {
+    if (!(zoom_center_rel > (bandwidth / 1.5 - waterfallWidth() * (1 - zoom_center_where) * range.hps))) {
+        zoom_center_rel += range.hps * screen.availWidth * 0.5;    // 0.5 = scroll right for 50% of waterfall width
         resize_canvases(false);
         mkscale();
         bookmarks.position();
