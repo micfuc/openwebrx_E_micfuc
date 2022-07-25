@@ -7,6 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+ 
 class ReceiverDetails(PropertyFilter):
     def __init__(self):
         super().__init__(
@@ -18,6 +19,12 @@ class ReceiverDetails(PropertyFilter):
                 "receiver_gps",
                 "photo_title",
                 "photo_desc",
+                "black_mod",
+                "status_button",
+                "log_button",
+                "receiver_button",
+                "map_button",
+                "settings_button",                                                                                
             )
         )
 

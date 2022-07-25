@@ -223,6 +223,7 @@ var waterfall_colors = buildWaterfallColors(['#000', '#FFF']);
 var waterfall_auto_levels;
 var waterfall_auto_min_range;
 
+
 function buildWaterfallColors(input) {
     return chroma.scale(input).colors(256, 'rgb');
 }
@@ -1706,7 +1707,7 @@ function waterfall_add(data) {
 //        let scaling = timeSeriesCtx.height/(Math.abs(waterfall_min_level)); // use for scale of 0dBm - wf_min_level
 //        const d = scaling * 10; // reticule line every 10dB of set window height // use for scale of 0dBm - wf_min_level
         let scaling = timeSeriesCtx.height / (Math.abs(waterfall_min_level - waterfall_max_level)); // scale from wf_min - wf_max
-        const d = (scaling * 10); // scale from wf_min - wf_max
+        const d = (scaling * 5); // scale from wf_min - wf_max ; changed by I8FUC from 10 to 5 20220721
         timeSeriesCtx.fillStyle = "#000";
         timeSeriesCtx.fillRect(0, 0, timeSeriesCtx.width, timeSeriesCtx.height);
         timeSeriesCtx.fillStyle = "#FFF";
@@ -1734,7 +1735,7 @@ function waterfall_add(data) {
 //---------------------------- reticule ----------------------------------------
         for (let i = 0; i < timeSeriesCtx.height; i++) {
             y = y + d; // reticule lines
-            dBnum = dBnum - 10;
+            dBnum = dBnum - 5;  //  changed by I8FUC from 10 to 5 2022072
             timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width - (label_w), 0.5);  // draw lines
             timeSeriesCtx.fillText(dBnum + "dB", timeSeriesCtx.width - (label_w), y); // write -dB values @RHS
         }
@@ -1806,7 +1807,7 @@ function waterfall_add(data) {
 
 //--------------------------- reticule ----------------------------------------
         for (let i = 0; i < spectrumCtx.height; i++) {
-            dBnum = dBnum - 10; // label values
+            dBnum = dBnum - 5; // label values ; changed by I8FUC from 10 to 5 2022072
             y = y + d; // reticule lines
 //                spectrumCtx.fillStyle = "#FFF"; // white, comment out for colour coded lines
             screenCtx.fillStyle = spectrumGradient; // remove comment for coloured labelling
@@ -1927,6 +1928,7 @@ function openwebrx_init() {
     initSliders();
     /* ----- --eroyee add for keyboard tuning 28 Dec 20 --------------------- */
     init_key_listener();
+    initTopBarMenu() ;   // by I8FUC to support top bar ccomponents hiding by admin screens
     /* ---------------------------------------------------------------------- */
 }
 
@@ -2069,6 +2071,28 @@ function initPanels() {
             first_show_panel(el);
         }
     });
+
+}    
+    
+function initTopBarMenu() {    // by I8FUC to support top bar ccomponents hiding by admin screens
+    $('#top_bar_buttons').find('.button').each(function () {
+        var el = this;
+          if(el.id && el.id === 'status_but_disable' ) { el.style.display= 'none' ; }   ;
+          if(el.id && el.id === 'status_but_enable' ) { el.style.display= 'block' ; }   ;
+          
+          if(el.id && el.id ===  'log_but_disable' ) { el.style.display= 'none' ; }  ;  
+           if(el.id && el.id === 'log_but_enable' ) { el.style.display= 'block' ; }  ;          
+                  
+          if(el.id && el.id === 'receiver_but_disable' ) { el.style.display= 'none' ; }  ; 
+          if(el.id && el.id === 'receiver_but_enable' ) { el.style.display= 'block' ; }  ;           
+            
+          if(el.id && el.id ===  'map_but_disable' ) { el.style.display= 'none' ; }  ;
+           if(el.id && el.id === 'map_but_enable' ) { el.style.display= 'block' ; }  ;         
+          
+          if(el.id && el.id === 'settings_but_disable' ) { el.style.display= 'none' ; } ;                          
+          if(el.id && el.id === 'settings_but_enable' ) { el.style.display= 'block' ; } ;             
+    });
+
 }
 
 /*
