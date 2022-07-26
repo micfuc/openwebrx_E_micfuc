@@ -226,23 +226,7 @@ class GeneralSettingsController(SettingsFormController):
                     append="s",
                 ),
             ),
-            Section(
-                "Mods settings",
-                TextInput(
-                    "mod_header_compose",
-                    "Mod: Header Compose Content",
-                    infotext="Allows verbose Header for main page, check out "
-                    + '<a href="https://developers.google.com/maps/documentation/embed/get-api-key" target="_blank">'
-                    + "their documentation</a> on how to obtain one.",
-                ),
-                NumberInput(
-                    "mod_id",
-                    "Mod Identity",
-                    infotext="Mod identity ",
-                    append="s",
-                ),
-            ),           
-            
+                      
         ]
 
     def remove_existing_image(self, image_id):
