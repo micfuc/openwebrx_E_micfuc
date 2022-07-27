@@ -24,7 +24,9 @@ class ReceiverDetails(PropertyFilter):
                 "log_button",
                 "receiver_button",
                 "map_button",
-                "settings_button",                                                                                
+                "settings_button",
+                "rx_usage_policy_page",
+                "pseudo_session_timeout",                                                                              
             )
         )
 

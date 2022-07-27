@@ -75,7 +75,7 @@ class GeneralSettingsController(SettingsFormController):
                 ),                                
             ),
             Section(
-                "Top Bar Display Components (still under test....)",
+                "Top Bar Panels Toggle Buttons Display ",
                 DropdownInput(
                     "status_button",
                     "Status Panel Button Display",
@@ -226,7 +226,22 @@ class GeneralSettingsController(SettingsFormController):
                     append="s",
                 ),
             ),
-                      
+            Section(
+                "Pseudo Session Timeout",
+                TextInput(
+                    "rx_usage_policy_page",
+                    "RX Usage Policy Details",
+                    infotext="URL for a page describing Usage Policy Rules and Objectives of this Receiver "
+                    + '<a href="https://my-web-site-owx.info" target="_blank">'
+                    + "..like this...</a>",
+                ),
+                NumberInput(
+                    "pseudo_session_timeout",
+                    "Pseudo Session Timeout",
+                    infotext="Timeout for a user sessionin seconds",
+                    append="secs",
+                ),
+            ),                      
         ]
 
     def remove_existing_image(self, image_id):
