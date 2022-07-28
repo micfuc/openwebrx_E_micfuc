@@ -238,7 +238,7 @@ class GeneralSettingsController(SettingsFormController):
                 NumberInput(
                     "pseudo_session_timeout",
                     "Pseudo Session Timeout",
-                    infotext="Timeout for a user sessionin seconds",
+                    infotext="Timeout for a user session in seconds",
                     append="secs",
                 ),
             ),                      
