@@ -33,6 +33,10 @@ var fft_codec;
 var waterfall_setup_done = 0;
 var secondary_fft_size;
 var StepHz = 5000        // tuxtiger: for 1 / 5 / 9 kHz stepchange
+var default_time_tick = 60;
+var default_sec_fft_offset_db = 10 ;
+var ts_start = "rhs";
+var default_ret_step = 5 ; 
 
 function updateVolume() {
     audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
@@ -982,6 +986,18 @@ function on_ws_recv(evt) {
                 switch (json.type) {
                     case "config":
                         var config = json['value'];
+                        if ('default_time_tick' in config) {
+                            default_time_tick = config['default_time_tick'];
+                        }
+                        if ('default_ret_step' in config) {
+                            default_ret_step = config['default_ret_step'];
+                        }
+                        if ('ts_start' in config) {
+                            ts_start = config['ts_start'];
+                        }
+                        if ('default_sec_fft_offset_db' in config) {
+                            default_sec_fft_offset_db = config['default_sec_fft_offset_db'];
+                        }                                                             
                         if ('waterfall_colors' in config) {
                             waterfall_colors = buildWaterfallColors(config['waterfall_colors']);
                         }
@@ -1505,10 +1521,11 @@ function dispSelect(evt) {
 var timeSeriesCtx;
 var timeseries_start = false;
 const timeseries_window_h = 130;
-//const timeseries_data = new Array(screen.availWidth-34); // do we want to start at the RHS?
-//const timeseries_ticks = new Array(screen.availWidth-34).fill(0); // Follows from RHS
-const timeseries_data = [];
-const timeseries_ticks = [];
+
+const timeseries_data = new Array(screen.availWidth-34);		// do we want to start at the RHS?
+const timeseries_ticks = new Array(screen.availWidth-34).fill(0); 	// Follows from RHS      
+ 
+
 var ts_time;
 var ts_ticks = false;
 const ts_out_data = [0];
@@ -1518,6 +1535,11 @@ function display_timeseries(status)
         display_spectra('stop');
     }
     if ((!timeseries_start) && (status = 'start')) {
+       if ( ts_start === "lhs"){
+          timeseries_data.length = 0;
+          timeseries_ticks.length = 0;          
+          };
+    
         var divTimeseries = '<div id="signal-div-timeseries">'
                 + '<canvas id="signal-canvas-timeseries" width="' + (screen.availWidth) + '" height="' + (timeseries_window_h) + '" style="width:100%;height:' + (timeseries_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
                 + '</div>';
@@ -1548,8 +1570,8 @@ function display_timeseries(status)
             const flush = document.querySelector("#signal-canvas-timeseries");
             flush.parentNode.removeChild(flush);
             timeseries_start = false;
-            timeseries_data.length = 0;
-            timeseries_ticks.length = 0;
+          //  timeseries_data.length = 0;
+          //  timeseries_ticks.length = 0;
             ts_out_data.length = 0;
             return;
         }
@@ -1703,11 +1725,9 @@ function waterfall_add(data) {
     if (timeseries_start) {
         var y = 1;
         const date = new Date();
-        var current = date.getTime();
-//        let scaling = timeSeriesCtx.height/(Math.abs(waterfall_min_level)); // use for scale of 0dBm - wf_min_level
-//        const d = scaling * 10; // reticule line every 10dB of set window height // use for scale of 0dBm - wf_min_level
+        var current = date.getTime(); 
         let scaling = timeSeriesCtx.height / (Math.abs(waterfall_min_level - waterfall_max_level)); // scale from wf_min - wf_max
-        const d = (scaling * 5); // scale from wf_min - wf_max ; changed by I8FUC from 10 to 5 20220721
+        const d = (scaling * default_ret_step ); // scale from wf_min - wf_max ; changed by I8FUC from 10 to 5 20220721
         timeSeriesCtx.fillStyle = "#000";
         timeSeriesCtx.fillRect(0, 0, timeSeriesCtx.width, timeSeriesCtx.height);
         timeSeriesCtx.fillStyle = "#FFF";
@@ -1717,7 +1737,7 @@ function waterfall_add(data) {
         timeseries_data.push(sig_data); // scale from wf_min - wf_max
         if (ts_ticks) {
             timeseries_ticks.push(0);
-            if (current >= ts_time + 30000) {  // division interval in milliseconds
+            if (current >= ts_time + default_time_tick * 1000 ) {  // division interval in milliseconds
                 ts_time = current;
                 let mins = date.getMinutes();
                 let secs = date.getSeconds();
@@ -1725,7 +1745,7 @@ function waterfall_add(data) {
                 timeseries_ticks.push(date.getHours() + ":" + (mins = mins <= 9 ? '0' + mins : mins) + ":" + (secs = secs <= 9 ? '0' + secs : secs)); // gives leading 0's
             }
         }
-        var dBnum = Math.round(waterfall_max_level); // scale from wf_min - wf_max
+        var dBnum = Math.round(waterfall_max_level +10 ); // scale from wf_min - wf_max
         if (timeseries_data.length >= timeSeriesCtx.width - (label_w)) { // subtract to stop trace & RHS text interacting
             timeseries_data.shift();  // yes this is a slow op but it doesn't appear to badly affect... 
             if (ts_ticks) {
@@ -1735,7 +1755,7 @@ function waterfall_add(data) {
 //---------------------------- reticule ----------------------------------------
         for (let i = 0; i < timeSeriesCtx.height; i++) {
             y = y + d; // reticule lines
-            dBnum = dBnum - 5;  //  changed by I8FUC from 10 to 5 2022072
+            dBnum = dBnum - default_ret_step ;  //  changed by I8FUC from 10 to 5 2022072
             timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width - (label_w), 0.5);  // draw lines
             timeSeriesCtx.fillText(dBnum + "dB", timeSeriesCtx.width - (label_w), y); // write -dB values @RHS
         }
@@ -1754,7 +1774,7 @@ function waterfall_add(data) {
                     timeSeriesCtx.fillText(timeseries_ticks[i], i + 3, timeSeriesCtx.height - 2) // write time alongside line
                 }
             }
-            y = timeSeriesCtx.height - (((timeseries_data[i] - waterfall_min_level) / wfmax_min) * timeSeriesCtx.height); // scale the data now so changes in min_waterfall+max_waterfall and reticule are reflected
+            y = timeSeriesCtx.height - (((timeseries_data[i] - waterfall_min_level - 10 ) / wfmax_min) * timeSeriesCtx.height); // scale the data now so changes in min_waterfall+max_waterfall and reticule are reflected - added 10 by I8FUC 20220814
 //            y = (timeseries_data[i]*scaling); // scale the data so changes in min_waterfall and reticule are reflected - use if scale is 0dBm - wf_min
             timeSeriesCtx.lineTo(i, y);
         }
@@ -2106,7 +2126,7 @@ function initTopBarMenu() {    // by I8FUC to support top bar ccomponents hiding
  |___/
  */
 
-var secondary_demod_fft_offset_db = 18; //need to calculate that later
+var secondary_demod_fft_offset_db = 10; //need to calculate that later - was 18 changed to 10 by I8FUC 20220814
 var secondary_demod_canvases_initialized = false;
 var secondary_demod_channel_freq = 1000;
 var secondary_demod_waiting_for_set = false;
@@ -2211,7 +2231,8 @@ function secondary_demod_waterfall_add(data) {
     //Add line to waterfall image
     var oneline_image = secondary_demod_current_canvas_context.createImageData(w, 1);
     for (x = 0; x < w; x++) {
-        var color = waterfall_mkcolor(data[x] + secondary_demod_fft_offset_db);
+//        var color = waterfall_mkcolor(data[x] + secondary_demod_fft_offset_db);  // replaced by I8FUC with following statement 20220814
+        var color = waterfall_mkcolor(data[x] + default_sec_fft_offset_db);        
         for (i = 0; i < 3; i++) {
             oneline_image.data[x * 4 + i] = color[i];
         }

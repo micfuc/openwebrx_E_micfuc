@@ -26,7 +26,10 @@ class ReceiverDetails(PropertyFilter):
                 "map_button",
                 "settings_button",
                 "rx_usage_policy_page",
-                "pseudo_session_timeout",                                                                              
+                "pseudo_session_timeout", 
+                "ts_start",
+                "default_time_tick",
+                "default_ret_step",                                                                             
             )
         )
 

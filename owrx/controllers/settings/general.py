@@ -182,7 +182,7 @@ class GeneralSettingsController(SettingsFormController):
                     + "waterfall colors",
                 ),
             ),
-            Section(
+             Section(
                 "Compression",
                 DropdownInput(
                     "audio_compression",
@@ -225,6 +225,13 @@ class GeneralSettingsController(SettingsFormController):
                     infotext="Specifies how log markers / grids will remain visible on the map",
                     append="s",
                 ),
+                TextInput(
+                    "callsign_url",
+                    "Callsign database URL",
+                    infotext="Specifies callsign lookup URL, such as QRZ.COM "
+                    + "or QRZCQ.COM. Place curly brackers ({}) where callsign "
+                    + "is supposed to be.",
+                ),                   
             ),
             Section(
                 "Pseudo Session Timeout",
