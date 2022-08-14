@@ -33,10 +33,13 @@ var fft_codec;
 var waterfall_setup_done = 0;
 var secondary_fft_size;
 var StepHz = 5000        // tuxtiger: for 1 / 5 / 9 kHz stepchange
-var default_time_tick = 60;
+// start  by I8FUC 20220806
+var default_time_tick = 60;           
 var default_sec_fft_offset_db = 10 ;
 var ts_start = "rhs";
 var default_ret_step = 5 ; 
+// end  by I8FUC 20220814
+
 
 function updateVolume() {
     audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
@@ -986,6 +989,7 @@ function on_ws_recv(evt) {
                 switch (json.type) {
                     case "config":
                         var config = json['value'];
+                        // start by I8FUC 20220806
                         if ('default_time_tick' in config) {
                             default_time_tick = config['default_time_tick'];
                         }
@@ -997,7 +1001,8 @@ function on_ws_recv(evt) {
                         }
                         if ('default_sec_fft_offset_db' in config) {
                             default_sec_fft_offset_db = config['default_sec_fft_offset_db'];
-                        }                                                             
+                        }
+                        // end by I8FUC 20220806                                                    
                         if ('waterfall_colors' in config) {
                             waterfall_colors = buildWaterfallColors(config['waterfall_colors']);
                         }
@@ -1522,6 +1527,7 @@ var timeSeriesCtx;
 var timeseries_start = false;
 const timeseries_window_h = 130;
 
+// modified by I8FUC 20220814
 const timeseries_data = new Array(screen.availWidth-34);		// do we want to start at the RHS?
 const timeseries_ticks = new Array(screen.availWidth-34).fill(0); 	// Follows from RHS      
  
@@ -1535,7 +1541,7 @@ function display_timeseries(status)
         display_spectra('stop');
     }
     if ((!timeseries_start) && (status = 'start')) {
-       if ( ts_start === "lhs"){
+       if ( ts_start === "lhs"){   // by I8FUC 20220812
           timeseries_data.length = 0;
           timeseries_ticks.length = 0;          
           };
@@ -1570,8 +1576,8 @@ function display_timeseries(status)
             const flush = document.querySelector("#signal-canvas-timeseries");
             flush.parentNode.removeChild(flush);
             timeseries_start = false;
-          //  timeseries_data.length = 0;
-          //  timeseries_ticks.length = 0;
+          //  timeseries_data.length = 0;   // removed by I8FUC
+          //  timeseries_ticks.length = 0;  // removed by I8FUC
             ts_out_data.length = 0;
             return;
         }
@@ -1745,7 +1751,7 @@ function waterfall_add(data) {
                 timeseries_ticks.push(date.getHours() + ":" + (mins = mins <= 9 ? '0' + mins : mins) + ":" + (secs = secs <= 9 ? '0' + secs : secs)); // gives leading 0's
             }
         }
-        var dBnum = Math.round(waterfall_max_level +10 ); // scale from wf_min - wf_max
+        var dBnum = Math.round(waterfall_max_level +10 ); // scale from wf_min - wf_max  - fix by I8FUC to adjut timeline y scale to waterfall colors
         if (timeseries_data.length >= timeSeriesCtx.width - (label_w)) { // subtract to stop trace & RHS text interacting
             timeseries_data.shift();  // yes this is a slow op but it doesn't appear to badly affect... 
             if (ts_ticks) {
@@ -1774,7 +1780,7 @@ function waterfall_add(data) {
                     timeSeriesCtx.fillText(timeseries_ticks[i], i + 3, timeSeriesCtx.height - 2) // write time alongside line
                 }
             }
-            y = timeSeriesCtx.height - (((timeseries_data[i] - waterfall_min_level - 10 ) / wfmax_min) * timeSeriesCtx.height); // scale the data now so changes in min_waterfall+max_waterfall and reticule are reflected - added 10 by I8FUC 20220814
+            y = timeSeriesCtx.height - (((timeseries_data[i] - waterfall_min_level - 10 ) / wfmax_min) * timeSeriesCtx.height); // scale the data now so changes in min_waterfall+max_waterfall and reticule are reflected - added 10 by I8FUC 20220814 to allign timeseries with waterfall colors
 //            y = (timeseries_data[i]*scaling); // scale the data so changes in min_waterfall and reticule are reflected - use if scale is 0dBm - wf_min
             timeSeriesCtx.lineTo(i, y);
         }
