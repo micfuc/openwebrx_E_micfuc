@@ -1,0 +1,39 @@
+@import url("openwebrx-header.css");
+@import url("openwebrx-globals.css");
+
+html, body {
+    height: unset;
+}
+
+body {
+    margin-bottom: 5rem;
+}
+
+hr {
+    background: #444;
+}
+
+h1 {
+    margin: 1em 0;
+    text-align: center;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 15px;
+}
+
+td {
+    text-align: center;
+    border: 3px dotted;
+}
+
+img {
+    width: 100%;
+}
+
+.file-title {
+    text-align: center;
+    font-size: 80%;
+}
+
