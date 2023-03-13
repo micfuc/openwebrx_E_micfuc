@@ -29,6 +29,11 @@ function AudioEngine(maxBufferLength, audioReporter) {
     this.hdResampler = new Interpolator(this.hdResamplingFactor);
 
     this.maxBufferSize = maxBufferLength * this.getSampleRate();
+
+    this.recorder = new AudioRecorder(this.getOutputRate(), 128);
+    this.hdRecorder = new AudioRecorder(this.getHdOutputRate(), 128);
+    this.recording = false;
+    this.lastHd = false;
 }
 
 AudioEngine.prototype.buildAudioContext = function() {
@@ -276,7 +281,7 @@ AudioEngine.prototype.getSampleRate = function() {
     return this.audioContext.sampleRate;
 };
 
-AudioEngine.prototype.processAudio = function(data, resampler) {
+AudioEngine.prototype.processAudio = function(data, resampler, recorder) {
     if (!this.audioNode) return;
     this.audioBytes.add(data.byteLength);
     var buffer;
@@ -285,6 +290,9 @@ AudioEngine.prototype.processAudio = function(data, resampler) {
         buffer = this.audioCodec.decodeWithSync(new Uint8Array(data));
     } else {
         buffer = new Int16Array(data);
+    }
+    if(this.recording) {
+        recorder.record(buffer);
     }
     buffer = resampler.process(buffer);
     if (this.audioNode.port) {
@@ -299,11 +307,13 @@ AudioEngine.prototype.processAudio = function(data, resampler) {
 }
 
 AudioEngine.prototype.pushAudio = function(data) {
-    this.processAudio(data, this.resampler);
+    this.processAudio(data, this.resampler, this.recorder);
+    this.lastHd = false;
 };
 
 AudioEngine.prototype.pushHdAudio = function(data) {
-    this.processAudio(data, this.hdResampler);
+    this.processAudio(data, this.hdResampler, this.hdRecorder);
+    this.lastHd = true;
 }
 
 AudioEngine.prototype.setCompression = function(compression) {
@@ -318,6 +328,78 @@ AudioEngine.prototype.getBuffersize = function() {
     // only available when using ScriptProcessorNode
     if (!this.audioBuffers) return 0;
     return this.audioBuffers.map(function(b){ return b.length; }).reduce(function(a, b){ return a + b; }, 0);
+};
+
+AudioEngine.prototype.startRecording = function() {
+    if (!this.recording) {
+        var date = new Date(Date.now()).toISOString().slice(2,19)
+            .replaceAll('-','').replaceAll(':','').replaceAll('T','-');
+        this.mp3fileName = "REC-" + date + ".mp3";
+        this.recording = true;
+    }
+};
+
+AudioEngine.prototype.stopRecording = function() {
+    if (this.recording) {
+        this.recording = false;
+
+        // Save last updated recording
+        if (this.lastHd) {
+            this.hdRecorder.saveRecording(this.mp3fileName);
+        } else {
+            this.recorder.saveRecording(this.mp3fileName);
+        }
+
+        // Clear and stop all recorders
+        this.hdRecorder.stopRecording();
+        this.recorder.stopRecording();
+    }
+};
+
+function AudioRecorder(sampleRate, kbps) {
+    // Mono (1 channel), with given sample rate and bitrate
+    this.mp3encoder = new lamejs.Mp3Encoder(1, sampleRate, kbps);
+    this.blockSize  = 1152; // better be a multiple of 576
+    this.mp3Data    = [];
+}
+
+AudioRecorder.prototype.record = function(samples) {
+    for (var i = 0; i < samples.length; i += this.blockSize) {
+        var chunk  = samples.subarray(i, i + this.blockSize);
+        var mp3buf = this.mp3encoder.encodeBuffer(chunk);
+        if (mp3buf.length > 0) this.mp3Data.push(mp3buf);
+    }
+};
+
+AudioRecorder.prototype.stopRecording = function() {
+    this.mp3encoder.flush();
+    this.mp3Data = [];
+}
+
+AudioRecorder.prototype.saveRecording = function(name) {
+    // finish writing mp3
+    var mp3buf = this.mp3encoder.flush();
+    if (mp3buf.length>0) this.mp3Data.push(new Int8Array(mp3buf));
+
+    // Do not save unless we have data
+    if (this.mp3Data.length==0) return false;
+
+    var blob = new Blob(this.mp3Data, {type: "audio/mp3"});
+
+    var a = document.createElement("a");
+    a.href = window.URL.createObjectURL(blob);
+    a.style = "display: none";
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(function() {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(a.href);
+    }, 0);
+
+    // Success
+    return true;
 };
 
 function ImaAdpcmCodec() {

@@ -94,4 +94,5 @@ validator_types = {
     "int": IntegerValidator,
     "number": NumberValidator,
     "num": NumberValidator,
+    "bool": BoolValidator,
 }

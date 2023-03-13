@@ -14,10 +14,11 @@ logger = logging.getLogger(__name__)
 
 
 class DirewolfModule(AutoStartModule, DirewolfConfigSubscriber):
-    def __init__(self, service: bool = False):
+    def __init__(self, service: bool = False, ais: bool = False):
         self.process = None
         self.tcpSource = None
         self.service = service
+        self.ais = ais
         self.direwolfConfigPath = "{tmp_dir}/openwebrx_direwolf_{myid}.conf".format(
             tmp_dir=CoreConfig().get_temporary_directory(), myid=id(self)
         )
@@ -43,11 +44,14 @@ class DirewolfModule(AutoStartModule, DirewolfConfigSubscriber):
         file.close()
 
         # direwolf -c {direwolf_config} -r {audio_rate} -t 0 -q d -q h 1>&2
-        self.process = Popen(
-            ["direwolf", "-c", self.direwolfConfigPath, "-r", "48000", "-t", "0", "-q", "d", "-q", "h", "-d", "ai" ],
-            start_new_session=True,
-            stdin=PIPE,
-        )
+        cmdLine = ["direwolf", "-c", self.direwolfConfigPath, "-r", "48000", "-t", "0", "-q", "d", "-q", "h"]
+
+        # for AIS mode, add -B AIS -A
+        if self.ais:
+            cmdLine += ["-B", "AIS", "-A"]
+
+        # launch Direwolf
+        self.process = Popen(cmdLine, start_new_session=True, stdin=PIPE)
 
         # resume in case the reader has been stop()ed before
         self.reader.resume()

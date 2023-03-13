@@ -5,15 +5,13 @@ function Filter(demodulator) {
 
 Filter.prototype.getLimits = function() {
     var max_bw;
-    if (['pocsag', 'packet'].indexOf(this.demodulator.get_secondary_demod()) >= 0) {
+    if (['pocsag', 'packet', 'ais'].indexOf(this.demodulator.get_secondary_demod()) >= 0) {
         max_bw = 12500;
     } else if (['dmr', 'dstar', 'nxdn', 'ysf', 'm17'].indexOf(this.demodulator.get_modulation()) >= 0) {
         max_bw = 6250;
     } else if (this.demodulator.get_modulation() === 'wfm') {
         max_bw = 100000;
     } else if (this.demodulator.get_modulation() === 'drm') {
-        max_bw = 50000;
-    } else if (this.demodulator.get_modulation() === 'spectrum') {
         max_bw = 50000;
     } else if (this.demodulator.get_modulation() === "freedv") {
         max_bw = 4000;
@@ -83,14 +81,12 @@ Envelope.prototype.draw = function(visible_range){
         scale_ctx.fill();
         scale_ctx.globalAlpha = 1;
         scale_ctx.stroke();
-        // start by I8FUC 20220813
         scale_ctx.lineWidth = 1;
         scale_ctx.textAlign = "left";
         scale_ctx.fillText(this.demodulator.high_cut.toString(), to_px + env_att_w, env_h2);
         scale_ctx.textAlign = "right";
         scale_ctx.fillText(this.demodulator.low_cut.toString(), from_px - env_att_w, env_h2);
         scale_ctx.lineWidth = 3;
-        // end by I8FUC    
     }
     if (typeof line !== "undefined") // out of screen?
     {
@@ -155,26 +151,24 @@ Envelope.prototype.drag_move = function(x) {
     //(PassBand Shift) on radio equipment: PBS does move the whole passband without moving the offset
     //frequency.
     if (this.dragged_range === dr.beginning || this.dragged_range === dr.bfo || this.dragged_range === dr.pbs) {
-        //we don't let low_cut go beyond its limits
-        if ((new_value = this.drag_origin.low_cut + minus * freq_change) < this.demodulator.filter.getLimits().low) return true;
-        //nor the filter passband be too small
-        if (this.demodulator.high_cut - new_value < this.demodulator.filter.min_passband) return true;
-        //sanity check to prevent GNU Radio "firdes check failed: fa <= fb"
-        if (new_value >= this.demodulator.high_cut) return true;
-        this.demodulator.setLowCut(new_value);
+        this.demodulator.moveBandpass(
+            this.drag_origin.low_cut + minus * freq_change,
+            this.drag_origin.high_cut
+        );
     }
     if (this.dragged_range === dr.ending || this.dragged_range === dr.bfo || this.dragged_range === dr.pbs) {
-        //we don't let high_cut go beyond its limits
-        if ((new_value = this.drag_origin.high_cut + minus * freq_change) > this.demodulator.filter.getLimits().high) return true;
-        //nor the filter passband be too small
-        if (new_value - this.demodulator.low_cut < this.demodulator.filter.min_passband) return true;
-        //sanity check to prevent GNU Radio "firdes check failed: fa <= fb"
-        if (new_value <= this.demodulator.low_cut) return true;
-        this.demodulator.setHighCut(new_value);
+        this.demodulator.moveBandpass(
+            this.drag_origin.low_cut,
+            this.drag_origin.high_cut + minus * freq_change
+        );
     }
     if (this.dragged_range === dr.anything_else || this.dragged_range === dr.bfo) {
         //when any other part of the envelope is dragged, the offset frequency is changed (whole passband also moves with it)
         new_value = this.drag_origin.offset_frequency + freq_change;
+        //round value to the current tuning step
+        if (tuning_step > 0) {
+            new_value = Math.round(new_value / tuning_step) * tuning_step;
+        }
         if (new_value > bandwidth / 2 || new_value < -bandwidth / 2) return true; //we don't allow tuning above Nyquist frequency :-)
         this.demodulator.set_offset_frequency(new_value);
     }
@@ -190,6 +184,21 @@ Envelope.prototype.drag_end = function(){
     return to_return;
 };
 
+Envelope.prototype.wheel = function(x, dir, modifier){
+    var range = this.where_clicked(x, this.drag_ranges, {});
+    if (range === Demodulator.draggable_ranges.none) return false;
+
+    // When modifier is FALSE, shift bandpass up / down
+    // When modifier is TRUE, make bandpadd wider / narrower
+    var high_delta = dir? -50 : 50;
+    var low_delta  = modifier? -high_delta : high_delta;
+    this.demodulator.moveBandpass(
+        this.demodulator.low_cut + low_delta,
+        this.demodulator.high_cut + high_delta
+    );
+
+    return true;
+};
 
 //******* class Demodulator_default_analog *******
 // This can be used as a base for basic audio demodulators.
@@ -344,6 +353,30 @@ Demodulator.prototype.setLowCut = function(low_cut) {
 Demodulator.prototype.setHighCut = function(high_cut) {
     this.high_cut = high_cut;
     this.set();
+};
+
+Demodulator.prototype.moveBandpass = function(low_new, high_new) {
+    // Don't let low_cut go beyond its limits
+    if (low_new < this.filter.getLimits().low) return;
+
+    // Nor the filter passband be too small
+    if (this.high_cut - low_new < this.filter.min_passband) return;
+
+    // Sanity check to prevent GNU Radio "firdes check failed: fa <= fb"
+    if (low_new >= this.high_cut) return;
+
+    // Don't let high_cut go beyond its limits
+    if (high_new > this.filter.getLimits().high) return;
+
+    // Nor the filter passband be too small
+    if (high_new - this.low_cut < this.filter.min_passband) return;
+
+    // Sanity check to prevent GNU Radio "firdes check failed: fa <= fb"
+    if (high_new <= this.low_cut) return;
+
+    // Set new bounds
+    this.setLowCut(low_new);
+    this.setHighCut(high_new);
 };
 
 Demodulator.prototype.getBandpass = function() {

@@ -1,4 +1,99 @@
-openwebrx (1.2.0) UNRELEASED; urgency=low
+openwebrx (1.2.9) bullseye jammy; urgency=low
+
+  * Fixed missing 'N' letters in RTTY and CW decoders output.
+  * Fixed SSTV decoder getting stuck after receiving 2-3 images.
+  * Added SSTV debug messages to the log.
+  * Removed some unused SSTV frequencies from band plan.
+  * Removed SSTV NFM mode, since either USB or can be used with NFM.
+  * Multiple other small fixes and style changes.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Sat, 11 Mar 2023 16:12:00 +0000
+
+openwebrx (1.2.8) bullseye jammy; urgency=low
+
+  * Added AIS vessel reporting, with the map and background service.
+  * Added configurable URL for looking up vessels by their MMSIs.
+  * Added Air and Marine service bands to the band plan.
+  * Added more SSTV frequencies to the band plan.
+  * Added US APRS frequency to the 2m band.
+  * Added frequency values to stored file names.
+  * Declared LSB and FM modes as supported by SSTV.
+  * SSTV decoder should now work in LSB mode.
+  * Refactored file storage mechanism.
+  * Refactored SSTV data parser.
+  * Multiple small fixes.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Sat, 4 Mar 2023 16:12:00 +0000
+
+openwebrx (1.2.7) bullseye jammy; urgency=low
+
+  * Added MP3 recorder for saving received audio to files.
+  * Added "Files" page for viewing received SSTV frames.
+  * Added automatic deletion of previously received files.
+  * Added setting for how many received files should be kept.
+  * Clicking on an SSTV frame now saves it to a file.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Thu, 23 Feb 2023 16:12:00 +0000
+
+openwebrx (1.2.6) bullseye jammy; urgency=low
+
+  * Added SSTV decoder with user interface.
+  * Added background SSTV decoding to /tmp folder.
+  * Extended CB band up to 28MHz, as used in some countries.
+  * Added SSTV and RTTY frequencies to the bands layout.
+  * Added cleanup of stale wave file in the /tmp folder.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Sat, 18 Feb 2023 16:12:00 +0000
+
+openwebrx (1.2.5) bullseye jammy; urgency=low
+
+  * Added RTTY decoder.
+  * Improved CW decoder.
+  * Fixed possible crash in CW chain.
+  * Switched both decoders to complex input.
+  * Can now use SHIFT with scroll wheel, as mouse button.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Sat, 4 Feb 2023 16:12:00 +0000
+
+openwebrx (1.2.4) bullseye jammy; urgency=low
+
+  * Added automated CW decoder (experimental).
+  * Added scroll wheel support to frequency scale.
+  * Added changing bandpass bounds with scroll wheel.
+  * Added optional HTTPS support.
+  * Fixed frequency jumping to last input value.
+  * Made tuning buttons bigger.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Sat, 28 Jan 2023 15:15:00 +0000
+
+openwebrx (1.2.3) bullseye jammy; urgency=low
+
+  * Added configurable session timeout option, with a default page.
+  * Made multiple user interface improvements for touch screens.
+  * Made touch-and-drag panning more reliable.
+  * Added zoom in/out with the stretch/pinch gesture.
+  * Added buttons for precisely touch-tuning the frequency. 
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Thu, 12 Jan 2023 15:15:00 +0000
+
+openwebrx (1.2.2) bullseye jammy; urgency=low
+
+  * Added noise filter based on spectral subtraction.
+  * Added configurable tuning step.
+  * Added support for panning on touch screens.
+  * Made OWRX tune to the CW frequency in the CW mode.
+  * Improved APRS information display.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Fri, 23 Dec 2022 15:15:00 +0000
+
+openwebrx (1.2.1) bullseye jammy; urgency=low
+
+  * FifiSDR support fixed (pipeline formats now line up correctly)
+  * Added "Device" input for FifiSDR devices for sound card selection
+
+ -- Jakob Ketterl <jakob.ketterl@gmx.de>  Tue, 20 Sep 2022 16:01:00 +0000
+
+openwebrx (1.2.0) bullseye jammy; urgency=low
 
   * Major rewrite of all demodulation components to make use of the new
     csdr/pycsdr and digiham/pydigiham demodulator modules
@@ -6,7 +101,7 @@ openwebrx (1.2.0) UNRELEASED; urgency=low
   * New devices supported:
     - Blade RF
 
- -- Jakob Ketterl <jakob.ketterl@gmx.de>  Tue, 03 Aug 2021 13:54:00 +0000
+ -- Jakob Ketterl <jakob.ketterl@gmx.de>  Wed, 15 Jun 2022 16:20:00 +0000
 
 openwebrx (1.1.0) buster hirsute; urgency=low
 

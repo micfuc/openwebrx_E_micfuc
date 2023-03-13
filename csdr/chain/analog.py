@@ -69,11 +69,8 @@ class WFm(BaseDemodulatorChain, FixedIfSampleRateChain, DeemphasisTauChain, HdAu
 
 class Ssb(BaseDemodulatorChain):
     def __init__(self):
-        agc = Agc(Format.FLOAT)
-        agc.setProfile(AgcProfile.SLOW)
-        agc.setInitialGain(200)
         workers = [
             RealPart(),
-            agc,
+            Agc(Format.FLOAT),
         ]
         super().__init__(workers)

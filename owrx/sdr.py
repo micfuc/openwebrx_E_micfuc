@@ -130,7 +130,9 @@ class ActiveSdrSources(PropertyReadOnly):
                 self._addSource(key, value)
 
     def isAvailable(self, source: SdrSource):
-        return source.isEnabled() and not source.isFailed()
+# @@@
+#        return source.isEnabled() and not source.isFailed()
+        return source.isEnabled()
 
     def _addSource(self, key, source: SdrSource):
         if self.isAvailable(source):

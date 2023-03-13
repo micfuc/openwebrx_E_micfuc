@@ -1,8 +1,7 @@
 from owrx.config import ConfigError
 from configparser import ConfigParser
-import os
 from glob import glob
-
+import os
 
 class CoreConfig(object):
     defaults = {
@@ -57,3 +56,4 @@ class CoreConfig(object):
 
     def get_aprs_symbols_path(self):
         return self.aprs_symbols_path
+

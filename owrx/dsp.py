@@ -34,10 +34,12 @@ class ClientDemodulatorSecondaryDspEventClient(ABC):
 
 
 class ClientDemodulatorChain(Chain):
-    def __init__(self, demod: BaseDemodulatorChain, sampleRate: int, outputRate: int, hdOutputRate: int, audioCompression: str, secondaryDspEventReceiver: ClientDemodulatorSecondaryDspEventClient):
+    def __init__(self, demod: BaseDemodulatorChain, sampleRate: int, outputRate: int, hdOutputRate: int, audioCompression: str, nrEnabled: bool, nrThreshold: int, secondaryDspEventReceiver: ClientDemodulatorSecondaryDspEventClient):
         self.sampleRate = sampleRate
         self.outputRate = outputRate
         self.hdOutputRate = hdOutputRate
+        self.nrEnabled = nrEnabled
+        self.nrThreshold = nrThreshold
         self.secondaryDspEventReceiver = secondaryDspEventReceiver
         self.selector = Selector(sampleRate, outputRate)
         self.selector.setBandpass(-4000, 4000)
@@ -50,7 +52,7 @@ class ClientDemodulatorChain(Chain):
         self.wfmDeemphasisTau = 50e-6
         inputRate = demod.getFixedAudioRate() if isinstance(demod, FixedAudioRateChain) else outputRate
         oRate = hdOutputRate if isinstance(demod, HdAudio) else outputRate
-        self.clientAudioChain = ClientAudioChain(demod.getOutputFormat(), inputRate, oRate, audioCompression)
+        self.clientAudioChain = ClientAudioChain(demod.getOutputFormat(), inputRate, oRate, audioCompression, nrEnabled, nrThreshold)
         self.secondaryFftSize = 2048
         self.secondaryFftOverlapFactor = 0.3
         self.secondaryFftFps = 9
@@ -251,6 +253,12 @@ class ClientDemodulatorChain(Chain):
     def setAudioCompression(self, compression: str) -> None:
         self.clientAudioChain.setAudioCompression(compression)
 
+    def setNrEnabled(self, nrEnabled: bool) -> None:
+        self.clientAudioChain.setNrEnabled(nrEnabled)
+
+    def setNrThreshold(self, nrThreshold: int) -> None:
+        self.clientAudioChain.setNrThreshold(nrThreshold)
+
     def setSquelchLevel(self, level: float) -> None:
         if level == self.squelchLevel:
             return
@@ -409,6 +417,8 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
             "mod": ModulationValidator(),
             "secondary_offset_freq": "int",
             "dmr_filter": "int",
+            "nr_enabled": "bool",
+            "nr_threshold": "int",
         }
         self.localProps = PropertyValidator(PropertyLayer().filter(*validators.keys()), validators)
 
@@ -436,6 +446,8 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
                 output_rate=12000,
                 hd_output_rate=48000,
                 digital_voice_codecserver="",
+                nr_enabled=False,
+                nr_threshold=0
             ).readonly()
         )
 
@@ -445,6 +457,8 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
             self.props["output_rate"],
             self.props["hd_output_rate"],
             self.props["audio_compression"],
+            self.props["nr_enabled"],
+            self.props["nr_threshold"],
             self
         )
 
@@ -487,6 +501,8 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
             self.props.wireProperty("wfm_deemphasis_tau", self.chain.setWfmDeemphasisTau),
             self.props.wireProperty("secondary_mod", self.setSecondaryDemodulator),
             self.props.wireProperty("secondary_offset_freq", self.chain.setSecondaryFrequencyOffset),
+            self.props.wireProperty("nr_enabled", self.chain.setNrEnabled),
+            self.props.wireProperty("nr_threshold", self.chain.setNrThreshold),
         ]
 
         # wire power level output
@@ -521,28 +537,9 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
         if isinstance(demod, BaseDemodulatorChain):
             return demod
         # TODO: move this to Modes
-        if demod == "sp50":
-            from csdr.chain.analog import NFm
-            return NFm(self.props["output_rate"])
-        if demod == "sp25":
-            from csdr.chain.analog import NFm
-            return NFm(self.props["output_rate"])
-        if demod == "sp15":
-            from csdr.chain.analog import NFm
-            return NFm(self.props["output_rate"])
-        if demod == "sp10":
-            from csdr.chain.analog import NFm
-            return NFm(self.props["output_rate"])            
-        if demod == "sp5":
-            from csdr.chain.analog import NFm
-            return NFm(self.props["output_rate"])
-        if demod == "sp2":
-            from csdr.chain.analog import NFm
-            return NFm(self.props["output_rate"])                 
         if demod == "nfm":
             from csdr.chain.analog import NFm
-            return NFm(self.props["output_rate"])            
-            
+            return NFm(self.props["output_rate"])
         elif demod == "wfm":
             from csdr.chain.analog import WFm
             return WFm(self.props["hd_output_rate"], self.props["wfm_deemphasis_tau"])
@@ -607,11 +604,11 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
         elif mod == "packet":
             from csdr.chain.digimodes import PacketDemodulator
             return PacketDemodulator()
-        elif mod == "spectrum":
+        elif mod == "ais":
             from csdr.chain.digimodes import PacketDemodulator
-            return PacketDemodulator()            
+            return PacketDemodulator(ais = True)
         elif mod == "pocsag":
-            from csdr.chain.digimodes import PocsagDemodulator
+            from csdr.chain.digiham import PocsagDemodulator
             return PocsagDemodulator()
         elif mod == "bpsk31":
             from csdr.chain.digimodes import PskDemodulator
@@ -619,6 +616,18 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
         elif mod == "bpsk63":
             from csdr.chain.digimodes import PskDemodulator
             return PskDemodulator(62.5)
+        elif mod == "cwdecoder":
+            from csdr.chain.digimodes import CwDemodulator
+            return CwDemodulator(75.0)
+        elif mod == "rtty170":
+            from csdr.chain.digimodes import RttyDemodulator
+            return RttyDemodulator(170.0, 45.45, reverse = False)
+        elif mod == "rtty450":
+            from csdr.chain.digimodes import RttyDemodulator
+            return RttyDemodulator(450.0, 50.0, reverse = True)
+        elif mod == "sstv":
+            from csdr.chain.digimodes import SstvDemodulator
+            return SstvDemodulator()
 
     def setSecondaryDemodulator(self, mod):
         demodulator = self._getSecondaryDemodulator(mod)
@@ -669,15 +678,20 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
     def _unpickle(self, callback):
         def unpickler(data):
             b = data.tobytes()
-            io = BytesIO(b)
-            try:
-                while True:
-                    callback(pickle.load(io))
-            except EOFError:
-                pass
-            # TODO: this is not ideal. is there a way to know beforehand if the data will be pickled?
-            except pickle.UnpicklingError:
+            # If we know it's not pickled, let us not unpickle
+            if len(b)<2 or b[0]!=0x80 or b[1]<0x03:
                 callback(b.decode("ascii"))
+            else:
+                io = BytesIO(b)
+                try:
+                    while True:
+                        callback(pickle.load(io))
+                except EOFError:
+                    pass
+                except pickle.UnpicklingError:
+                    callback(b.decode("ascii"))
+                except ValueError:
+                    pass
 
         return unpickler
 

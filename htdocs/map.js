@@ -37,8 +37,9 @@ $(function(){
     var retention_time = 2 * 60 * 60 * 1000;
     var strokeOpacity = 0.8;
     var fillOpacity = 0.35;
-    var callsign_url = null;   // by I8FUC 20220814
- 
+    var callsign_url = null;
+    var vessel_url = null;
+
     var colorKeys = {};
     var colorScale = chroma.scale(['red', 'blue', 'green']).mode('hsl');
     var getColor = function(id){
@@ -138,9 +139,16 @@ $(function(){
                         title: update.callsign
                     }, aprsOptions, getMarkerOpacityOptions(update.lastseen) ));
                     marker.lastseen = update.lastseen;
-                    marker.mode = update.mode;
-                    marker.band = update.band;
-                    marker.comment = update.location.comment;
+                    marker.mode     = update.mode;
+                    marker.band     = update.band;
+                    marker.comment  = update.location.comment;
+                    marker.weather  = update.location.weather;
+                    marker.altitude = update.location.altitude;
+                    marker.height   = update.location.height;
+                    marker.power    = update.location.power;
+                    marker.gain     = update.location.gain;
+                    marker.device   = update.location.device;
+                    marker.directivity = update.location.directivity;
 
                     if (expectedCallsign && expectedCallsign == update.callsign) {
                         map.panTo(pos);
@@ -287,8 +295,11 @@ $(function(){
                         if ('map_position_retention_time' in config) {
                             retention_time = config.map_position_retention_time * 1000;
                         }
-                        if ('callsign_url' in config) {              //  // by I8FUC 20220814
+                        if ('callsign_url' in config) {
                             callsign_url = config['callsign_url'];
+                        }
+                        if ('vessel_url' in config) {
+                            vessel_url = config['vessel_url'];
                         }
                     break;
                     case "update":
@@ -344,16 +355,40 @@ $(function(){
         return infowindow;
     }
 
-    var linkifyCallsign = function(callsign) {                      // by I8FUC 20220814
-        if ((callsign_url == null) || (callsign_url == ''))
+    var linkifyCallsign = function(callsign) {
+        var url = null;
+
+        // 9-character strings may be AIS MMSI numbers
+        if(callsign.match(new RegExp('^[0-9]{9}$')))
+            url = vessel_url;
+        else
+            url = callsign_url;
+
+        // Must have valid lookup URL
+        if ((url == null) || (url == ''))
             return callsign;
         else
-            var arr = callsign.split('-');
-            var base_callsign = arr[0] ;
-            return '<a href="#" onclick="window.open(' + "'" +
-                callsign_url.replaceAll('{}', base_callsign) +
-                "','callsign_info'" + ');">' + base_callsign + '</a>';
+            return '<a target="callsign_info" href="' +
+                url.replaceAll('{}', callsign.replace(new RegExp('-.*$'), '')) +
+                '">' + callsign + '</a>';
     };
+
+    var distanceKm = function(p1, p2) {
+        // Earth radius in km
+        var R = 6371.0;
+        // Convert degrees to radians
+        var rlat1 = p1.lat() * (Math.PI/180);
+        var rlat2 = p2.lat() * (Math.PI/180);
+        // Compute difference in radians
+        var difflat = rlat2-rlat1;
+        var difflon = (p2.lng()-p1.lng()) * (Math.PI/180);
+        // Compute distance
+        d = 2 * R * Math.asin(Math.sqrt(
+            Math.sin(difflat/2) * Math.sin(difflat/2) +
+            Math.cos(rlat1) * Math.cos(rlat2) * Math.sin(difflon/2) * Math.sin(difflon/2)
+        ));
+        return Math.round(d);
+    }
 
     var infowindow;
     var showLocatorInfoWindow = function(locator, pos) {
@@ -366,13 +401,15 @@ $(function(){
         }).sort(function(a, b){
             return b.lastseen - a.lastseen;
         });
+        var distance = receiverMarker?
+            " at " + distanceKm(receiverMarker.position, pos) + " km" : "";
         infowindow.setContent(
-            '<h3>Locator: ' + locator + '</h3>' +
+            '<h3>Locator: ' + locator + distance + '</h3>' +
             '<div>Active Callsigns:</div>' +
             '<ul>' +
                 inLocator.map(function(i){
                     var timestring = moment(i.lastseen).fromNow();
-                    var message = linkifyCallsign(i.callsign) + ' (' + timestring + ' using ' + i.mode;   // by I8FUC 20220814
+                    var message = linkifyCallsign(i.callsign) + ' (' + timestring + ' using ' + i.mode;
                     if (i.band) message += ' on ' + i.band;
                     message += ')';
                     return '<li>' + message + '</li>'
@@ -383,20 +420,136 @@ $(function(){
         infowindow.open(map);
     };
 
+    var degToCompass = function(deg) {
+        dir = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+        return dir[Math.floor((deg/22.5) + 0.5) % 16];
+    }
+
+    var makeListTitle = function(name) {
+        return '<div style="border-bottom:2px solid;"><b>' + name + '</b></div>';
+    }
+
+    var makeListItem = function(name, value) {
+        return '<div style="border-bottom:1px dotted;">'
+            + '<span>' + name + '</span>'
+            + '<span style="float:right;">' + value + '</span>'
+            + '</div>';
+    }
+
     var showMarkerInfoWindow = function(callsign, pos) {
         var infowindow = getInfoWindow();
         infowindow.callsign = callsign;
         var marker = markers[callsign];
         var timestring = moment(marker.lastseen).fromNow();
         var commentString = "";
+        var weatherString = "";
+        var detailsString = "";
+        var distance = "";
+
         if (marker.comment) {
-            commentString = '<div>' + marker.comment + '</div>';
+            commentString += '<p>' + makeListTitle('Comment') + '<div>' +
+                marker.comment + '</div></p>';
         }
-        infowindow.setContent(                            // by I8FUC 20220814
-            '<h3>' + linkifyCallsign(callsign) + '</h3>' +
-            '<div>' + timestring + ' using ' + marker.mode + ( marker.band ? ' on ' + marker.band : '' ) + '</div>' +
-            commentString
+
+        if (marker.weather) {
+            weatherString += '<p>' + makeListTitle('Weather');
+
+            if (marker.weather.temperature) {
+                weatherString += makeListItem('Temperature', marker.weather.temperature.toFixed(1) + ' oC');
+            }
+
+            if (marker.weather.humidity) {
+                weatherString += makeListItem('Humidity', marker.weather.humidity + '%');
+            }
+
+            if (marker.weather.barometricpressure) {
+                weatherString += makeListItem('Pressure', marker.weather.barometricpressure.toFixed(1) + ' mbar');
+            }
+
+            if (marker.weather.wind) {
+                if (marker.weather.wind.speed && (marker.weather.wind.speed>0)) {
+                    weatherString += makeListItem('Wind',
+                        degToCompass(marker.weather.wind.direction) + ' ' +
+                        marker.weather.wind.speed.toFixed(1) + ' km/h '
+                    );
+                }
+
+                if (marker.weather.wind.gust && (marker.weather.wind.gust>0)) {
+                    weatherString += makeListItem('Gusts', marker.weather.wind.gust.toFixed(1) + ' km/h');
+                }
+            }
+
+            if (marker.weather.rain && (marker.weather.rain.day>0)) {
+                weatherString += makeListItem('Rain',
+                    marker.weather.rain.hour.toFixed(0) + ' mm/h, ' +
+                    marker.weather.rain.day.toFixed(0) + ' mm/day'
+//                    marker.weather.rain.sincemidnight + ' mm since midnight'
+                );
+            }
+
+            if (marker.weather.snowfall) {
+                weatherString += makeListItem('Snow', marker.weather.snowfall.toFixed(1) + ' cm');
+            }
+
+            weatherString += '</p>';
+        }
+
+        if (marker.altitude) {
+            detailsString += makeListItem('Altitude', marker.altitude.toFixed(0) + ' m');
+        }
+
+        if (marker.device) {
+            detailsString += makeListItem('Device',
+                marker.device.device + " by " +
+                marker.device.manufacturer
+            );
+        }
+
+        if (marker.height) {
+            detailsString += makeListItem('Height', marker.height.toFixed(0) + ' m');
+        }
+
+        if (marker.power) {
+            detailsString += makeListItem('Power', marker.power + " W");
+        }
+
+        if (marker.gain) {
+            detailsString += makeListItem('Gain', marker.gain + " dB");
+        }
+
+        if (marker.directivity) {
+            detailsString += makeListItem('Direction', marker.directivity);
+        }
+
+        // Combine course and speed if both present
+        if (marker.course && marker.speed) {
+            detailsString += makeListItem('Course',
+                degToCompass(marker.course) + " " +
+                marker.speed.toFixed(1) + " km/h"
+            );
+        } else {
+            if (marker.course) {
+                detailsString += makeListItem('Course', degToCompass(marker.course));
+            }
+            if (marker.speed) {
+                detailsString += makeListItem('Speed', marker.speed.toFixed(1) + " km/h");
+            }
+        }
+
+        if (detailsString.length > 0) {
+            detailsString = '<p>' + makeListTitle('Details') + detailsString + '</p>';
+        }
+
+        if (receiverMarker) {
+            distance = " at " + distanceKm(receiverMarker.position, marker.position) + " km";
+        }
+
+        infowindow.setContent(
+            '<h3>' + linkifyCallsign(callsign) + distance + '</h3>' +
+            '<div align="center">' + timestring + ' using ' + marker.mode + ( marker.band ? ' on ' + marker.band : '' ) + '</div>' +
+            commentString + weatherString + detailsString
         );
+
         infowindow.open(map, marker);
     }
 

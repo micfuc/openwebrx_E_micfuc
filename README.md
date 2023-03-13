@@ -1,9 +1,24 @@
-OpenWebRX
+OpenWebRX+
 =========
 
-OpenWebRX is a multi-user SDR receiver software with a web interface. 
+This is the **improved version** of the OpenWebRX online SDR. The pre-built OpenWebRX+ packages are available from the [package repository](https://luarvique.github.io/ppa/). Pre-built disk images are available from the [Releases page](https://github.com/luarvique/openwebrx/releases). News, support, and general discussion can be found in the [Telegram channel](https://t.me/openwebrx) and related [chat](https://t.me/openwebrx_chat). Features found in OpenWebRX+ that are not present in the original version:
+* AIS, SSTV, RTTY, and CW decoders.
+* Background SSTV decoding with received images browser.
+* Built-in recorder for received audio.
+* Adjustable noise filtering based on spectral subtraction.
+* Adjustable tuning step.
+* Waterfall panning and zooming on touchscreen based devices.
+* Bandpass control with the scroll wheel.
+* Improved tuning in CW mode.
+* More reliable SDRPlay devices operation.
+* Better map information, with distances.
+* Better APRS map information, with weather.
+* Support for configurable session timeout, with a policy page.
+* HTTPS protocol support (requires certificate).
 
-![OpenWebRX](https://github.com/eroyee/openwebrx_E/blob/develop/owrx_versionE_screenshot_with_ghost_july_10th_22.jpg)
+OpenWebRX is a multi-user SDR receiver software with a web interface.
+
+![OpenWebRX](https://www.openwebrx.de/gfx/openwebrx-screenshot.png)
 
 It has the following features:
 
@@ -13,52 +28,48 @@ It has the following features:
 - it works in Google Chrome, Chromium and Mozilla Firefox
 - supports a wide range of [SDR hardware](https://github.com/jketterl/openwebrx/wiki/Supported-Hardware#sdr-devices)
 - Multiple SDR devices can be used simultaneously
-- A wide range of digital decoding options are available [Background Decoding](https://github.com/jketterl/openwebrx/wiki/Background-decoding)
-- Frequency spectrum display
-- Plotting of signal level over time (timeseries)
+- [digiham](https://github.com/jketterl/digiham) based demodularors (DMR, YSF, Pocsag, D-Star, NXDN)
+- [wsjt-x](https://physics.princeton.edu/pulsar/k1jt/wsjtx.html) based demodulators (FT8, FT4, WSPR, JT65, JT9, FST4,
+  FST4W)
+- [direwolf](https://github.com/wb2osz/direwolf) based demodulation of APRS packets
+- [JS8Call](http://js8call.com/) support
+- [DRM](https://github.com/jketterl/openwebrx/wiki/DRM-demodulator-notes) support
+- [FreeDV](https://github.com/jketterl/openwebrx/wiki/FreeDV-demodulator-notes) support
+- M17 support based on [m17-cxx-demod](https://github.com/mobilinkd/m17-cxx-demod)
 
 ## Setup
 
-The following methods of setting up this 'E' version of OpenwebRX are available:
+The following methods of setting up a receiver are currently available:
 
+- Raspberry Pi SD card images
+- Debian repository
+- Docker images
 - Manual installation
 
-## Information
+Please checkout the [setup guide on the wiki](https://github.com/jketterl/openwebrx/wiki/Setup-Guide) for more details
+on the respective methods.
 
-This is a somewhat experimental version of OpenWebRX, which I have dubbed the 'E' version. It contains changes that have been implemented following personal request(s), and in the interests of possibly enhancing this great software I make these public. Hopefully the contributions will be useful to some, and if you've something to contribute back I'd be pleased to hear from you. 
+## Community
 
-Any changes you see here should be considered alpha. I only test with Firefox + RTL-SDR and, other than myself, there is just one other person
-that uses my installation very occasionally. Thus it's quite possible bugs may arise from what I've done - so please bear this in mind 
-if you trial anything, best make a backup beforehand!
-
-[Jakob Ketterl](https://github.com/jketterl/) has gone to some trouble to make it easy to install his build, including productions of pre-built packages and docker images. Please see the [setup guide on Jakob's wiki](https://github.com/jketterl/openwebrx/wiki/Setup-Guide) for more detail on various installation methods.
-
-Jakob has also done a *lot* of work improving OpenWebRX which was orignally created by [András Retzler](https://github.com/ha7ilm), he has formed a group list on:
-
+If you have trouble setting up or configuring your receiver, you have some great idea you want to see implemented, or
+you just generally want to have some OpenWebRX-related chat, come visit us over on
 [our groups.io group](https://groups.io/g/openwebrx).
 
-Jakob has a wealth of knowledge and is usually responsive on his group. This fork is absolutely not intended
-to supercede his work, which should be seen as the primary source for all things good on OWRX. 
+If you want to hang out, chat, or get in touch directly with the developers, receiver operators or users, feel free to
+drop by in [our Discord server](https://discord.gg/gnE9hPz).
 
-Recent changes include:
+## Usage tips
 
-*  Ability to toggle waterfall display, add timestamp and tick lines for Timeseries (selectable from menu)
-*  Add option for spectra line display - may reduce load for low-power machines
-*  Remove some buttons, include functions in new Display selection menu
-*  Addition of < > buttons to shift zoomed display up to max allowable extent
-*  Addition of frequency change buttons, allowing the use of click-change to frequency
-*  Addition of stepchange button for change from 5kHz to 9kHz steps for broadcast SWL
-*  Addition of Spectrum display - this is somewhat new and may well get some changes 
-*  Alteration/addition to allow for slower AGC in SSB operation (may need addition to pycsdr)
-*  Addition of 'ghost' mode - makes much of the receiver panel transparent so the waterfall is visible behind
-*  Add smeter scale, decouple smeter from waterfall (now gets value direct from csdr), add js meter for performance benefits
-*  Add 'peak hold' to the spectrum display, displays updated signal peaks untill turned off
-*  Add 'timeseries' option to plot signal levels over time. Toggled via new 'yellow' button from receiver panel
+You can zoom the waterfall display by the mouse wheel. You can also drag the waterfall to pan across it.
+
+The filter envelope can be dragged at its ends and moved around to set the passband.
+
+However, if you hold down the shift key, you can drag the center line (BFO) or the whole passband (PBS).
 
 ## Licensing
 
 OpenWebRX is available under Affero GPL v3 license
 ([summary](https://tldrlegal.com/license/gnu-affero-general-public-license-v3-(agpl-3.0))).
 
-OpenWebRX is also available under a commercial license on request. Please contact Andras at the address
+OpenWebRX is also available under a commercial license on request. Please contact me at the address
 *&lt;randras@sdr.hu&gt;* for licensing options. 

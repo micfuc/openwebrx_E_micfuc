@@ -43,3 +43,9 @@ class MapController(WebpageController):
     def indexAction(self):
         # TODO check if we have a google maps api key first?
         self.serve_template("map.html", **self.template_variables())
+
+
+class PolicyController(WebpageController):
+    def indexAction(self):
+        self.serve_template("policy.html", **self.template_variables())
+

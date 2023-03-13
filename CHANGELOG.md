@@ -1,41 +1,66 @@
-**unreleased**
-- Add settings support for ivanmarcus (https://github.com/eroyee/openwebrx_E) _E added feature: top bar pushbuttons hide/show (via setip "Top Bar Panels Toggle Buttons Display")
-- Add settings support for ivanmarcus _E added feature: black background  mode for top bar image
-- Add settings support for ivanmarcus _E added feature: timeseries ( time_tick diagram start side, reticule db spacing, time tick spacing per profile )
-- add per profile secondary_demod_fft_offset_db settings support to align colour mappings for main waterfall and secondary waterfall
-- Add timeseries scale values offset to allign with main and secondary waterfall colour schemes
-- Add new pseudo-demodulator "Spectrum" to allow flexible secondary spectrum use for deep waterfall analysis with step variable bandwidth ( 50 Khz to 2 Khz); this feature help to gain detailed view of small ranges of a wide waterfall ( i.e. 8-10 Mhz with RSP1x devices)
-- Add pseudo-session-timeout via main page index meta http-equiv 
-- Add psedudo-session-timeout setting support via section "Pseudo Session Timeout" (to set landing page and session timeout)
-- add support for direwolf detailed packets logging with history
-- Add support for Mode column in left_panel for digital modes
-- Add support from luarvique (https://github.com/luarvique/openwebrx) for display of bandwitch presently in use on top of waterfall
-- Add support from luarvique (https://github.com/luarvique/openwebrx) for Settings item to configure callsign lookup database for map display
-- Add few corrections to bands.json
+**1.2.9**
+- Fixed missing 'N' letters in RTTY and CW decoders output.
+- Fixed SSTV decoder getting stuck after receiving 2-3 images.
+- Added SSTV debug messages to the log.
+- Removed some unused SSTV frequencies from band plan.
+- Removed SSTV NFM mode, since either USB or can be used with NFM.
+- Multiple other small fixes and style changes.
 
-**1.2.0-dev_E**
+**1.2.8**
+- Added AIS vessel reporting, with the map and background service.
+- Added configurable URL for looking up vessels by their MMSIs.
+- Added Air and Marine service bands to the band plan.
+- Added more SSTV frequencies to the band plan.
+- Declared LSB and FM as modes supported by SSTV.
+- Refactored file storage mechanism.
 
-- Add 'snap to nearest 1000Hz' for outer frequency step buttons
-- Add ability to toggle waterfall display via menu
-- Add timestamp and tick lines for Timeseries (selectable from menu)
-- Add new spectra line display option (in addition to fill)
-- Add new Display selection menu for spectrum and timeseries displays
-- Remove of spectrum and timeseries buttons, shift other button positions
-- Add panning of zoomed display via RX panel buttons
-- Add value labels for timeseries plot and spectra
-- Add plotting of signal level over time
-- Add peak hold to spectrum display
-- Add frequency spectrum display
-- Add 'ghost mode' for viewing waterfall through RX panel
-- Rewrite s-meter bar update to reduce system load on some client machines
-- Add s-meter scale, decouple from variability due to waterfall levels
-- Add/alter to new 'very slow' option for SSB AGC
-- Add toggling of major stepchange value (5kHz/9kHz)
-- Add frequency step change buttons
-- Add keyboard tuning of receiver
+**1.2.7**
+- Added MP3 recorder for saving received audio to files.
+- Added "Files" page for viewing received SSTV frames.
+- Added automatic deletion of previously received files.
+- Added setting for how many received files should be kept.
+- Clicking on an SSTV frame now saves it to a file.
 
+**1.2.6**
+- Added SSTV decoder with user interface.
+- Added background SSTV decoding to /tmp folder.
+- Extended CB band up to 28MHz, as used in some countries.
+- Added SSTV and RTTY frequencies to the bands layout.
 
-**unreleased**
+**1.2.5**
+- Added RTTY decoder.
+- Improved CW decoder.
+- Fixed possible crash in CW chain.
+- Switched both decoders to complex input.
+- Can now use SHIFT with scroll wheel, as mouse button.
+
+**1.2.4**
+- Added automated CW decoder (experimental).
+- Added scroll wheel support to frequency scale.
+- Added changing bandpass bounds with scroll wheel.
+- Added optional HTTPS support.
+- Fixed frequency jumping to last input value.
+- Made tuning buttons bigger.
+
+**1.2.3**
+- Added configurable session timeout option, with a default page.
+- Made multiple user interface improvements for touch screens.
+- Made touch-and-drag panning more reliable.
+- Added zoom in/out with the stretch/pinch gesture.
+- Added buttons for precisely touch-tuning the frequency.
+
+**1.2.2**
+- Added noise filter based on spectral subtraction.
+- Added configurable tuning step.
+- Added support for panning on touch screens.
+- Made OWRX tune to the CW frequency in the CW mode.
+- Improved APRS information display.
+
+**1.2.1**
+- FifiSDR support fixed (pipeline formats now line up correctly)
+- Added "Device" input for FifiSDR devices for sound card selection
+
+**1.2.0**
 - Major rewrite of all demodulation components to make use of the new csdr/pycsdr and digiham/pydigiham demodulator
   modules
 - Preliminary display of M17 callsign information

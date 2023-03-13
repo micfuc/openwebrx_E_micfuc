@@ -31,14 +31,15 @@
       "jt9": 1839000,
       "js8": 1842000,
       "fst4": 1839000,
-      "fst4w": 1836800
+      "fst4w": 1836800,
+      "sstv": { "frequency": 1890000, "underlying": "lsb" }
     },
     "tags": ["hamradio"]
   },
   {
     "name": "80m",
     "lower_bound": 3500000,
-    "upper_bound": 3800000,
+    "upper_bound": 3900000,
     "frequencies": {
       "bpsk31": 3580000,
       "ft8": 3573000,
@@ -46,13 +47,17 @@
       "jt65": 3570000,
       "jt9": 3572000,
       "ft4": [3568000, 3575000],
-      "js8": 3578000
+      "js8": 3578000,
+      "sstv": [
+        { "frequency": 3730000, "underlying": "lsb" },
+        { "frequency": 3845000, "underlying": "lsb" }
+      ]
     },
     "tags": ["hamradio"]
   },
   {
     "name": "60m",
-    "lower_bound": 5280000,
+    "lower_bound": 5351500,
     "upper_bound": 5366500,
     "frequencies": {
       "ft8": 5357000,
@@ -71,7 +76,12 @@
       "jt65": 7076000,
       "jt9": 7078000,
       "ft4": 7047500,
-      "js8": 7078000
+      "js8": 7078000,
+      "sstv": [
+        { "frequency": 7165000, "underlying": "lsb" },
+        { "frequency": 7171000, "underlying": "lsb" },
+        { "frequency": 7180000, "underlying": "lsb" }
+      ]
     },
     "tags": ["hamradio"]
   },
@@ -86,7 +96,9 @@
       "jt65": 10138000,
       "jt9": 10140000,
       "ft4": 10140000,
-      "js8": 10130000
+      "js8": 10130000,
+      "rtty450": 10099800,
+      "sstv": 10132000
     },
     "tags": ["hamradio"]
   },
@@ -101,7 +113,8 @@
       "jt65": 14076000,
       "jt9": 14078000,
       "ft4": 14080000,
-      "js8": 14078000
+      "js8": 14078000,
+      "sstv": [14230000, 14233000, 14227000]
     },
     "tags": ["hamradio"]
   },
@@ -131,7 +144,8 @@
       "jt65": 21076000,
       "jt9": 21078000,
       "ft4": 21140000,
-      "js8": 21078000
+      "js8": 21078000,
+      "sstv": 21340000
     },
     "tags": ["hamradio"]
   },
@@ -146,7 +160,8 @@
       "jt65": 24917000,
       "jt9": 24919000,
       "ft4": 24919000,
-      "js8": 24922000
+      "js8": 24922000,
+      "sstv": 24975000
     },
     "tags": ["hamradio"]
   },
@@ -161,7 +176,8 @@
       "jt65": 28076000,
       "jt9": 28078000,
       "ft4": 28180000,
-      "js8": 28078000
+      "js8": 28078000,
+      "sstv": 28680000
     },
     "tags": ["hamradio"]
   },
@@ -183,7 +199,7 @@
   },
   {
     "name": "4m",
-    "lower_bound": 70050000,
+    "lower_bound": 70150000,
     "upper_bound": 70200000,
     "frequencies": {
       "wspr": 70091000
@@ -225,7 +241,7 @@
   },
   {
     "name": "13cm",
-    "lower_bound": 2300000000,
+    "lower_bound": 2320000000,
     "upper_bound": 2450000000,
     "frequencies": {
       "q65": [2301065000, 2304065000, 2320065000]
@@ -352,9 +368,10 @@
   {
     "name": "11m CB",
     "lower_bound": 26965000,
-    "upper_bound": 27405000,
+    "upper_bound": 28000000,
     "frequencies": {
-      "js8": 27245000
+      "js8": 27245000,
+      "sstv": 27700000
     },
     "tags": ["public"]
   },
@@ -363,5 +380,20 @@
     "lower_bound": 446000000,
     "upper_bound": 446200000,
     "tags": ["public"]
+  },
+  {
+    "name": "VHF Air",
+    "lower_bound": 108000000,
+    "upper_bound": 137000000,
+    "tags": ["service"]
+  },
+  {
+    "name": "VHF Marine",
+    "lower_bound": 156000000,
+    "upper_bound": 174000000,
+    "frequencies": {
+      "ais": [161975000, 162025000]
+    },
+    "tags": ["service"]
   }
 ]

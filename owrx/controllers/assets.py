@@ -122,6 +122,7 @@ class CompiledAssetsController(GzipMixin, ModificationAwareController):
             "openwebrx.js",
             "lib/jquery-3.2.1.min.js",
             "lib/jquery.nanoscroller.min.js",
+            "lib/lame.min.js",
             "lib/Header.js",
             "lib/Demodulator.js",
             "lib/DemodulatorPanel.js",

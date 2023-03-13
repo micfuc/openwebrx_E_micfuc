@@ -20,7 +20,8 @@ from owrx.audio.queue import DecoderQueue
 from owrx.admin import add_admin_parser, run_admin_action
 import signal
 import argparse
-
+import ssl
+import os.path
 
 class ThreadedHttpServer(ThreadingMixIn, HTTPServer):
     pass
@@ -35,7 +36,7 @@ def handleSignal(sig, frame):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="OpenWebRX - Open Source SDR Web App for Everyone!")
+    parser = argparse.ArgumentParser(description="OpenWebRX+ - Open Source SDR Web App for Everyone!")
     parser.add_argument("-v", "--version", action="store_true", help="Show the software version")
     parser.add_argument("--debug", action="store_true", help="Set loglevel to DEBUG")
 
@@ -56,7 +57,7 @@ def main():
         logging.getLogger().setLevel(logging.INFO)
 
     if args.version:
-        print("OpenWebRX version {version}".format(version=openwebrx_version))
+        print("OpenWebRX+ version {version}".format(version=openwebrx_version))
         return 0
 
     if args.module == "admin":
@@ -72,17 +73,17 @@ def start_receiver():
     print(
         """
 
-OpenWebRX - Open Source SDR Web App for Everyone!  | for license see LICENSE file in the package
+OpenWebRX+ - Open Source SDR Web App for Everyone!  | for license see LICENSE file in the package
 _________________________________________________________________________________________________
 
-Author contact info:    Jakob Ketterl, DD5JFK <dd5jfk@darc.de>
+Author contact info:    Marat Fayzullin <luarvique@gmail.com>
 Documentation:          https://github.com/jketterl/openwebrx/wiki
 Support and info:       https://groups.io/g/openwebrx
 
     """
     )
 
-    logger.info("OpenWebRX version {0} starting up...".format(openwebrx_version))
+    logger.info("OpenWebRX+ version {0} starting up...".format(openwebrx_version))
 
     for sig in [signal.SIGINT, signal.SIGTERM]:
         signal.signal(sig, handleSignal)
@@ -112,7 +113,22 @@ Support and info:       https://groups.io/g/openwebrx
     Services.start()
 
     try:
+        # This is our HTTP server
         server = ThreadedHttpServer(("0.0.0.0", coreConfig.get_web_port()), RequestHandler)
+        # We expect to find SSL certificate here
+        keyFile  = "/etc/openwebrx/key.pem"
+        certFile = "/etc/openwebrx/cert.pem"
+        # If SSL certificate found, use HTTPS instead of HTTP
+        if os.path.isfile(keyFile) and os.path.isfile(certFile):
+            server.socket = ssl.wrap_socket(
+                server.socket, keyFile, certFile, server_side=True)
+            logger.info("Found SSL certificate, using https:// protocol.")
+        else:
+            logger.info("No SSL certificate, using http:// protocol.")
+            logger.info("To enable https://, supply SSL certificate:")
+            logger.info("    " + certFile)
+            logger.info("    " + keyFile)
+        # Run the server
         server.serve_forever()
     except SignalException:
         pass

@@ -1,16 +1,16 @@
 Source: openwebrx
-Maintainer: Jakob Ketterl <jakob.ketterl@gmx.de>
+Maintainer: Marat Fayzullin <luarvique@gmail.com>
 Section: hamradio
 Priority: optional
 Standards-Version: 4.2.0
 Build-Depends: debhelper (>= 11), dh-python, python3-all (>= 3.5), python3-setuptools
 Homepage: https://www.openwebrx.de/
-Vcs-Browser: https://github.com/jketterl/openwebrx
-Vcs-Git: https://github.com/jketterl/openwebrx.git
+Vcs-Browser: https://github.com/luarvique/openwebrx
+Vcs-Git: https://github.com/luarvique/openwebrx.git
 
 Package: openwebrx
 Architecture: all
-Depends: adduser, python3 (>= 3.5), python3-pkg-resources, owrx-connector (>= 0.5), soapysdr-tools, python3-csdr (>= 0.18), ${python3:Depends}, ${misc:Depends}
+Depends: adduser, python3 (>= 3.5), python3-pkg-resources, owrx-connector (>= 0.6), soapysdr-tools, python3-csdr (>= 0.18), ${python3:Depends}, ${misc:Depends}
 Recommends: python3-digiham (>= 0.6), direwolf (>= 1.4), wsjtx, js8call, runds-connector (>= 0.2), hpsdrconnector, aprs-symbols, m17-demod, js8call, python3-js8py (>= 0.1), nmux (>= 0.18), codecserver (>= 0.1)
 Description: multi-user web sdr
  Open source, multi-user SDR receiver with a web interface

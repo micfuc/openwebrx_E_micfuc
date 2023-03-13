@@ -1,10 +1,10 @@
 /*
 
-        This file is part of OpenWebRX,
-        an open-source SDR receiver software with a web UI.
-        Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
-        Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
-        Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
+	This file is part of OpenWebRX,
+	an open-source SDR receiver software with a web UI.
+	Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
+	Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
+	Copyright (c) 2022-2023 by Marat Fayzullin <luarvique@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -24,130 +24,130 @@
 @import url("openwebrx-globals.css");
 
 html, body {
-    overflow: hidden;
+	overflow: hidden;
 }
 
 select
 {
-    font-family: "DejaVu Sans", Verdana, Geneva, sans-serif;
+	font-family: "DejaVu Sans", Verdana, Geneva, sans-serif;
 }
 
 input
 {
-    vertical-align:middle;
+	vertical-align:middle;
 }
 
 input[type=range] {
-    -webkit-appearance: none;
-    margin: 0 0;
-    background: transparent !important;
-    --track-background: #B6B6B6;
+	-webkit-appearance: none;
+	margin: 0 0;
+	background: transparent !important;
+	--track-background: #B6B6B6;
 }
 
 input[type=range]:focus {
-    outline: none;
+	outline: none;
 }
 
 input[type=range]::-webkit-slider-runnable-track
 {
-    height: 5px;
-    cursor: pointer;
-    /*	animate: 0.2s;  */
-    box-shadow: 0px 0px 0px #000000;
-    background: #B6B6B6;
-    /*border-radius: 11px;*/
-    border: 1px solid #8A8A8A;
-    background: var(--track-background);
+	height: 5px;
+	cursor: pointer;
+	animate: 0.2s;
+	box-shadow: 0px 0px 0px #000000;
+	background: #B6B6B6;
+	/*border-radius: 11px;*/
+	border: 1px solid #8A8A8A;
+	background: var(--track-background);
 }
 
 input[type=range]::-webkit-slider-thumb
 {
-    box-shadow: 1px 1px 1px #828282;
-    border: 1px solid #8A8A8A;
-    height: 15px;
-    width: 15px;
-    border-radius: 10px;
-    background: #FFFFFF;
-    cursor: pointer;
-    -webkit-appearance: none;
-    margin-top: -7px;
+	box-shadow: 1px 1px 1px #828282;
+	border: 1px solid #8A8A8A;
+	height: 15px;
+	width: 15px;
+	border-radius: 10px;
+	background: #FFFFFF;
+	cursor: pointer;
+	-webkit-appearance: none;
+	margin-top: -7px;
 }
 
 input[type=range]:focus::-webkit-slider-runnable-track
 {
-    background: #B6B6B6;
-    background: var(--track-background);
+	background: #B6B6B6;
+	background: var(--track-background);
 }
 
 input[type=range]::-moz-range-track
 {
-    height: 3px;
-    cursor: pointer;
-    /*	animate: 0.2s;  */
-    box-shadow: 0px 0px 0px #000000;
-    background: #B6B6B6;
-    background: var(--track-background);
-    border-radius: 11px;
-    border: 1px solid #8A8A8A;
+	height: 3px;
+	cursor: pointer;
+	animate: 0.2s;
+	box-shadow: 0px 0px 0px #000000;
+	background: #B6B6B6;
+	background: var(--track-background);
+	border-radius: 11px;
+	border: 1px solid #8A8A8A;
 }
 
 input[type=range]::-moz-range-thumb
 {
-    box-shadow: 1px 1px 1px #828282;
-    border: 1px solid #8A8A8A;
-    height: 12px;
-    width: 12px;
-    border-radius: 10px;
-    background: #FFFFFF;
-    cursor: pointer;
+	box-shadow: 1px 1px 1px #828282;
+	border: 1px solid #8A8A8A;
+	height: 12px;
+	width: 12px;
+	border-radius: 10px;
+	background: #FFFFFF;
+	cursor: pointer;
 }
 
 input[type=range]::-ms-track
 {
-    width: 100%;
-    height: 7px;
-    cursor: pointer;
-    /*	animate: 0.2s;  */
-    background: transparent;
-    border-color: transparent;
-    color: transparent;
+	width: 100%;
+	height: 7px;
+	cursor: pointer;
+	animate: 0.2s;
+	background: transparent;
+	border-color: transparent;
+	color: transparent;
 }
 
 input[type=range]::-ms-fill-lower
-{
-    background: #B6B6B6;
-    border: 1px solid #8A8A8A;
-    border-radius: 22px;
-    box-shadow: 0px 0px 0px #000000;
+ {
+	background: #B6B6B6;
+	border: 1px solid #8A8A8A;
+	border-radius: 22px;
+	box-shadow: 0px 0px 0px #000000;
 }
 
 input[type=range]::-ms-fill-upper
 {
-    background: #B6B6B6;
-    border: 1px solid #8A8A8A;
-    border-radius: 22px;
-    box-shadow: 0px 0px 0px #000000;
+	background: #B6B6B6;
+	border: 1px solid #8A8A8A;
+	border-radius: 22px;
+	box-shadow: 0px 0px 0px #000000;
 }
 
 input[type=range]::-ms-thumb
 {
-    box-shadow: 1px 1px 1px #828282;
-    border: 1px solid #8A8A8A;
-    height: 24px;
-    width: 7px;
-    border-radius: 0px;
-    background: #FFFFFF;
-    cursor: pointer;
+	box-shadow: 1px 1px 1px #828282;
+	border: 1px solid #8A8A8A;
+	height: 24px;
+	width: 7px;
+	border-radius: 0px;
+	background: #FFFFFF;
+	cursor: pointer;
 }
 
 input[type=range]:focus::-ms-fill-lower
 {
-    background: #B6B6B6;
+	background: #B6B6B6;
 }
 
 input[type=range]:focus::-ms-fill-upper
 {
-    background: #B6B6B6;
+	background: #B6B6B6;
 }
 
 input[type=range]:disabled {
@@ -164,17 +164,17 @@ input[type=range]:disabled {
 
 #openwebrx-scale-container
 {
-    height: 47px;
-    overflow: hidden;
-    z-index:1000;
-    position: relative;
+	height: 47px;
+	overflow: hidden;
+	z-index:1000;
+	position: relative;
 }
 
 #openwebrx-frequency-container {
-    /*	background-image: url("../gfx/openwebrx-scale-background.png"); eroyee; remove for clear freq bar */
-    background-repeat: repeat-x;
-    background-size: cover;
-    background-color: #000; /* eroyee; change from #444 for black high-contrast */
+	background-image: url("../gfx/openwebrx-scale-background.png");
+	background-repeat: repeat-x;
+	background-size: cover;
+    background-color: #444;
     z-index: 1001;
 }
 
@@ -235,17 +235,17 @@ input[type=range]:disabled {
 }
 
 #openwebrx-bookmarks-container .bookmark:after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border: 5px solid transparent;
-    border-top-color: #FFFF00;
-    border-bottom: 0;
-    margin-left: -5px;
-    margin-bottom: -5px;
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border: 5px solid transparent;
+	border-top-color: #FFFF00;
+	border-bottom: 0;
+	margin-left: -5px;
+	margin-bottom: -5px;
 }
 
 #openwebrx-bookmarks-container .bookmark[data-source=local] {
@@ -266,12 +266,12 @@ input[type=range]:disabled {
 
 #webrx-canvas-background {
     flex-grow: 1;
-    background-image: url('../gfx/openwebrx-background-cool-blue.png');
-    background-repeat: no-repeat;
-    background-color: #1e5f7f;
-    background-size: cover;
-    display: flex;
-    flex-direction: column;
+	background-image: url('../gfx/openwebrx-background-cool-blue.png');
+	background-repeat: no-repeat;
+	background-color: #1e5f7f;
+	background-size: cover;
+	display: flex;
+	flex-direction: column;
 }
 
 @supports(background-image: -webkit-image-set(url('../gfx/openwebrx-background-cool-blue.webp') 1x)) {
@@ -288,19 +288,19 @@ input[type=range]:disabled {
 
 #webrx-canvas-container
 {
-    position: relative;
-    overflow: visible;
-    cursor: crosshair;
-    flex-grow: 1;
+	position: relative;
+	overflow: visible;
+	cursor: crosshair;
+	flex-grow: 1;
 }
 
 #webrx-canvas-container canvas
 {
-    position: absolute;
-    top: 0;
-    border-style: none;
-    image-rendering: crisp-edges;
-    image-rendering: -webkit-optimize-contrast;
+	position: absolute;
+	top: 0;
+	border-style: none;
+	image-rendering: crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
     width: 100%;
     height: 200px;
     will-change: transform;
@@ -313,36 +313,32 @@ input[type=range]:disabled {
     width: 619px
 }
 
-.nano .nano-pane   {
-    background: #444;
-}
-.nano .nano-slider {
-    background: #eee !important;
-}
+.nano .nano-pane   { background: #444; }
+.nano .nano-slider { background: #eee !important;  }
 
 .webrx-error
 {
-    font-weight: bold;
-    color: #ff6262;
+	font-weight: bold;
+	color: #ff6262;
 }
 
 @font-face {
     font-family: 'roboto-mono';
     src: url('../fonts/RobotoMono-Regular.woff2') format('woff2'),
-        url('../fonts/RobotoMono-Regular.woff') format('woff'),
-        url('../fonts/RobotoMono-Regular.ttf') format('truetype');
+         url('../fonts/RobotoMono-Regular.woff') format('woff'),
+         url('../fonts/RobotoMono-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
 
 .webrx-actual-freq {
-    width: 100%;
-    text-align: left;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: row;
-    cursor: pointer;
+	width: 100%;
+	text-align: left;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: row;
+	cursor: pointer;
 }
 
 .webrx-actual-freq > * {
@@ -405,8 +401,8 @@ input[type=range]:disabled {
 }
 
 .webrx-actual-freq, .webrx-actual-freq input {
-    font-size: 16pt;
-    font-family: 'roboto-mono';
+	font-size: 16pt;
+	font-family: 'roboto-mono';
 }
 
 .webrx-actual-freq .digit {
@@ -414,19 +410,19 @@ input[type=range]:disabled {
 }
 
 .webrx-actual-freq .digit:hover {
-    color: #FFFF50;
-    border-radius: 5px;
-    background: -webkit-gradient( linear, left top, left bottom, color-stop(0.0 , #373737), color-stop(1, #4F4F4F) );
-    background: -moz-linear-gradient( center top, #373737 0%, #4F4F4F 100% );
+	color: #FFFF50;
+	border-radius: 5px;
+	background: -webkit-gradient( linear, left top, left bottom, color-stop(0.0 , #373737), color-stop(1, #4F4F4F) );
+	background: -moz-linear-gradient( center top, #373737 0%, #4F4F4F 100% );
 }
 
 .webrx-mouse-freq {
-    width: 100%;
-    text-align: left;
-    font-size: 10pt;
-    color: #AAA;
-    font-family: 'roboto-mono';
-    margin-bottom: 5px;
+	width: 100%;
+	text-align: left;
+	font-size: 10pt;
+	color: #AAA;
+	font-family: 'roboto-mono';
+	margin-bottom: 5px;
 }
 
 #openwebrx-panels-container-left,
@@ -452,70 +448,63 @@ input[type=range]:disabled {
 
 .openwebrx-panel
 {
-    transform: perspective( 600px ) rotateX( 90deg );
-    background-color: #000; /* eroyee; bg colour from 575757, make this #000 for high-contrast black or <000 for transparent panel */
-    padding: 10px;
-    color: white;
-    font-size: 10pt;
-    /* --- do below for transparent mode --- */
-    border-style: solid;
-    border-color: black;
-    border-width: 1px;
-    /* ------------------------------------- */
-    border-radius: 5px; /* eroyee, border-radius to 5 fm 15 */
-    -moz-border-radius: 5px;
-    margin: 5.9px;
-    box-sizing: content-box;
+	transform: perspective( 600px ) rotateX( 90deg );
+	background-color: #575757;
+	padding: 10px;
+	color: white;
+	font-size: 10pt;
+	border-radius: 15px;
+	-moz-border-radius: 15px;
+	margin: 5.9px;
+	box-sizing: content-box;
 }
 
 .openwebrx-panel a
 {
-    color: #5ca8ff;
-    text-shadow: none;
+	color: #5ca8ff;
+	text-shadow: none;
 }
 
 .openwebrx-panel-inner
 {
-    overflow-y: auto;
-    overflow-x: hidden;
-    height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+	height: 100%;
 }
 
-.openwebrx-button  /* This changes the mode buttons */
+.openwebrx-button
 {
-    background-color: #373737;
-    padding: 2.2px; /* eroyee; change from 4.2px to 2.2px */
-    border-radius: 5px;
-    /*    -moz-border-radius: 5px; */
-    color: White;
-    /*	font-weight: bold; eroyee; remove bold */
-    margin-right: 1px;
-    cursor: pointer;
-    /* eroyee; comment below to remove gradient to make it easier for transparent 'Ghost' mode
-            background:-webkit-gradient( linear, left top, left bottom, color-stop(0.0	, #373737), color-stop(1, #4F4F4F) );
-            background:-moz-linear-gradient( center top, #373737 0%, #4F4F4F 100% );
-    */
-    user-select: none;
-    /*    -webkit-touch-callout: none; */
+	background-color: #373737;
+	padding: 4.2px;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	color: White;
+	font-weight: bold;
+	margin-right: 1px;
+	cursor: pointer;
+	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.0	, #373737), color-stop(1, #4F4F4F) );
+	background:-moz-linear-gradient( center top, #373737 0%, #4F4F4F 100% );
+	user-select: none;
+    -webkit-touch-callout: none;
     -webkit-user-select: none;
-    /*    -khtml-user-select: none; */
+    -khtml-user-select: none;
     -moz-user-select: none;
-    /*    -ms-user-select: none; */
-    display: inline-block;
+    -ms-user-select: none;
+	display: inline-block;
 }
 
 .openwebrx-button:hover, .openwebrx-demodulator-button.highlighted, .openwebrx-button.highlighted
 {
-    /*background:-webkit-gradient( linear, left top, left bottom, color-stop(0.0	, #3F3F3F), color-stop(1, #777777) );
-    background:-moz-linear-gradient( center top, #373737 5%, #4F4F4F 100% );*/
-    background: #474747;
-    color: #FFFF50;
+	/*background:-webkit-gradient( linear, left top, left bottom, color-stop(0.0	, #3F3F3F), color-stop(1, #777777) );
+	background:-moz-linear-gradient( center top, #373737 5%, #4F4F4F 100% );*/
+	background: #474747;
+	color: #FFFF50;
 }
 
 .openwebrx-button:active
 {
-    background: #777777;
-    color: #FFFF50;
+	background: #777777;
+	color: #FFFF50;
 }
 
 .openwebrx-button:last-child {
@@ -526,71 +515,13 @@ input[type=range]:disabled {
     opacity: 0.5;
 }
 
-/* --- eroyee add 1kHz/5kHz/9kHz freq step change button --- */
-
-.openwebrx-stepchangeHz-button {
-
-    background-color: #04AA6D; /* Green */
-    /*  border: none; */
-    color: white;
-    height: 16px;
-    width: 16px;
-    border-radius: 3px;
-    border: 1px solid #FFF;
-    font-size: 9px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    bottom: 4px; /* bring up to same level as step buttons */
-}
-/* ----------------------------------------------------- */
-
-/* -- eroyee add transparent 'Ghost' RX panel button --- */
-
-.openwebrx-GhostRX-button {
-
-    background-color: black;
-    /*  border: none; */
-    color: white;
-    height: 27px;
-    width: 23px;
-    border-radius: 3px;
-    border: 2px solid rgba(255,255,255,0.5);
-    font-size: 16px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    bottom: 2px; /* bring up to same level as adjacent buttons */
-}
-
-/* ----------------------------------------------------- */
-/* ---- eroyee add toggle spectrum peak hold button ---- */
-
-.openwebrx-SpectraHold-button {
-
-    background-color: green;
-    /*  border: none; */
-    color: white;
-    height: 18px;
-    width: 16px;
-    border-radius: 3px;
-    border: 0px solid #000;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    top: 0px; /* bring down to same level as adjacent drop-down */
-}
-/* ----------------------------------------------------- */
-
-.openwebrx-demodulator-button /* this is for mode (eg ssb etc) buttons */
+.openwebrx-demodulator-button
 {
-    height: 14px; /* eroyee; changed from 19px to 14 */
-    font-size: 10pt; /* eroyee; changed from 12 to 10pt */
-    text-align: center;
-    flex: 1;
-    margin-right: 5px;
+	height: 19px;
+	font-size: 12pt;
+	text-align: center;
+	flex: 1;
+	margin-right: 5px;
 }
 
 .openwebrx-demodulator-button.same-mod {
@@ -599,73 +530,80 @@ input[type=range]:disabled {
 
 .openwebrx-square-button img
 {
-    height: 27px;
+	height: 27px;
 }
 
 .openwebrx-round-button
 {
-    margin-right: -2px;
-    width: 35px;
-    height: 35px;
-    border-radius: 25px;
+	margin-right: -2px;
+	width: 35px;
+	height: 35px;
+	border-radius: 25px;
 }
 
 .openwebrx-round-button img
 {
-    height: 30px;
+	height: 30px;
 }
 
 .openwebrx-round-button-small
 {
-    margin-right: -3px;
-    width:  20px;
-    height: 20px;
-    border-radius: 25px;
+	margin-right: -3px;
+	width:  20px;
+	height: 20px;
+	border-radius: 25px;
 }
 
 .openwebrx-round-button-small img
 {
-    height: 20px;
+	height: 20px;
 }
 
 img.openwebrx-mirror-img
 {
-    transform: scale(-1, 1);
+	transform: scale(-1, 1);
 }
 
 
 .openwebrx-round-rightarrow img
 {
-    position: relative;
-    left: 12px;
-    top: 3px;
+	position: relative;
+	left: 12px;
+	top: 3px;
 }
 
 .openwebrx-round-leftarrow img
 {
-    position: relative;
-    left: 7px;
-    top: 3px;
+	position: relative;
+	left: 7px;
+	top: 3px;
 }
 
 #openwebrx-client-log-title
 {
-    margin-bottom: 5px;
-    font-weight: bold;
+	margin-bottom: 5px;
+	font-weight: bold;
+}
+
+.openwebrx-tune-button
+{
+	margin: 5px 5px 5px 5px;
+	text-align: center;
+	opacity: 0.5;
 }
 
 .openwebrx-progressbar
 {
-    position: relative;
-    border-radius: 5px;
-    background-color: #003850; /*#006235;*/
-    display: inline-block;
-    text-align: center;
-    font-size: 8pt;
-    font-weight: bold;
-    text-shadow: 0px 0px 4px #000000;
-    cursor: default;
-    user-select: none;
+	position: relative;
+	border-radius: 5px;
+	background-color: #003850; /*#006235;*/
+	display: inline-block;
+	text-align: center;
+	font-size: 8pt;
+	font-weight: bold;
+	text-shadow: 0px 0px 4px #000000;
+	cursor: default;
+	user-select: none;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -676,16 +614,16 @@ img.openwebrx-mirror-img
 }
 
 .openwebrx-progressbar-bar {
-    background-color: #00aba6;
-    border-radius: 5px;
-    height: 100%;
-    width: 100%;
-    transition-property: transform, background-color;
-    transition-duration: 1s;
-    transition-timing-function: ease-in-out;
-    transform: translate(-100%) translateZ(0);
-    will-change: transform, background-color;
-    z-index: 0;
+	background-color: #00aba6;
+	border-radius: 5px;
+	height: 100%;
+	width: 100%;
+	transition-property: transform, background-color;
+	transition-duration: 1s;
+	transition-timing-function: ease-in-out;
+	transform: translate(-100%) translateZ(0);
+	will-change: transform, background-color;
+	z-index: 0;
 }
 
 .openwebrx-progressbar--over .openwebrx-progressbar-bar {
@@ -694,30 +632,30 @@ img.openwebrx-mirror-img
 
 .openwebrx-progressbar-text
 {
-    position: absolute;
-    left:50%;
-    top:50%;
-    transform: translate(-50%, -50%);
-    white-space: nowrap;
-    z-index: 2;
+	position: absolute;
+	left:50%;
+	top:50%;
+	transform: translate(-50%, -50%);
+	white-space: nowrap;
+	z-index: 2;
 }
 
 #openwebrx-panel-status
 {
-    margin: 0 0 0 5.9px;
-    padding: 0px;
-    background-color:rgba(0, 0, 0, 0);
+	margin: 0 0 0 5.9px;
+	padding: 0px;
+	background-color:rgba(0, 0, 0, 0);
 }
 
 #openwebrx-panel-status div.openwebrx-progressbar
 {
-    width: 200px;
-    height: 20px;
+	width: 200px;
+	height: 20px;
 }
 
 #openwebrx-panel-receiver
 {
-    width:100px; /* eroyee; changed from 110px */
+	width:110px;
 }
 
 
@@ -732,9 +670,16 @@ img.openwebrx-mirror-img
 }
 
 #openwebrx-panel-receiver .openwebrx-bookmark-button {
-    width: 20px; /* eroyee; 27 to 20, alters size of 'bookmark' icon in rx panel */
-    height: 20px; /* eroyee; 27 to 20 */
+    width: 27px;
+    height: 27px;
     text-align: center;
+}
+
+.openwebrx-panel-listbox
+{
+    position: relative;
+    top: 0px;
+    width: 95px;
 }
 
 .openwebrx-panel-slider
@@ -768,7 +713,7 @@ img.openwebrx-mirror-img
 .openwebrx-modes-grid .openwebrx-demodulator-button {
     margin: 0;
     white-space: nowrap;
-    flex: 1 0 28px; /* eroyee; change from 38 to 28px - this is for SSB etc mode buttons */
+    flex: 1 0 38px;
     margin: 5px 5px 0 0;
 }
 
@@ -784,144 +729,39 @@ img.openwebrx-mirror-img
 }
 
 #openwebrx-smeter {
-    border-color: #888;
-    border-style: solid;
-    border-width: 0px;
-    width: 259px;  /* adjust to fit with scale */
-    height: 7px;
-    background-color: #FFF;  /* same colour as scale */
-    border-radius: 0px;  /* no rounded corners! */
-    overflow: hidden;
+	border-color: #888;
+	border-style: solid;
+	border-width: 0px;
+	width: 255px;
+	height: 7px;
+	background-color: #373737;
+	border-radius: 3px;
+	overflow: hidden;
 }
 
-/* eroyee, use this for js smeter */
-
-#openwebrx-smeter-bar {
-    width: 15%;
-    height: 100%;
-    background-color: rgba(4, 170, 109, 1);
-}
-/* ------------------------------ */
-
-.openwebrx-smeter-bar-OFF { /* turn '-OFF' when not using this (if using js smeter) */
-    transition-property: transform;
-    transition-duration: 0.2s;
-    transition-timing-function: linear;
-    will-change: transform;
-    transform: translate(-100%) translateZ(0);
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to top, #ff5939 , #961700);
-    margin: 0;
-    padding: 0;
-    border-radius: 0px; /* eroyee; bradius to 0 from 3 */
+.openwebrx-smeter-bar {
+	transition-property: transform;
+	transition-duration: 0.2s;
+	transition-timing-function: linear;
+	will-change: transform;
+	transform: translate(-100%) translateZ(0);
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(to top, #ff5939 , #961700);
+	margin: 0;
+	padding: 0;
+	border-radius: 3px;
 }
 
 #openwebrx-smeter-db
 {
-    color: #aaa;
-    display: inline-block;
-    font-size: 10pt;
-    float: right;
-    margin-right: 5px;
-    margin-top: 8px; /* eroyee; change to have 'dB' values displayed just under the 'dig' bar in the rx panel. */
-    font-family: 'roboto-mono';
+	color: #aaa;
+	display: inline-block;
+	font-size: 10pt;
+	float: right;
+	margin-right: 5px;
+	font-family: 'roboto-mono';
 }
-
-/* ----- eroyee, makes CSS scale for s-meter ----- */
-/* loosely based on code from Artur Arsalanov 
-      https://codepen.io/pbweb/pen/gMQKEK */
-
-.openwebrx-smeter-scale {
-    /* display: inline-block; */
-    margin-left: 25px;
-    float: left;
-    width: 90%;
-    /* margin: 2px auto; */
-    margin-top: 22px;  /* distance from icons above */
-    margin-bottom: 4px;
-    height: 1px;
-}
-.openwebrx-smeter-scale .s{
-    position: absolute;
-    border-left: 4px solid #fff; /* width of tick */
-    height: 4px;
-    width: 15%;
-    padding-bottom: 0px;
-    border-bottom: 1px solid rgba(255,255,255,0.9); /* If using CSS smeter make same as smeter-bar to 'fill' border, for js smeter use 1px */
-}
-
-.openwebrx-smeter-scale .s:after {
-    position: absolute;
-    bottom: 8px;
-    font: 11px/1 sans-serif;
-}
-.openwebrx-smeter-scale .s:nth-of-type(1) {
-    left: 10.5px; /* 10px fits best to lhs meter start (was 0%) */
-}
-.openwebrx-smeter-scale .s:nth-of-type(1):after {
-    content: "0";
-    right:95%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(2) {
-    left: 15%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(2):after {
-    content: "S3";
-    right:90%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(3) {
-    left: 25%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(3):after {
-    content: "S5";
-    right:90%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(4) {
-    left: 35%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(4):after {
-    content: "S7";
-    right:90%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(5) {
-    left: 45%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(5):after {
-    content: "S9";
-    right:90%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(6) {
-    left: 55%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(6):after {
-    content: "+10";
-    right:85%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(7) {
-    left: 65%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(7):after {
-    content: "+20";
-    right:85%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(8) {
-    left: 79%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(8):after {
-    content: "+40";
-    right:85%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(9) {
-    left: 95%;
-    width: 0%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(9):after {
-    content: "+60";
-    right: 100%;
-}
-
-/* ----------------------------------------------- */
 
 .openwebrx-overlay {
     position: absolute;
@@ -941,12 +781,12 @@ img.openwebrx-mirror-img
 
 #openwebrx-autoplay-overlay
 {
-    cursor: pointer;
-    transition: opacity 0.3s linear;
+	cursor: pointer;
+	transition: opacity 0.3s linear;
 }
 
 #openwebrx-autoplay-overlay svg {
-    width: 150px;
+	width: 150px;
 }
 
 .openwebrx-overlay .overlay-content {
@@ -965,11 +805,11 @@ img.openwebrx-mirror-img
 
 #openwebrx-digimode-canvas-container
 {
-    /*margin: -10px -10px 10px -10px;*/
+	/*margin: -10px -10px 10px -10px;*/
     margin: -10px -10px 0px -10px;
-    border-radius: 15px;
-    height: 300px;
-    background-color: #333;
+	border-radius: 15px;
+	height: 150px;
+	background-color: #333;
     position: relative;
     overflow: hidden;
 }
@@ -987,22 +827,23 @@ img.openwebrx-mirror-img
 .openwebrx-panel input,
 .openwebrx-dialog select,
 .openwebrx-dialog input {
-    border-radius: 5px;
-    background-color: #373737;
-    color: White;
-    font-weight: normal;
-    font-size: 10pt; /* eroyee; 13pt to 10pt */
-    margin-right: 1px;
-    background:linear-gradient(organge, #4F4F4F);
-    border-color: transparent;
-    border-width: 0px;
+	border-radius: 5px;
+	background-color: #373737;
+	color: White;
+	font-weight: normal;
+	font-size: 13pt;
+	margin-right: 1px;
+	background:linear-gradient(#373737, #4F4F4F);
+	border-color: transparent;
+	border-width: 0px;
 }
 
 @supports(-moz-appearance: none) {
     .openwebrx-panel select,
     .openwebrx-dialog select {
         -moz-appearance: none;
-        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20%20xmlns%3Av%3D%22https%3A%2F%2Fvecta.io%2Fnano%22%3E%3Cpath%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8s-1.9-9.2-5.5-12.8z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E');
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%20%20xmlns%3Av%3D%22https%3A%2F%2Fvecta.io%2Fnano%22%3E%3Cpath%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8s-1.9-9.2-5.5-12.8z%22%20fill%3D%22%23fff%22%2F%3E%3C%2Fsvg%3E'),
+            linear-gradient(#373737, #4F4F4F);
         background-repeat: no-repeat, repeat;
         background-position: right .3em top 50%, 0 0;
         background-size: .65em auto, 100%;
@@ -1016,70 +857,56 @@ img.openwebrx-mirror-img
 
 .openwebrx-panel select option,
 .openwebrx-dialog select option {
-    border-width: 0px;
-    background-color: #373737;
-    color: White;
+	border-width: 0px;
+	background-color: #373737;
+	color: White;
 }
 
 .openwebrx-secondary-demod-listbox {
-    width: 173px;
-    height: 18px; /* eroyee; change height from 27 to 18px */
-    padding-left:3px;
-    flex: 4;
-}
-
-/* eroyee; change colour of 'Displays' drop-down menu */
-#change_display.openwebrx-secondary-demod-listbox {
-    background-color: green;
+	width: 173px;
+	height: 27px;
+	padding-left:3px;
+	flex: 4;
 }
 
 #openwebrx-sdr-profiles-listbox {
     width: 100%;
     font-size: 10pt;
-    height: 25px; /* eroyee; change height from 27 to 25px */
+    height: 27px;
+}
+
+#openwebrx-tuning-step-listbox {
+    font-size: 10pt;
 }
 
 #openwebrx-cursor-blink
 {
-    animation: cursor-blink 1s infinite;
-    /*animation: cursor-3d 2s infinite;*/
-    animation-timing-function: linear;
-    animation-direction: alternate;
-    height: 1em;
-    width: 8px;
-    background-color: White;
-    display: inline-block;
+	animation: cursor-blink 1s infinite;
+	/*animation: cursor-3d 2s infinite;*/
+	animation-timing-function: linear;
+	animation-direction: alternate;
+	height: 1em;
+	width: 8px;
+	background-color: White;
+	display: inline-block;
     position: relative;
     top: 1px;
-    /*perspective: 60px;*/
+	/*perspective: 60px;*/
 
 }
 
 @keyframes cursor-blink
 {
-    0%{
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-    100%{
-        opacity: 0;
-    }
+	0%{ opacity: 0; }
+	50% { opacity: 1; }
+	100%{ opacity: 0; }
 }
 
 @keyframes cursor-3d
 {
-    0%{
-        transform: rotateX(0deg) rotateX(Ydeg);
-    }
-    50% {
-        transform: rotateX(180deg) rotateY(360deg);
-        opacity: 0.1;
-    }
-    100%{
-        transform: rotateX(360deg) rotateY(720deg);
-    }
+	0%{ transform: rotateX(0deg) rotateX(Ydeg); }
+	50% { transform: rotateX(180deg) rotateY(360deg); opacity: 0.1; }
+	100%{ transform: rotateX(360deg) rotateY(720deg); }
 }
 
 #openwebrx-digimode-content
@@ -1088,13 +915,14 @@ img.openwebrx-mirror-img
     position: absolute;
     bottom: 0;
     width: 100%;
+    font-family: monospace;
 }
 
 #openwebrx-digimode-content-container
 {
     overflow-y: hidden;
     display: block;
-    height: 50px;
+    height: 75px;
     position: relative;
 }
 
@@ -1252,11 +1080,11 @@ img.openwebrx-mirror-img
 }
 
 .openwebrx-m17-source:not(:empty):before {
-    content: "SRC: ";
+	content: "SRC: ";
 }
 
 .openwebrx-m17-destination:not(:empty):before {
-    content: "DEST: ";
+	content: "DEST: ";
 }
 
 .openwebrx-dstar-yourcall:not(:empty):before {
@@ -1370,6 +1198,29 @@ img.openwebrx-mirror-img
     white-space: pre;
 }
 
+#openwebrx-panel-sstv-message {
+    height: 310px;
+    width: 365px;
+    max-width: 365px;
+}
+
+#openwebrx-panel-sstv-message tbody {
+    height: 280px;
+    width: 360px;
+    max-width: 360px;
+}
+
+#openwebrx-panel-sstv-message .message {
+    width: 360px;
+    max-width: 360px;
+    white-space: pre;
+}
+
+#openwebrx-panel-sstv-message .frame {
+    border: 2px dotted white;
+    cursor: pointer;
+}
+
 .aprs-symbol {
     display: inline-block;
     width: 15px;
@@ -1390,13 +1241,13 @@ img.openwebrx-mirror-img
 }
 
 .openwebrx-dialog {
-    background-color: #575757;
-    padding: 10px;
-    color: white;
-    position: fixed;
-    font-size: 10pt;
-    border-radius: 15px;
-    -moz-border-radius: 15px;
+	background-color: #575757;
+	padding: 10px;
+	color: white;
+	position: fixed;
+	font-size: 10pt;
+	border-radius: 15px;
+	-moz-border-radius: 15px;
     position: fixed;
     left: 50%;
     top: 50%;
@@ -1451,24 +1302,26 @@ img.openwebrx-mirror-img
 #openwebrx-panel-digimodes[data-mode="jt9"]    #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="ft4"]    #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="packet"] #openwebrx-digimode-content-container,
+#openwebrx-panel-digimodes[data-mode="ais"]    #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="pocsag"] #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="js8"]    #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="fst4"]   #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="fst4w"]  #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="q65"]    #openwebrx-digimode-content-container,
-#openwebrx-panel-digimodes[data-mode="spectrum"]    #openwebrx-digimode-content-container,
+#openwebrx-panel-digimodes[data-mode="sstv"]   #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="ft8"]    #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="wspr"]   #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="jt65"]   #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="jt9"]    #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="ft4"]    #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="packet"] #openwebrx-digimode-select-channel,
+#openwebrx-panel-digimodes[data-mode="ais"]    #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="pocsag"] #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="js8"]    #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="fst4"]   #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="fst4w"]  #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="q65"]    #openwebrx-digimode-select-channel,
-#openwebrx-panel-digimodes[data-mode="spectrum"]   #openwebrx-digimode-select-channel
+#openwebrx-panel-digimodes[data-mode="sstv"]   #openwebrx-digimode-select-channel
 {
     display: none;
 }
@@ -1479,24 +1332,34 @@ img.openwebrx-mirror-img
 #openwebrx-panel-digimodes[data-mode="jt9"]    #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="ft4"]    #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="packet"] #openwebrx-digimode-canvas-container,
+#openwebrx-panel-digimodes[data-mode="ais"]    #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="pocsag"] #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="js8"]    #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="fst4"]   #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="fst4w"]  #openwebrx-digimode-canvas-container,
-#openwebrx-panel-digimodes[data-mode="q65"]    #openwebrx-digimode-canvas-container
+#openwebrx-panel-digimodes[data-mode="q65"]    #openwebrx-digimode-canvas-container,
+#openwebrx-panel-digimodes[data-mode="sstv"]   #openwebrx-digimode-canvas-container
 {
     height: 200px;
     margin: -10px;
 }
 
-#openwebrx-panel-digimodes[data-mode="spectrum"]    #openwebrx-digimode-canvas-container
-{
-    height: 400px;
-    margin: -10px;
+.openwebrx-zoom-button svg {
+    height: 27px;
 }
 
-.openwebrx-zoom-button svg {
-    height: 20px; /* eroyee; change from 27 to 20px */
+@keyframes openwebrx-record-animation {
+    0% { background: #ff0000; color: white; }
+   50% { background: #800000; color: white; }
+  100% { background: #ff0000; color: white; }
+}
+
+.openwebrx-record-button {
+    color: #ff8080;
+    float: right;
+    margin-top: 13px;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
 }
 
 .openwebrx-slider-button svg {
@@ -1543,4 +1406,3 @@ img.openwebrx-mirror-img
 .openwebrx-waterfall-container > * {
     flex: 0 0 auto;
 }
-

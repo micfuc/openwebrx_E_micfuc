@@ -64,69 +64,30 @@ class GeneralSettingsController(SettingsFormController):
                     infotext="For performance reasons, images are cached. "
                     + "It can take a few hours until they appear on the site.",
                 ),
-                DropdownInput(
-                    "black_mod",
-                    "Black background",
-                    infotext="Replace background photo with solid black ",
-                    options=[
-                        Option("webrx-top-container-black", "Enable"),
-                        Option("webrx-top-container", "Disable"),
-                    ],
-                ),                                
             ),
-            Section(
-                "Top Bar Panels Toggle Buttons Display ",
-                DropdownInput(
-                    "status_button",
-                    "Status Panel Button Display",
-                    infotext="Enable display of Bottom left Status Panel toggle button ",
-                    options=[
-                        Option("status_but_enable", "Enable"),
-                        Option("status_but_disable", "Disable"),
-                    ],
-                ), 
-                DropdownInput(
-                    "log_button",
-                    "Log Panel Button Display",
-                    infotext="Enable display of Bottom left Log panel toggle button ",
-                    options=[
-                        Option("log_but_enable", "Enable"),
-                        Option("log_but_disable", "Disable"),
-                    ],
-                ),
-                DropdownInput(
-                    "receiver_button",
-                    "Receiver Panel Button Display",
-                    infotext="Enable display of Bottom right Receiver Panel toggle button ",
-                    options=[
-                        Option("receiver_but_enable", "Enable"),
-                        Option("receiver_but_disable", "Disable"),
-                    ],
-                ), 
-                DropdownInput(
-                    "map_button",
-                    "Map Page Button Display",
-                    infotext="Direct link to Receiver Map Page Display ",
-                    options=[
-                        Option("map_but_enable", "Enable"),
-                        Option("map_but_disable", "Disable"),
-                    ],
-                ),
-                DropdownInput(
-                    "settings_button",
-                    "Settings Page Button Display",
-                    infotext="Direct link to Receiver Settings Page Display ",
-                    options=[
-                        Option("settings_but_enable", "Enable"),
-                        Option("settings_but_disable", "Disable"),
-                    ],
-                ),                                                
-            ),            
             Section(
                 "Receiver limits",
                 NumberInput(
                     "max_clients",
                     "Maximum number of clients",
+                    infotext="Number of people who can connect at the same time.",
+                ),
+                NumberInput(
+                    "keep_files",
+                    "Maximum number of files",
+                    infotext="Number of received images and other files to keep.",
+                ),
+                NumberInput(
+                    "session_timeout",
+                    "Session timeout",
+                    infotext="Client session timeout in seconds (0 to disable timeout).",
+                    append="secs",
+                ),
+                TextInput(
+                    "usage_policy_url",
+                    "Usage policy URL",
+                    infotext="Specifies web page describing receiver usage policy "
+                    + "and shown when a client session times out.",
                 ),
             ),
             Section(
@@ -182,7 +143,7 @@ class GeneralSettingsController(SettingsFormController):
                     + "waterfall colors",
                 ),
             ),
-             Section(
+            Section(
                 "Compression",
                 DropdownInput(
                     "audio_compression",
@@ -231,24 +192,15 @@ class GeneralSettingsController(SettingsFormController):
                     infotext="Specifies callsign lookup URL, such as QRZ.COM "
                     + "or QRZCQ.COM. Place curly brackers ({}) where callsign "
                     + "is supposed to be.",
-                ),                   
-            ),
-            Section(
-                "Pseudo Session Timeout",
+                ),
                 TextInput(
-                    "rx_usage_policy_page",
-                    "RX Usage Policy Details",
-                    infotext="URL for a page describing Usage Policy Rules and Objectives of this Receiver "
-                    + '<a href="https://my-web-site-owx.info" target="_blank">'
-                    + "..like this...</a>",
+                    "vessel_url",
+                    "Vessel database URL",
+                    infotext="Specifies vessel lookup URL, such as VESSELFINDER.COM, "
+                    + "allowing to look up vessel information by its AIS MMSI number. "
+                    + "Place curly brackers ({}) where MMSI is supposed to be.",
                 ),
-                NumberInput(
-                    "pseudo_session_timeout",
-                    "Pseudo Session Timeout",
-                    infotext="Timeout for a user session in seconds",
-                    append="secs",
-                ),
-            ),                      
+            ),
         ]
 
     def remove_existing_image(self, image_id):

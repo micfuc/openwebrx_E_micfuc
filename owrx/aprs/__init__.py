@@ -148,7 +148,7 @@ class AprsLocation(LatLngLocation):
 
     def __dict__(self):
         res = super(AprsLocation, self).__dict__()
-        for key in ["comment", "symbol", "course", "speed"]:
+        for key in ["comment", "symbol", "course", "speed", "altitude", "weather", "device", "power", "height", "gain", "directivity"]:
             if key in self.data:
                 res[key] = self.data[key]
         return res
@@ -190,19 +190,22 @@ class AprsParser(PickleModule):
             # TODO how can we tell if this is an APRS frame at all?
             aprsData = self.parseAprsData(data)
 
+            # the frontend uses this to distinguish messages from the different parsers
+            aprsData["mode"] = "AIS" if aprsData.get("source")=="AIS" else "APRS"
+
             logger.debug("decoded APRS data: %s", aprsData)
             self.updateMap(aprsData)
             self.getMetric("total").inc()
             if self.isDirect(aprsData):
                 self.getMetric("direct").inc()
 
-            # the frontend uses this to distinguis hessages from the different parsers
-            aprsData["mode"] = "APRS"
             return aprsData
+
         except Exception:
             logger.exception("exception while parsing aprs data")
 
     def updateMap(self, mapData):
+        mode = mapData["mode"] if "mode" in mapData else "APRS"
         if "type" in mapData and mapData["type"] == "thirdparty" and "data" in mapData:
             mapData = mapData["data"]
         if "lat" in mapData and "lon" in mapData:
@@ -213,7 +216,7 @@ class AprsParser(PickleModule):
                     source = mapData["item"]
                 elif mapData["type"] == "object":
                     source = mapData["object"]
-            Map.getSharedInstance().updateLocation(source, loc, "APRS", self.band)
+            Map.getSharedInstance().updateLocation(source, loc, mode, self.band)
 
     def hasCompressedCoordinates(self, raw):
         return raw[0] == "/" or raw[0] == "\\"
@@ -296,6 +299,9 @@ class AprsParser(PickleModule):
         elif dti == ")":
             # item
             aprsData.update(self.parseItem(information[1:]))
+        elif dti == "{":
+            # NMEA sentence
+            aprsData.update(self.parseNmea(information[1:]))
 
         return aprsData
 
@@ -462,6 +468,46 @@ class AprsParser(PickleModule):
         aprsData["comment"] = comment
 
         return aprsData
+
+    def parseNmea(self, information):
+        # Message must start with "DA!"
+        if information[0:3] != "DA!":
+            return {}
+
+        # Only parsing "AIVDM" messages
+        result = { "type": "nmea", "nmea_type": information[3:8] }
+        if information[3:8] != "AIVDM":
+            return result
+
+        data = information.split(",")
+        out  = b""
+        buf  = 0
+        cnt  = 0
+
+        # Decode binary message
+        for c in data[5]:
+            # Each character contains 6 bits of data
+            if c>="0" and c<="W":
+                buf = (buf<<6) | (ord(c[0]) - ord("0"))
+            elif c>="`" and c<="w":
+                buf = (buf<<6) | (ord(c[0]) - ord("`") + 40)
+            else:
+                buf = buf<<6
+
+            # Output a new byte once we have got 8 bits
+            cnt += 6
+            if cnt>=8:
+                out += bytes([buf >> (cnt-8)])
+                buf &= (1 << (cnt-8)) - 1
+                cnt -= 8
+
+        # Output final bits
+        if cnt>0:
+            out += bytes([buf])
+
+        # For now, just pring data in hex
+        result["message"] = " ".join(["%02X" % x for x in out])
+        return result
 
 
 class MicEParser(object):

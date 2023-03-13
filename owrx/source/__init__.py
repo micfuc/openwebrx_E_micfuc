@@ -12,13 +12,8 @@ from owrx.command import CommandMapper
 from owrx.socket import getAvailablePort
 from owrx.property import PropertyStack, PropertyLayer, PropertyFilter, PropertyCarousel, PropertyDeleted
 from owrx.property.filter import ByLambda
-
 from owrx.form.input import Input, TextInput, NumberInput, CheckboxInput, ModesInput, ExponentialInput, DropdownInput, Option
 from owrx.form.input.converter import OptionalConverter, IntConverter
-
-#from owrx.form.input import Input, TextInput, NumberInput, CheckboxInput, ModesInput, ExponentialInput, Option
-#from owrx.form.input.converter import OptionalConverter
-
 from owrx.form.input.device import GainInput, SchedulerInput, WaterfallLevelsInput
 from owrx.form.input.validator import RequiredValidator
 from owrx.form.section import OptionalSection
@@ -254,10 +249,13 @@ class SdrSource(ABC):
     def getPort(self):
         return self.port
 
+    def _getTcpSourceFormat(self):
+        return Format.COMPLEX_FLOAT
+
     def _getTcpSource(self):
         with self.modificationLock:
             if self.tcpSource is None:
-                self.tcpSource = TcpSource(self.port, Format.COMPLEX_FLOAT)
+                self.tcpSource = TcpSource(self.port, self._getTcpSourceFormat())
         return self.tcpSource
 
     def getBuffer(self):
@@ -279,8 +277,9 @@ class SdrSource(ABC):
             if self.monitor:
                 return
 
-            if self.isFailed():
-                return
+# @@@
+#            if self.isFailed():
+#                return
 
             try:
                 self.preStart()
@@ -571,35 +570,11 @@ class SdrDeviceDescription(object):
             ExponentialInput("start_freq", "Initial frequency", "Hz"),
             ModesInput("start_mod", "Initial modulation"),
             DropdownInput(
-                "ts_start",
-                "TimeSeries starting point",
-                infotext="From where to start timeseries diagram at beginning ",
-                options=[
-                    Option("rhs", "RightEndSide"),
-                    Option("lhs", "LeftEndSide"),
-                    ],
-            ),
-            DropdownInput(
-                "default_time_tick",
-                "Default Time Ticks ",
-                infotext="Default Delta for time ticks ",                
-                options=[Option(str(i), "{} secs".format(i)) for i in [60, 30, 20, 10, 5]],
+                "tuning_step",
+                "Tuning step",
+                options=[Option(str(i), "{} Hz".format(i)) for i in [1, 100, 500, 1000, 2500, 3000, 5000, 6000, 9000, 10000, 12000, 50000]],
                 converter=IntConverter(),
             ),
-            DropdownInput(
-                "default_ret_step",
-                "Default Reticule db step",
-                infotext="Default level difference for reticule lines ",
-                options=[Option(str(i), "{} db".format(i)) for i in [5, 10, 20]],
-                converter=IntConverter(),
-            ),
-            DropdownInput(
-                "default_sec_fft_offset_db",
-                "Default Secondary fft offset db",
-                infotext="Default offset for secondary fft panel with reference to main waterfall in db ",
-                options=[Option(str(i), "{} db".format(i)) for i in [5, 10, 15, 20, 25 , 30, 35, 40]],
-                converter=IntConverter(),
-            ),                         
             NumberInput("initial_squelch_level", "Initial squelch level", append="dBFS"),
         ]
 
@@ -624,7 +599,7 @@ class SdrDeviceDescription(object):
         return keys
 
     def getProfileMandatoryKeys(self):
-        return ["name", "center_freq", "samp_rate", "start_freq", "start_mod","default_time_tick","default_ret_step","ts_start", "default_sec_fft_offset_db"]
+        return ["name", "center_freq", "samp_rate", "start_freq", "start_mod", "tuning_step"]
 
     def getProfileOptionalKeys(self):
         return ["initial_squelch_level", "rf_gain", "lfo_offset", "waterfall_levels"]

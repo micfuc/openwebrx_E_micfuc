@@ -1,6 +1,7 @@
 from owrx.controllers.status import StatusController
-from owrx.controllers.template import IndexController, MapController
+from owrx.controllers.template import IndexController, MapController, PolicyController
 from owrx.controllers.feature import FeatureController
+from owrx.controllers.file import FilesController, FileController
 from owrx.controllers.assets import OwrxAssetsController, AprsSymbolsController, CompiledAssetsController
 from owrx.controllers.websocket import WebSocketController
 from owrx.controllers.api import ApiController
@@ -22,6 +23,7 @@ from owrx.controllers.session import SessionController
 from owrx.controllers.profile import ProfileController
 from owrx.controllers.imageupload import ImageUploadController
 from owrx.controllers.robots import RobotsController
+from owrx.storage import Storage
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
 import re
@@ -94,7 +96,10 @@ class Router(object):
             StaticRoute("/ws/", WebSocketController),
             RegexRoute("^(/favicon.ico)$", OwrxAssetsController),
             StaticRoute("/map", MapController),
+            StaticRoute("/policy", PolicyController),
             StaticRoute("/features", FeatureController),
+            StaticRoute("/files", FilesController),
+            RegexRoute("^/files/(%s)$" % Storage().getNamePattern(), FileController),
             StaticRoute("/api/features", ApiController),
             StaticRoute("/metrics", MetricsController, options={"action": "prometheusAction"}),
             StaticRoute("/metrics.json", MetricsController),
