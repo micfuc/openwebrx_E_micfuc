@@ -1,0 +1,436 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>OpenWebRX Settings</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../../../../static/favicon.ico" />
+    <link rel="stylesheet" href="../../../../static/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../static/css/admin.css" />
+    <script src="../../../../compiled/settings.js"></script>
+    <meta charset="utf-8">
+</head>
+<body>
+<!--  several changes to support top bar menu buttons hiding and black_mod by a -  by I8FUCdmin settings -->
+<div class=webrx-top-container id=webrx-top-container  >
+    <div id="top_bar_buttons" class="webrx-top-bar">
+       <a href="https://www.openwebrx.de/" target="_blank"><svg viewBox="0 0 591 100" class="webrx-top-logo"><title>Visit the OpenWebRX homepage</title><use xlink:href="../../../../static/gfx/svg-defs.svg#top-logo"></use></svg></a>
+        <img class="webrx-rx-avatar openwebrx-photo-trigger" src="../../../../static/gfx/openwebrx-avatar.png" alt="Receiver avatar"/>
+        <div class="webrx-rx-texts openwebrx-photo-trigger">
+            <h1 class="webrx-rx-title">[Sarimesh.net]</h1>
+            <div class="webrx-rx-desc">Punta Scutari | Loc: JN70ep, ASL: 220 m</div>
+        </div>
+       
+    <section class="openwebrx-main-buttons">
+      <!-- pseudo-session-timeout and rx use policy page display feature by I8FUC -->
+<p id="pstt"></p>
+<script>
+  var path = window.location.pathname;
+  var page = path.split("/").pop();
+//  console.log( page );
+  if ( page === ""){
+    document.getElementById("pstt").innerHTML =  "<meta http-equiv=\"refresh\" content=\"1800; url=http://meshtest.sarimesh.net/sdrrx.html\"> ";
+    }
+  else{
+     document.getElementById("pstt").innerHTML = "" ;
+     };
+</script>
+ 
+            <dev  class="button" id=status_but_enable   data-toggle-panel="openwebrx-panel-status"><svg viewBox="0 0 80 80"><use xlink:href="../../../../static/gfx/svg-defs.svg#panel-status"></use></svg><br/>Status</dev>
+            <dev  class="button" id=log_but_enable   data-toggle-panel="openwebrx-panel-log"><svg viewBox="0 0 80 80"><use xlink:href="../../../../static/gfx/svg-defs.svg#panel-log"></use></svg><br/>Log</dev>
+            <dev  class="button" id=receiver_but_enable   data-toggle-panel="openwebrx-panel-receiver"><svg viewBox="0 0 80 80"><use xlink:href="../../../../static/gfx/svg-defs.svg#panel-receiver"></use></svg><br/>Receiver</dev>
+            <a    class="button" id=map_but_enable   href="../../../../map" target="openwebrx-map"  ><svg viewBox="0 0 80 80"><use xlink:href="../../../../static/gfx/svg-defs.svg#panel-map"></use></svg><br/>Map</a> 
+            <a    class="button" id=settings_but_disable   href="../../../../settings" target="openwebrx-settings"><svg viewBox="0 0 80 80"><use xlink:href="../../../../static/gfx/svg-defs.svg#panel-settings"></use></svg><br/>Settings</a>
+
+        </section>
+    </div>
+    <!--  eroyee for spectrum display -->
+    <div id = "spectrum_container" class="openwebrx-spectrum-container">
+    </div>
+    <!-- -------------------------- -->
+    <div class="openwebrx-description-container">
+        <div class="webrx-rx-photo-title"><center>Panorama of Sorrento</center></div>
+        <div class="webrx-rx-photo-desc">This is a test Receiver to explore the radio spectrum in selected segments... It is a single user system based on the <center> OpenWebRX SW ...  it is usable freely by several users simultaneously if they stay in the same band... this is a feature of the SW used for the implementation of the RX ( when using a single radio)...<br /><br />
+<center>For additional Receiver infos please visit <a href="http://meshtest.sarimesh.net/sdrrx.html" target="_sdr_rx">http://meshtest.sarimesh.net/sdrrx.html</a></center><br />
+
+Receiver is operated by: <a href="mailto:admin@sarimesh.net">admin@sarimesh.net</a><br/>
+Device: RSP1<br />
+Antenna: Longwire 13m/3el collinear<br />
+Website: <a href="http://meshtest.sarimesh.net:8070" target="_blank">http://meshtest.sarimesh.net:8070</a>
+</div>
+    </div>
+    <a class="openwebrx-rx-details-arrow openwebrx-rx-details-arrow--down openwebrx-photo-trigger">
+        <svg class="down" viewBox="0 0 43 12"><use xlink:href="static/gfx/svg-defs.svg#rx-details-arrow-down"></use></svg>
+        <svg class="up" viewBox="0 0 43 12"><use xlink:href="static/gfx/svg-defs.svg#rx-details-arrow-up"></use></svg>
+    </a>
+</div>
+
+<div class="container">
+          
+    <div class="row">
+        <h1 class="col-12">SDRPlay RSP1A Agile Profile Settings</h1>
+    </div>
+       
+            <div class="tab-body">
+                
+            <form class="settings-body" method="POST">
+                
+            <div class="col-12 settings-section optional-section">
+                <h3 class="settings-header">
+                    Profile settings
+                </h3>
+                
+            <div class="form-group row" data-field="name">
+                <label class="col-form-label col-form-label-sm col-3" for="name">Profile name</label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            <input class="form-control form-control-sm" id="name" name="name" placeholder="Profile name" value="Agile-Mode" type="text" />
+            
+        
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="rf_gain">
+                <label class="col-form-label col-form-label-sm col-3" for="rf_gain">Device Gain</label>
+                <div class="col-9 p-0 removable-group removable">
+                    <div class="removable-item">
+                        
+            <div id="rf_gain">
+                
+            <select class="form-control form-control-sm" id="rf_gain-select" name="rf_gain-select" >
+                
+                <option value="auto" >Enable hardware AGC</option>
+            
+                <option value="manual" >Specify manual gain</option>
+            
+                <option value="stages" selected>Specify gain stages individually</option>
+            
+            </select>
+            <div class="option manual" style="display: none;">
+                <input type="number" id="rf_gain-manual" name="rf_gain-manual" value="0.0" class="form-control form-control-sm"
+                placeholder="Manual device gain" step="any" >
+            </div>
+            
+            <div class="option stages container container-fluid" style="display: none;">
+                
+                    <div class="row">
+                        <label class="col-form-label col-form-label-sm col-3">RFGR</label>
+                        <input type="number" id="rf_gain-RFGR" name="rf_gain-RFGR" value="1"
+                        class="col-9 form-control form-control-sm" placeholder="RFGR" step="any" >
+                    </div>
+                
+                    <div class="row">
+                        <label class="col-form-label col-form-label-sm col-3">IFGR</label>
+                        <input type="number" id="rf_gain-IFGR" name="rf_gain-IFGR" value="59"
+                        class="col-9 form-control form-control-sm" placeholder="IFGR" step="any" >
+                    </div>
+                
+            </div>
+        
+        
+                
+            </div>
+        
+                        
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger option-remove-button">Remove</button>
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="waterfall_levels">
+                <label class="col-form-label col-form-label-sm col-3" for="waterfall_levels">Waterfall levels</label>
+                <div class="col-9 p-0 removable-group removable">
+                    <div class="removable-item">
+                        
+            <div class="row " id="waterfall_levels">
+                
+                <div class="col row">
+                    <label class="col-3 col-form-label col-form-label-sm" for="waterfall_levels-min">Minimum</label>
+                    <div class="col-9 input-group input-group-sm">
+                        <input type="number" step="any" class="form-control form-control-sm" name="waterfall_levels-min" value="-90.0" >
+                        <div class="input-group-append">
+                            <span class="input-group-text">dBFS</span>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="col row">
+                    <label class="col-3 col-form-label col-form-label-sm" for="waterfall_levels-max">Maximum</label>
+                    <div class="col-9 input-group input-group-sm">
+                        <input type="number" step="any" class="form-control form-control-sm" name="waterfall_levels-max" value="-40.0" >
+                        <div class="input-group-append">
+                            <span class="input-group-text">dBFS</span>
+                        </div>
+                    </div>
+                </div>
+            
+            </div>
+            
+        
+                        
+                    </div>
+                    <button type="button" class="btn btn-sm btn-danger option-remove-button">Remove</button>
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="center_freq">
+                <label class="col-form-label col-form-label-sm col-3" for="center_freq">Center frequency</label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            <div class="input-group input-group-sm exponential-input">
+                <input class="form-control form-control-sm" id="center_freq" name="center_freq" placeholder="Center frequency" value="162000000" type="number" step="any" />
+                
+            <div class="input-group-append">
+                <select class="input-group-text exponent" name="center_freq-exponent" tabindex="-1" >
+                    <option value="0" selected>Hz</option>
+                    <option value="3">kHz</option>
+                    <option value="6">MHz</option>
+                    <option value="9">GHz</option>
+                    <option value="12">THz</option>
+                </select>
+            </div>
+        
+                
+            </div>
+        
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="samp_rate">
+                <label class="col-form-label col-form-label-sm col-3" for="samp_rate">Sample rate</label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            <div class="input-group input-group-sm exponential-input">
+                <input class="form-control form-control-sm" id="samp_rate" name="samp_rate" placeholder="Sample rate" value="256000" type="number" step="any" />
+                
+            <div class="input-group-append">
+                <select class="input-group-text exponent" name="samp_rate-exponent" tabindex="-1" >
+                    <option value="3"  selected>kS/s</option>
+                    <option value="6">MS/s</option>
+                </select>
+            </div>
+        
+                
+            </div>
+        
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="start_freq">
+                <label class="col-form-label col-form-label-sm col-3" for="start_freq">Initial frequency</label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            <div class="input-group input-group-sm exponential-input">
+                <input class="form-control form-control-sm" id="start_freq" name="start_freq" placeholder="Initial frequency" value="162000000" type="number" step="any" />
+                
+            <div class="input-group-append">
+                <select class="input-group-text exponent" name="start_freq-exponent" tabindex="-1" >
+                    <option value="3" selected>kHz</option>
+                    <option value="6">MHz</option>
+                </select>
+            </div>
+        
+                
+            </div>
+        
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="start_mod">
+                <label class="col-form-label col-form-label-sm col-3" for="start_mod">Initial modulation</label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            
+            <select class="form-control form-control-sm" id="start_mod" name="start_mod" >
+                <option value="nfm" selected>FM</option>
+            
+                <option value="wfm" >WFM</option>
+            
+                <option value="am" >AM</option>
+            
+                <option value="lsb" >LSB</option>
+            
+                <option value="usb" >USB</option>
+            
+                <option value="cw" >CW</option>
+            
+                <option value="sp50" >SP50</option>
+            
+                <option value="sp25" >SP25</option>
+            
+                <option value="sp15" >SP15</option>
+            
+                <option value="sp10" >SP10</option>
+            
+                <option value="sp5" >SP5</option>
+            
+                <option value="sp2" >SP2</option>
+            
+                <option value="m17" >M17</option>
+            
+                <option value="freedv" >FreeDV</option>
+            
+                <option value="drm" >DRM</option>
+            
+                <option value="bpsk31" >BPSK31</option>
+            
+                <option value="bpsk63" >BPSK63</option>
+            
+                <option value="ft8" >FT8</option>
+            
+                <option value="ft4" >FT4</option>
+            
+                <option value="jt65" >JT65</option>
+            
+                <option value="jt9" >JT9</option>
+            
+                <option value="wspr" >WSPR</option>
+            
+                <option value="fst4" >FST4</option>
+            
+                <option value="fst4w" >FST4W</option>
+            
+                <option value="q65" >Q65</option>
+            
+                <option value="js8" >JS8Call</option>
+            
+                <option value="packet" >Packet</option>
+            
+                <option value="spectrum" >Spectrum</option>
+            
+                <option value="pocsag" >Pocsag</option>
+            </select>
+        
+            
+        
+                        
+                    </div>
+                    
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="ts_start">
+                <label class="col-form-label col-form-label-sm col-3" for="ts_start">TimeSeries starting point</label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            
+            <select class="form-control form-control-sm" id="ts_start" name="ts_start" >
+                <option value="rhs" selected>RightEndSide</option>
+            
+                <option value="lhs" >LeftEndSide</option>
+            </select>
+        
+            
+        
+                        <small>From where to start timeseries diagram at beginning </small>
+                    </div>
+                    
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="default_time_tick">
+                <label class="col-form-label col-form-label-sm col-3" for="default_time_tick">Default Time Ticks </label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            
+            <select class="form-control form-control-sm" id="default_time_tick" name="default_time_tick" >
+                <option value="60" selected>60 secs</option>
+            
+                <option value="30" >30 secs</option>
+            
+                <option value="20" >20 secs</option>
+            
+                <option value="10" >10 secs</option>
+            
+                <option value="5" >5 secs</option>
+            </select>
+        
+            
+        
+                        <small>Default Delta for time ticks </small>
+                    </div>
+                    
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="default_ret_step">
+                <label class="col-form-label col-form-label-sm col-3" for="default_ret_step">Default Reticule db step</label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            
+            <select class="form-control form-control-sm" id="default_ret_step" name="default_ret_step" >
+                <option value="5" selected>5 db</option>
+            
+                <option value="10" >10 db</option>
+            
+                <option value="20" >20 db</option>
+            </select>
+        
+            
+        
+                        <small>Default level difference for reticule lines </small>
+                    </div>
+                    
+                </div>
+            </div>
+        
+            <div class="form-group row" data-field="default_sec_fft_offset_db">
+                <label class="col-form-label col-form-label-sm col-3" for="default_sec_fft_offset_db">Default Secondary fft offset db</label>
+                <div class="col-9 p-0 removable-group ">
+                    <div class="removable-item">
+                        
+            
+            <select class="form-control form-control-sm" id="default_sec_fft_offset_db" name="default_sec_fft_offset_db" >
+                <option value="5" >5 db</option>
+            
+                <option value="10" >10 db</option>
+            
+                <option value="15" selected>15 db</option>
+            
+                <option value="20" >20 db</option>
+            
+                <option value="25" >25 db</option>
+            
+                <option value="30" >30 db</option>
+            
+                <option value="35" >35 db</option>
+            
+                <option value="40" >40 db</option>
+            </select>
+                           <small>Default offset for secondary fft panel with reference to main waterfall in db </small>
+                       </div>
+                   </div>
+               </div>
+         
+               </div>
+                   <div class="buttons container">       
+                      <button type="submit" class="btn btn-primary">Apply and save</button>
+                   </div>
+            </form>
+        
+            </div>  
+         </div>                   
+     </div>
+   </div>
+ </div>
+        
+</body>
+

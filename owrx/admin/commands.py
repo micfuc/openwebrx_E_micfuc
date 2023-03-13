@@ -88,6 +88,20 @@ class EnableUser(UserCommand):
         userList[username].enable()
         userList.store()
 
+class DisableUserAgile(UserCommand):
+    def run(self, args):
+        username = args.user
+        userList = UserList()
+        userList[username].agile_disable()
+        userList.store()
+
+
+class EnableUserAgile(UserCommand):
+    def run(self, args):
+        username = args.user
+        userList = UserList()
+        userList[username].agile_enable()
+        userList.store()
 
 class ListUsers(Command):
     def run(self, args):

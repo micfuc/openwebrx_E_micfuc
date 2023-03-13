@@ -1,0 +1,66 @@
+#!/bin/bash
+echo "owrx.sched vr. 2.0"
+LOGGER="logger -t owrx.sched -p local3.info"
+date_display=`date "+%Y/%m/%d - %H:%M"`
+echo $date_display
+
+$LOGGER "owrx.sched vr. 2.0"
+BANDS="6m 10m 12m 15m 17m 20m 30m 40m 60m 80m 144_DIGI"
+#BANDS="10m 12m 15m 17m 20m 30m 40m 60m 80m 160m 630m 2200m"
+#BANDS="40m 60m 80m 160m 20m 30m"
+
+
+#BANDS="MultiBand"
+#BANDS="30m 40m 60m SW2"
+
+while true ; do
+   echo "Starting main loop for data collection......."	
+#   wget -O pskreporter.html https://retrieve.pskreporter.info/query?receiverCallsign=i8fuc
+#   grep OpenWebRX   pskreporter.html
+#   echo "  "
+#   echo "  "
+   for band in $BANDS ; do
+	date_display=`date "+%Y/%m/%d - %H:%M:%S"`
+	rm owrx.flag ; touch owrx.flag ; chown sdradmin:sdradmin owrx.flag
+	$LOGGER "Starting band " $band  " at " $date_display  
+	echo $date_display "---> Starting band " $band  
+	cat /var/lib/openwebrx/settings.json.proto | sed "s/SCHED_BAND/$band/" > /var/lib/openwebrx/settings.json ; systemctl  restart openwebrx
+#	sleep 120
+        if [ "X$band" == "X144_DIGI" ] ; then
+            sleep 600
+	else
+            timeout 120s grep -q 'scheduling next' <(tail -f /var/log/syslog  ) 
+            exit_status=$?
+            if [ $exit_status == 124 ] ; then 
+		$LOGGER "[ $exit_status ]  no spots received on $band band in 120 secs...  skipping this band..."
+		echo " [ $exit_status ] no spots received in 120 secs; skip this $band band"
+	    else
+                $LOGGER " [ $exit_status ]  some spots received on $band ... continue for other 360 sec"
+                echo "  [ $exit_status ]  ---> [$spots_detected] received some spots on $band in 120 secs... continue for other 360 sec"
+                timeout 360s grep -q 'uploading' <(tail -f /var/log/syslog  ) 
+                exit_status=$?
+                if [ $exit_status != 124 ] ; then
+                   spots=`tail -200 /var/log/syslog | grep uploading | tail -1`
+                   $LOGGER " [ $spots ] on $band  "
+                   echo "  [ $spots ]   on $band "                 
+                fi
+	    fi
+	fi
+#	spots=`tail -100 /var/log/syslog | grep "scheduling next" | awk  '/uploading (.*)/{print $14}'|tail -1 `
+#	spots_detected=`tail -100 /var/log/syslog | grep "scheduling next" |tail -1 `
+#	spots=`cat owrx.flag`
+#	spots=12
+#	echo "===$spots==="
+#	if [[ ! -n ${spots//[0-9]/} ]]; then
+#	   if [ "X$spots" != "X" ] ; then
+#		if [ "$spots_detected" != ""  ] ; then
+#			$LOGGER "some spots received on $band ... continue for other 360 sec"
+#			echo "---> [$spots_detected]received some spots on $band in 90 secs... continue for other 360 sec"
+#			sleep 340
+#		fi
+#	   fi
+#	fi
+   done
+done
+systemctl stop openwebrx
+#systemctl status openwebrx

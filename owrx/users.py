@@ -95,6 +95,7 @@ class User(object):
     def __init__(self, name: str, enabled: bool, password: Password, must_change_password: bool = False):
         self.name = name
         self.enabled = enabled
+        self.agile_user = enabled        
         self.password = password
         self.must_change_password = must_change_password
 
@@ -102,13 +103,14 @@ class User(object):
         return {
             "user": self.name,
             "enabled": self.enabled,
+            "agile_user": self.agile_user,
             "must_change_password": self.must_change_password,
             "password": self.password.toJson()
         }
 
     @staticmethod
     def fromJson(d):
-        if "user" in d and "password" in d and "enabled" in d:
+        if "user" in d and "password" in d and "enabled" in d and  "agile_user" in d:
             mcp = d["must_change_password"] if "must_change_password" in d else False
             return User(d["user"], d["enabled"], Password.from_dict(d["password"]), mcp)
 
@@ -126,6 +128,14 @@ class User(object):
     def disable(self):
         self.enabled = False
 
+    def is_agile(self):
+        return self.agile_user
+
+    def agile_enable(self):
+        self.agile_user = True
+
+    def agile_disable(self):
+        self.agile_user = False
 
 class UserList(object):
     sharedInstance = None

@@ -1,4 +1,4 @@
-from owrx.admin.commands import NewUser, DeleteUser, ResetPassword, ListUsers, DisableUser, EnableUser, HasUser
+from owrx.admin.commands import NewUser, DeleteUser, ResetPassword, ListUsers, DisableUser, EnableUser, DisableUserAgile, EnableUserAgile, HasUser
 import sys
 import traceback
 
@@ -29,6 +29,14 @@ def add_admin_parser(moduleparser):
     enableuser_parser = subparsers.add_parser("enableuser", help="Enable a user")
     enableuser_parser.add_argument("user", help="Username to be enabled")
     enableuser_parser.set_defaults(cls=EnableUser)
+
+    disableuseragile_parser = subparsers.add_parser("disableuseragile", help="Disable a user agile status")
+    disableuseragile_parser.add_argument("user", help="Username to be disabled")
+    disableuseragile_parser.set_defaults(cls=DisableUserAgile)
+
+    enableuseragile_parser = subparsers.add_parser("enableuseragile", help="Enable a user agile status")
+    enableuseragile_parser.add_argument("user", help="Username to be enabled")
+    enableuseragile_parser.set_defaults(cls=EnableUserAgile)
 
     hasuser_parser = subparsers.add_parser("hasuser", help="Test if a user exists")
     hasuser_parser.add_argument("user", help="Username to be checked")
