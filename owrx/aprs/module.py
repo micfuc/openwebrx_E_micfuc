@@ -44,7 +44,7 @@ class DirewolfModule(AutoStartModule, DirewolfConfigSubscriber):
         file.close()
 
         # direwolf -c {direwolf_config} -r {audio_rate} -t 0 -q d -q h 1>&2
-        cmdLine = ["direwolf", "-c", self.direwolfConfigPath, "-r", "48000", "-t", "0", "-q", "d", "-q", "h"]
+        cmdLine = ["direwolf", "-c", self.direwolfConfigPath, "-r", "48000", "-t", "0", "-q", "d", "-q", "h", "-d", "ai" ]
 
         # for AIS mode, add -B AIS -A
         if self.ais:

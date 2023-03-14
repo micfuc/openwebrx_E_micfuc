@@ -4,6 +4,7 @@
 	an open-source SDR receiver software with a web UI.
 	Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
 	Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
+        Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
 	Copyright (c) 2022-2023 by Marat Fayzullin <luarvique@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
@@ -36,6 +37,13 @@ var tuning_step_default = 1;
 var tuning_step = 1;
 var nr_enabled = false;
 var nr_threshold = 0;
+// start  by I8FUC 20220806
+var default_time_tick = 60;           
+var default_sec_fft_offset_db = 10 ;
+var ts_start = "rhs";
+var default_ret_step = 5 ; 
+// end  by I8FUC 20220814
+
 
 function updateVolume() {
     audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
@@ -52,8 +60,26 @@ function toggleMute() {
         volumeBeforeMute = $volumePanel.val();
         $volumePanel.prop('disabled', true).val(0);
     }
-
     updateVolume();
+}
+
+/* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- 
+ - note this is optimised for tuning precision of 10Hz. Furture improvement to 
+ include that variable and adjust accordingly -----------------------------*/
+function toggleStepHz() {
+    if (StepHz == 1000) {
+        StepHz = 5000;
+        document.getElementById('stepchangeHz').innerHTML = "5";
+        document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
+    } else if (StepHz == 5000) {
+        StepHz = 9000;
+        document.getElementById('stepchangeHz').innerHTML = "9";
+        document.getElementById('stepchangeHz').style.backgroundColor = "blue";
+    } else if (StepHz == 9000) {
+        StepHz = 1000;
+        document.getElementById('stepchangeHz').innerHTML = "1";
+        document.getElementById('stepchangeHz').style.backgroundColor = "red";
+    }
 }
 
 function updateNR() {
@@ -77,6 +103,9 @@ function toggleNR() {
 
     nr_changed();
 }
+
+
+
 
 function toggleRecording() {
     var $recButton = $('.openwebrx-record-button');
@@ -157,7 +186,7 @@ function updateWaterfallColors(which) {
     waterfall_min_level = parseInt($wfmin.val());
     if (waterfall_min_level >= waterfall_max_level) {
         if (!which) {
-            waterfall_min_level = waterfall_max_level -1;
+            waterfall_min_level = waterfall_max_level - 1;
         } else {
             waterfall_max_level = waterfall_min_level + 1;
         }
@@ -167,11 +196,11 @@ function updateWaterfallColors(which) {
 
 function updateWaterfallSliders() {
     $('#openwebrx-waterfall-color-max')
-        .val(waterfall_max_level)
-        .attr('title', 'Waterfall maximum level (' + Math.round(waterfall_max_level) + ' dB)');
+            .val(waterfall_max_level)
+            .attr('title', 'Waterfall maximum level (' + Math.round(waterfall_max_level) + ' dB)');
     $('#openwebrx-waterfall-color-min')
-        .val(waterfall_min_level)
-        .attr('title', 'Waterfall minimum level (' + Math.round(waterfall_min_level) + ' dB)');
+            .val(waterfall_min_level)
+            .attr('title', 'Waterfall minimum level (' + Math.round(waterfall_min_level) + ' dB)');
 }
 
 function waterfallColorsDefault() {
@@ -204,15 +233,17 @@ function waterfallColorsContinuous(levels) {
     if (levels.max > waterfall_continuous.max + 1) {
         waterfall_continuous.max += 1;
     } else if (levels.max < waterfall_continuous.max - 1) {
-        waterfall_continuous.max -= .1;
+        waterfall_continuous.max -= 0.1;
     }
     if (levels.min < waterfall_continuous.min - 1) {
         waterfall_continuous.min -= 1;
     } else if (levels.min > waterfall_continuous.min + 1) {
-        waterfall_continuous.min += .1;
+        waterfall_continuous.min += 0.1;
     }
     waterfallColorsAuto(waterfall_continuous);
 }
+
+/* eroyee; don't need this if using js meter
 
 function setSmeterRelativeValue(value) {
     if (value < 0) value = 0;
@@ -231,6 +262,7 @@ function setSmeterRelativeValue(value) {
         $bar.css({background: 'linear-gradient(to top, #22ff2f , #008908)'});
     }
 }
+ */
 
 function setSquelchSliderBackground(val) {
     var $slider = $('#openwebrx-panel-receiver .openwebrx-squelch-slider');
@@ -249,16 +281,65 @@ function getLogSmeterValue(value) {
     return 10 * Math.log10(value);
 }
 
+/* eroyee, this is the original function (with mods) for css transform,
+ replacement using js is below this block. CSS *should* be better but it 
+ seems to increase CPU load considerably on low power machines:
+ 
+ function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
+ {
+ var logValue = getLogSmeterValue(value);
+ setSquelchSliderBackground(logValue);
+ var percent = (logValue + 100) / (100);  // waterfall min/max no longer affect s-meter, -0dBm should = 100%
+ setSmeterRelativeValue(percent);
+ $("#openwebrx-smeter-db").html(logValue.toFixed(1) + " dB");
+ }
+ 
+ */
+/* eroyee function to draw smeter with js, is not as smooth, but is a *lot* 
+ easier on remote CPU than using CSS transform; on a reasonable i7 
+ (Linux + Firefox) with css transform the system load was ~3, with this 
+ function it is typically < 2.
+ 
+ Signal should cause bar to rise quickly once timeout has completed, then decay 
+ slowly according to the value of decay.
+ 
+ This is probably more suited to SSB reception, particularly with the slow AGC 
+ as per my mods, although it shouldn't adversely affect AM/FM in most cases. 
+ 
+ SetTimeout is attempted in a probably futile effor to more closely sync bar
+ movement with audio, expect this to vary with relative CPU speed etc. Quite 
+ experimental and prob not be worth the effort...
+ */
+
+var sig_data; // EROYEE FOR TIMESERIES
 function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
 {
+    var speak = 0;
+    var decay = 0.01;
     var logValue = getLogSmeterValue(value);
+    sig_data = logValue; // EROYEE FOR TIMESERIES
+    var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
+    //    setTimeout(function(){
+    $("#openwebrx-smeter-db").html(logValue.toFixed(0) + "dB"); // eroyee; re-introduce dB levels for anyone that wants them
+//    },0.9);
     setSquelchSliderBackground(logValue);
-    var lowLevel = waterfall_min_level - 20;
-    var highLevel = waterfall_max_level + 20;
-    var percent = (logValue - lowLevel) / (highLevel - lowLevel);
-    setSmeterRelativeValue(percent);
-    $("#openwebrx-smeter-db").html(logValue.toFixed(1) + " dB");
+    if (percent < 0) {
+        percent = 0;
+    }
+    if (percent > 1.0) {
+        percent = 1.0;
+    }
+    if (percent > speak) {
+        speak = percent;
+    } else {
+        speak = (speak - decay);
+    }
+    setTimeout(function () {
+        document.getElementById('openwebrx-smeter-bar').style.width = (speak * 100) + "%";
+    }, 300);
+// console.log(logValue, percent, speak);
 }
+/* -------------------------------------------------------------------------- */
 
 function typeInAnimation(element, timeout, what, onFinish) {
     if (!what) {
@@ -899,6 +980,28 @@ function get_zoom_coeff_from_hps(hps) {
     return bandwidth / shown_bw;
 }
 
+// eroyee, clickbutton shift waterfall, apparently useful for mobile browsers // 
+
+function canLeft() {
+    if (zoom_center_rel > (-bandwidth / 1.5 + waterfallWidth() * zoom_center_where * range.hps)) {
+        zoom_center_rel -= range.hps * screen.availWidth * 0.5;    // 0.5 = scroll left for 50% of waterfall width
+        resize_canvases(false);
+        mkscale();
+        bookmarks.position();
+    }
+}
+
+function canRight() {
+    if (!(zoom_center_rel > (bandwidth / 1.5 - waterfallWidth() * (1 - zoom_center_where) * range.hps))) {
+        zoom_center_rel += range.hps * screen.availWidth * 0.5;    // 0.5 = scroll right for 50% of waterfall width
+        resize_canvases(false);
+        mkscale();
+        bookmarks.position();
+    }
+}
+
+// -------------------------------------------------------------------------- //
+
 var zoom_levels = [1];
 var zoom_level = 0;
 var zoom_offset_px = 0;
@@ -984,6 +1087,20 @@ function on_ws_recv(evt) {
                 switch (json.type) {
                     case "config":
                         var config = json['value'];
+                        // start by I8FUC 20220806
+                        if ('default_time_tick' in config) {
+                            default_time_tick = config['default_time_tick'];
+                        }
+                        if ('default_ret_step' in config) {
+                            default_ret_step = config['default_ret_step'];
+                        }
+                        if ('ts_start' in config) {
+                            ts_start = config['ts_start'];
+                        }
+                        if ('default_sec_fft_offset_db' in config) {
+                            default_sec_fft_offset_db = config['default_sec_fft_offset_db'];
+                        }
+                        // end by I8FUC 20220806    
                         if ('waterfall_colors' in config)
                             waterfall_colors = buildWaterfallColors(config['waterfall_colors']);
                         if ('waterfall_levels' in config) {
@@ -1283,6 +1400,11 @@ function onAudioStart(apiType){
         toggle_panel("openwebrx-panel-log", !!was_error);
     }, 2000);
 
+//eroyee added to hide status panel on start
+    window.setTimeout(function () {
+        toggle_panel("openwebrx-panel-status", !!was_error);
+    }, 500);
+
     //Synchronise volume with slider
     updateVolume();
 }
@@ -1416,6 +1538,11 @@ function resize_canvases(zoom) {
         width: waterfallWidth() * zoom_levels[zoom_level] + 'px',
         left: zoom_offset_px + "px"
     });
+    // eroyee; add the spectrum canvas here so it can be 'natively' 'resized, rather than using observe
+    $('#freq-canvas-spectrum').css({
+        width: waterfallWidth() * zoom_levels[zoom_level] + 'px',
+        left: zoom_offset_px + "px"
+    });
 }
 
 function waterfall_init() {
@@ -1425,6 +1552,222 @@ function waterfall_init() {
     mkzoomlevels();
     waterfall_setup_done = 1;
 }
+
+// - eroyee add for dropdown menu select of different display options - //
+
+var wfStart = true;
+window.addEventListener("change", dispSelect); // from demodulators.js
+function dispSelect(evt) {
+    var sel = (change_display.value);
+    switch (sel) {
+        case '1':
+            if (timeseries_start) {
+                display_timeseries('stop');
+                setTimeout(function () {  // gets its tits in a tangle if restarted too quickly (when swapping between functions)
+                    ts_ticks = false;
+                    display_timeseries('start');
+                }, 100);
+            } else {
+                ts_ticks = false;
+                display_timeseries('start');
+            }
+            break;
+        case '2':
+            if (timeseries_start) {
+                display_timeseries('stop');
+                setTimeout(function () {
+                    ts_ticks = true;
+                    display_timeseries('start');
+                }, 100);
+            } else {
+                ts_ticks = true;
+                display_timeseries('start');
+            }
+            break;
+        case '3':
+            spec_start = false;
+            display_spectra('start', 'line');
+            break;
+        case '4':
+            spec_start = false;
+            display_spectra('start', 'fill');
+            break;
+        case '5':
+            if (wfStart) {
+                wfStart = false;
+            }
+            break;
+        case '6':
+            if (!wfStart) {
+                wfStart = true;
+            }
+            break;
+        default:
+            if (timeseries_start) {
+                ts_ticks = false;
+                display_timeseries('stop');
+            }
+            if (spec_start) {
+                display_spectra('stop', 0);
+            }
+    }
+}
+
+// - eroyee add for timeseries display, using spectrum container for present - //
+
+var timeSeriesCtx;
+var timeseries_start = false;
+const timeseries_window_h = 130;
+
+// modified by I8FUC 20220814
+const timeseries_data = new Array(screen.availWidth-34);		// do we want to start at the RHS?
+const timeseries_ticks = new Array(screen.availWidth-34).fill(0); 	// Follows from RHS      
+ 
+
+var ts_time;
+var ts_ticks = false;
+const ts_out_data = [0];
+function display_timeseries(status)
+{
+    if (spec_start) {
+        display_spectra('stop');
+    }
+    if ((!timeseries_start) && (status = 'start')) {
+       if ( ts_start === "lhs"){   // by I8FUC 20220812
+          timeseries_data.length = 0;
+          timeseries_ticks.length = 0;          
+          };
+    
+        var divTimeseries = '<div id="signal-div-timeseries">'
+                + '<canvas id="signal-canvas-timeseries" width="' + (screen.availWidth) + '" height="' + (timeseries_window_h) + '" style="width:100%;height:' + (timeseries_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
+                + '</div>';
+//eroyee; below to drop down time series container
+        document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
+        document.getElementById('spectrum_container').style.opacity = "1";
+        var div = document.querySelector(".openwebrx-spectrum-container");
+        div.insertAdjacentHTML('beforeEnd', divTimeseries);
+//eroyee; setup the canvas and start timeseries display
+        timeSeriesCtx = document.querySelector("#signal-canvas-timeseries").getContext('2d');
+        timeSeriesCtx.width = (screen.availWidth);
+        timeSeriesCtx.height = (spec_window_h); // one less than canvas height
+        if (ts_ticks) {
+            let date = new Date();
+            ts_time = date.getTime();
+            let mins = date.getMinutes();
+            let secs = date.getSeconds();
+//            timeseries_ticks.push(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()); // pushes time string without leading 0's for nums < 10
+            timeseries_ticks.push(date.getHours() + ":" + (mins = mins <= 9 ? '0' + mins : mins) + ":" + (secs = secs <= 9 ? '0' + secs : secs)); // gives leading 0's
+        }
+        timeseries_start = true;
+    } else {
+        if (status = 'stop') {
+            timeseries_start = false;
+            ts_ticks = false;
+            document.getElementById('spectrum_container').style.height = "0px";
+            document.getElementById('spectrum_container').style.opacity = "0";
+            const flush = document.querySelector("#signal-canvas-timeseries");
+            flush.parentNode.removeChild(flush);
+            timeseries_start = false;
+          //  timeseries_data.length = 0;   // removed by I8FUC
+          //  timeseries_ticks.length = 0;  // removed by I8FUC
+            ts_out_data.length = 0;
+            return;
+        }
+    }
+}
+
+// ------------ eroyee add for start/stop spectrum display -------------- //
+
+var specStyle;
+var screenCtx;
+var spectrumCtx;
+var spectrumGradient;
+const spec_data_in = [];
+var spec_start = false;
+const spec_window_h = 130; // sets height of spectrum + timeseries display
+const label_w = 34; // sets width of label column (ie. dB values)
+const spec_out_data = [];
+function display_spectra(status, style)
+{
+    if (timeseries_start) {
+        display_timeseries('stop');
+        ts_ticks = false;
+    }
+    if ((!spec_start) && (status = 'start')) {
+//console.log(status);
+        var divspectrum = '<div id="freq-div-spectrum">'
+                + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;"></canvas>'
+                + '<canvas id="freq-canvas-spectrum-label" width="' + (label_w) + '" height="' + (spec_window_h) + '" style="width:' + (label_w) + ';height:' + (spec_window_h) + 'px;right:0px;position:absolute;bottom:0px"></canvas>'
+                + '</div>';
+//eroyee; below to drop down spectrum container
+        document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
+        document.getElementById('spectrum_container').style.opacity = "1";
+        var div = document.querySelector(".openwebrx-spectrum-container");
+        div.insertAdjacentHTML('beforeEnd', divspectrum);
+// eroyee; ensure new spectrum canvas is set with the same position and zoom level as the waterfall canvas (the label canvas is fixed and divorced from this)
+        document.querySelector("#freq-canvas-spectrum").style.left = document.querySelector("#webrx-canvas-container").style.left;
+        document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width;
+// eroyee set variables and canvas colours
+        spectrumCtx = document.querySelector("#freq-canvas-spectrum").getContext('2d');
+        spectrumCtx.width = (fft_size);
+        spectrumCtx.height = (spec_window_h) - 1; // one less than canvas height
+        spectrumGradient = spectrumCtx.createLinearGradient(0, 0, 0, spectrumCtx.height);
+        spectrumGradient.addColorStop(0.00, 'red'); // probably should align these colours with the waterfall...
+        spectrumGradient.addColorStop(0.50, 'yellow');
+        spectrumGradient.addColorStop(1.00, 'blue');
+// eroyee setup second small canvas to show -dB labels (since spectrum is expanded according to zoom)
+        screenCtx = document.querySelector("#freq-canvas-spectrum-label").getContext('2d');
+        screenCtx.width = (label_w);
+        screenCtx.height = (spec_window_h) - 1;
+// eroyee; initialise the spectrum and peak data arrays
+        for (i = 0; i < (fft_size); ++i) {
+            spec_peak_data[i] = 0; // initialise the peak data array with 0's
+        }
+        for (i = 0; i < (fft_size); ++i) {
+            spec_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
+        }
+        specStyle = style;
+//console.log(specStyle);
+        spec_start = true;
+    } else {
+        if (status = 'stop') {
+//console.log(status);
+            spec_start = false;
+            document.getElementById('spectrum_container').style.height = "0px";
+            document.getElementById('spectrum_container').style.opacity = "0";
+            const flush = document.getElementById("freq-div-spectrum");
+            flush.parentNode.removeChild(flush);
+            spec_start = false;
+            return;
+        }
+    }
+}
+
+// ----------------- eroyee for starting peak hold display ---------------------
+
+const spec_peak_data = [];
+var peak_start = false;
+function peak_spectra_hold()
+{
+    if (!spec_start && !timeseries_start) {
+        peak_start = false;
+        return;
+    }
+    if (!peak_start) {
+        peak_start = true;
+        for (i = 0; i < (fft_size); ++i) {
+            spec_peak_data[i] = 0; // initialise the peak data array with 0's
+        }
+    } else if (peak_start) {
+        peak_start = false;
+        for (i = 0; i < (fft_size); ++i) {
+            spec_peak_data[i] = 0; // clear the peak data array with 0's
+        }
+        return;
+    }
+}
+
+// ---- eroyee additions to waterfall_add function for spectrum display ----- //
 
 function waterfall_add(data) {
     if (!waterfall_setup_done) return;
@@ -1447,15 +1790,196 @@ function waterfall_add(data) {
 
     //Add line to waterfall image
     var oneline_image = canvas_context.createImageData(w, 1);
-    for (var x = 0; x < w; x++) {
+    var wfmax_min = (waterfall_max_level - waterfall_min_level);
+    var wfmin_max = (waterfall_min_level / wfmax_min);
+    for (let x = 0; x < w; x++) {
+        if (spec_start) {
+//      eroyee for spectrum display; this 2nd formula is ok, and should use less cpu than 1st (which is same as mkcolor value percent)
+//            spec_data_in.push(Math.max(0, Math.min(1,(data[x] - waterfall_min_level) / (waterfall_max_level - waterfall_min_level))));
+            spec_data_in.push((data[x] - waterfall_min_level) / wfmax_min);
+        }
         var color = waterfall_mkcolor(data[x]);
-        for (i = 0; i < 3; i++) oneline_image.data[x * 4 + i] = color[i];
+        for (let i = 0; i < 3; i++) {
+            oneline_image.data[x * 4 + i] = color[i];
+        }
         oneline_image.data[x * 4 + 3] = 255;
     }
 
     //Draw image
-    canvas_context.putImageData(oneline_image, 0, --canvas_actual_line);
-    shift_canvases();
+    if (wfStart) {
+        canvas_context.putImageData(oneline_image, 0, --canvas_actual_line);
+        shift_canvases();
+    }
+
+// ------------------------------------------------------------------ TIMESERIES
+
+// eroyee; Implements plotting of signal level over time. Data is plotted from
+// left (oldest) to right (newest), and will 'scroll' once plotwidth is filled.
+// Plotwidth is set at client screenwidth. Plots/sec depend upon fft_fps, signal
+// level is plotted from 0dBm to down Waterfall Min Level. Reticule lines are
+// similarly scaled and drawn at ~10dB intervals. 
+// 
+    if (timeseries_start) {
+        var y = 1;
+        const date = new Date();
+        var current = date.getTime(); 
+        let scaling = timeSeriesCtx.height / (Math.abs(waterfall_min_level - waterfall_max_level)); // scale from wf_min - wf_max
+        const d = (scaling * default_ret_step ); // scale from wf_min - wf_max ; changed by I8FUC from 10 to 5 20220721
+        timeSeriesCtx.fillStyle = "#000";
+        timeSeriesCtx.fillRect(0, 0, timeSeriesCtx.width, timeSeriesCtx.height);
+        timeSeriesCtx.fillStyle = "#FFF";
+        timeSeriesCtx.font = "16px";
+//        timeseries_data.push(Math.abs(sig_data)); // use for scale of 0dBm - wf_min_level
+//        var dBnum = 0; // use for scale of 0dBm - wf_min_level
+        timeseries_data.push(sig_data); // scale from wf_min - wf_max
+        if (ts_ticks) {
+            timeseries_ticks.push(0);
+            if (current >= ts_time + default_time_tick * 1000 ) {  // division interval in milliseconds
+                ts_time = current;
+                let mins = date.getMinutes();
+                let secs = date.getSeconds();
+//                timeseries_ticks.push(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()); // pushes time string without leading 0's for nums < 10
+                timeseries_ticks.push(date.getHours() + ":" + (mins = mins <= 9 ? '0' + mins : mins) + ":" + (secs = secs <= 9 ? '0' + secs : secs)); // gives leading 0's
+            }
+        }
+        var dBnum = Math.round(waterfall_max_level +10 ); // scale from wf_min - wf_max  - fix by I8FUC to adjut timeline y scale to waterfall colors
+        if (timeseries_data.length >= timeSeriesCtx.width - (label_w)) { // subtract to stop trace & RHS text interacting
+            timeseries_data.shift();  // yes this is a slow op but it doesn't appear to badly affect... 
+            if (ts_ticks) {
+                timeseries_ticks.shift();
+            }
+        }
+//---------------------------- reticule ----------------------------------------
+        for (let i = 0; i < timeSeriesCtx.height; i++) {
+            y = y + d; // reticule lines
+            dBnum = dBnum - default_ret_step ;  //  changed by I8FUC from 10 to 5 2022072
+            timeSeriesCtx.fillRect(0, y, timeSeriesCtx.width - (label_w), 0.5);  // draw lines
+            timeSeriesCtx.fillText(dBnum + "dB", timeSeriesCtx.width - (label_w), y); // write -dB values @RHS
+        }
+//---------------------------- end reticule ----------------------------------------
+        timeSeriesCtx.fillStyle = "grey"; // lighten up the time ticks
+        timeSeriesCtx.lineWidth = 1;
+        timeSeriesCtx.strokeStyle = 'yellow';
+        timeSeriesCtx.beginPath();
+        timeSeriesCtx.moveTo(timeSeriesCtx.lineWidth - 2, timeseries_data[0]); // -2 helps with rogue trace at LHS
+//---------------------------- plot data  ----------------------------------------
+        var tslen = timeseries_data.length; // put the .length calc outside the for loop to speed up
+        for (let i = 0; i < tslen; i++) {
+            if (ts_ticks) {
+                if (timeseries_ticks[i]) {  // time ticks turned on?
+                    timeSeriesCtx.fillRect(i, 0, 1, timeSeriesCtx.height); // draw vertical line at specified interval
+                    timeSeriesCtx.fillText(timeseries_ticks[i], i + 3, timeSeriesCtx.height - 2) // write time alongside line
+                }
+            }
+            y = timeSeriesCtx.height - (((timeseries_data[i] - waterfall_min_level - 10 ) / wfmax_min) * timeSeriesCtx.height); // scale the data now so changes in min_waterfall+max_waterfall and reticule are reflected - added 10 by I8FUC 20220814 to allign timeseries with waterfall colors
+//            y = (timeseries_data[i]*scaling); // scale the data so changes in min_waterfall and reticule are reflected - use if scale is 0dBm - wf_min
+            timeSeriesCtx.lineTo(i, y);
+        }
+        timeSeriesCtx.stroke();
+    }
+
+// ------------------------------------------------------------------/TIMESERIES
+
+// eroyee --------------------------------------------------------------SPECTRUM
+
+    if (spec_start) {
+        var dBnum = Math.round(waterfall_max_level); // dB label values
+// eroyee; spectrum height in pixels / dB range between wfmax & wfmin gives num pixels to draw first & subsequent reticule lines 10dB apart
+// eg. If spec is 128px high, wft max is -19, wf min is -69 (ie.range is 50dB), then 128/(50/10) = 25.6 pixels to the first 10dB line
+// Should probably round the outcome but that may use more CPU...
+        var y = 1;
+        const d = (spectrumCtx.height / ((Math.abs(waterfall_min_level - waterfall_max_level)) / 10));
+        const k = 0.3; // value to set filter rise/fall time, lower is slower
+        var speclen = spec_data_in.length;
+// setup spectrum window ready to draw spectra
+        spectrumCtx.fillStyle = "#000";
+        spectrumCtx.fillRect(0, 0, spectrumCtx.width, spectrumCtx.height);
+        spectrumCtx.fillStyle = spectrumGradient;
+// setup lable window ready to draw labels
+        screenCtx.fillStyle = "#000";
+        screenCtx.fillRect(0, 0, screenCtx.width, screenCtx.height + 1); // need the +1 otherwise get an artifact at the bottom of the label list
+// ----------------------------- Filter types ------------------------------- //
+// Other filter types, is it worth the hassle? Tried IIR and not that much 
+// different from EMA....
+// --------------------- EMA filter ------------------------------------------- //
+// eroyee; we are ultimately dealing with inputs of percent_value, a number 
+// between 0 and 1, need to work with these numbers for *both* input and output 
+// data for the ema filter to work correctly ()and multiply the output to fit 
+// the canvas later on).The alternative is to first multiply the input value to
+//  canvas height and go from there. I think this is better as it makes it a 
+//  little easier to understand and possibly reduces the variable count slightly. 
+//  Either should work.
+//      var ema = ((spec_data_in[i]) * k) + (spec_out_data[i] * (1-k)); // use if utilising raw value_percent input
+        for (let i = 0; i < speclen; i += 1) {
+            var ema = (((spec_data_in[i]) * spectrumCtx.height) * k) + (spec_out_data[i] * (1 - k)); // multiply raw by canvas height
+            if (ema < 0) {
+                ema = 0;
+            }
+            if (ema > spectrumCtx.height) {
+                ema = spectrumCtx.height;
+            }
+            spec_out_data[i] = ema;
+        }
+// -------------------------------------------------------------------------- //
+
+//--------------------------- reticule ----------------------------------------
+        for (let i = 0; i < spectrumCtx.height; i++) {
+            dBnum = dBnum - 5; // label values ; changed by I8FUC from 10 to 5 2022072
+            y = y + d; // reticule lines
+//                spectrumCtx.fillStyle = "#FFF"; // white, comment out for colour coded lines
+            screenCtx.fillStyle = spectrumGradient; // remove comment for coloured labelling
+            spectrumCtx.fillRect(0, y, spectrumCtx.width, 0.5);  // draw lines
+//                screenCtx.fillStyle = "#FFF";  // white labelling, comment out for same colour as spectra
+            screenCtx.fillText(dBnum + "dB", 0, y + 1); // + or - moves the number alignment relative to line
+        }
+// -------------------------- spectra fill -----------------------------------
+        if (specStyle == 'fill') {
+            for (let i = 0; i < spectrumCtx.width; i++) {
+                spectrumCtx.fillStyle = spectrumGradient; // for coloured spectra gradient
+                spectrumCtx.fillRect(i, spectrumCtx.height, 1, -spec_out_data[i]);  // draw spectra
+            }
+        }
+//-------------------------- spectra line -----------------------------------
+        if (specStyle == 'line') {
+            spectrumCtx.lineWidth = 2;
+            spectrumCtx.strokeStyle = spectrumGradient;
+            spectrumCtx.beginPath();
+            spectrumCtx.moveTo(0, y);
+            for (let i = 0; i < spectrumCtx.width; i++) {
+                let z = ((1 - spec_out_data[i] / spectrumCtx.height) * spectrumCtx.height) - 1; // draw spectra line
+                spectrumCtx.lineTo(i, z);
+            }
+            spectrumCtx.stroke();
+        }
+
+// eroyee -------------------------------------------------------------/SPECTRUM
+
+// eroyee ------------------------------------------------------------ PEAK HOLD
+// This draws a fine spectra line from the peak of the current data. It 
+// maintains an array of peak data that is checked against the current data 
+// output (from spec_out_data) on each cycle. If there are any data points in
+// spec_out_data greater than the corresponding data in the spec_peak_data array 
+// it will update spec_peak_data, which is then drawn out by a standard routine. 
+// Starting and stopping is actioned via the peak_spectra_hold function.
+        if (peak_start) {
+            spectrumCtx.lineWidth = 1;
+            spectrumCtx.strokeStyle = 'green';
+            spectrumCtx.beginPath();
+            spectrumCtx.moveTo(0, y);
+            for (let i = 0; i < spectrumCtx.width; i++) {
+                if (spec_out_data[i] > spec_peak_data[i]) {
+                    spec_peak_data[i] = spec_out_data[i];
+                }
+                y = ((1 - spec_peak_data[i] / spectrumCtx.height) * spectrumCtx.height) - 1;
+//                y = (1- spec_peak_data[i]/1) * ((spectrumCtx.height) - 1); // needed if using raw value_percent input
+                spectrumCtx.lineTo(i, y);
+            }
+            spectrumCtx.stroke();
+        }
+        spec_data_in.length = 0;
+    }
+
+// eroyee ------------------------------------------------------------/PEAK HOLD
 }
 
 function waterfall_clear() {
@@ -1519,6 +2043,10 @@ function openwebrx_init() {
     window.addEventListener("resize", openwebrx_resize);
     bookmarks = new BookmarkBar();
     initSliders();
+    /* ----- --eroyee add for keyboard tuning 28 Dec 20 --------------------- */
+    init_key_listener();
+    initTopBarMenu() ;   // by I8FUC to support top bar ccomponents hiding by admin screens
+    /* ---------------------------------------------------------------------- */
 }
 
 function initSliders() {
@@ -1650,6 +2178,28 @@ function initPanels() {
         });
         if (panel_displayed(el)) first_show_panel(el);
     });
+
+}    
+    
+function initTopBarMenu() {    // by I8FUC to support top bar ccomponents hiding by admin screens
+    $('#top_bar_buttons').find('.button').each(function () {
+        var el = this;
+          if(el.id && el.id === 'status_but_disable' ) { el.style.display= 'none' ; }   ;
+          if(el.id && el.id === 'status_but_enable' ) { el.style.display= 'block' ; }   ;
+          
+          if(el.id && el.id ===  'log_but_disable' ) { el.style.display= 'none' ; }  ;  
+           if(el.id && el.id === 'log_but_enable' ) { el.style.display= 'block' ; }  ;          
+                  
+          if(el.id && el.id === 'receiver_but_disable' ) { el.style.display= 'none' ; }  ; 
+          if(el.id && el.id === 'receiver_but_enable' ) { el.style.display= 'block' ; }  ;           
+            
+          if(el.id && el.id ===  'map_but_disable' ) { el.style.display= 'none' ; }  ;
+           if(el.id && el.id === 'map_but_enable' ) { el.style.display= 'block' ; }  ;         
+          
+          if(el.id && el.id === 'settings_but_disable' ) { el.style.display= 'none' ; } ;                          
+          if(el.id && el.id === 'settings_but_enable' ) { el.style.display= 'block' ; } ;             
+    });
+
 }
 
 /*
@@ -1663,7 +2213,7 @@ function initPanels() {
            |___/
 */
 
-var secondary_demod_fft_offset_db = 18; //need to calculate that later
+var secondary_demod_fft_offset_db = 10; //need to calculate that later - was 18 changed to 10 by I8FUC 20220814
 var secondary_demod_canvases_initialized = false;
 var secondary_demod_channel_freq = 1000;
 var secondary_demod_waiting_for_set = false;

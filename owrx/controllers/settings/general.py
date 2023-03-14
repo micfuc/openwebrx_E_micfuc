@@ -64,7 +64,64 @@ class GeneralSettingsController(SettingsFormController):
                     infotext="For performance reasons, images are cached. "
                     + "It can take a few hours until they appear on the site.",
                 ),
+                DropdownInput(
+                    "black_mod",
+                    "Black background",
+                    infotext="Replace background photo with solid black ",
+                    options=[
+                        Option("webrx-top-container-black", "Enable"),
+                        Option("webrx-top-container", "Disable"),
+                    ],
+                ),                                
             ),
+            Section(
+                "Top Bar Panels Toggle Buttons Display ",
+                DropdownInput(
+                    "status_button",
+                    "Status Panel Button Display",
+                    infotext="Enable display of Bottom left Status Panel toggle button ",
+                    options=[
+                        Option("status_but_enable", "Enable"),
+                        Option("status_but_disable", "Disable"),
+                    ],
+                ), 
+                DropdownInput(
+                    "log_button",
+                    "Log Panel Button Display",
+                    infotext="Enable display of Bottom left Log panel toggle button ",
+                    options=[
+                        Option("log_but_enable", "Enable"),
+                        Option("log_but_disable", "Disable"),
+                    ],
+                ),
+                DropdownInput(
+                    "receiver_button",
+                    "Receiver Panel Button Display",
+                    infotext="Enable display of Bottom right Receiver Panel toggle button ",
+                    options=[
+                        Option("receiver_but_enable", "Enable"),
+                        Option("receiver_but_disable", "Disable"),
+                    ],
+                ), 
+                DropdownInput(
+                    "map_button",
+                    "Map Page Button Display",
+                    infotext="Direct link to Receiver Map Page Display ",
+                    options=[
+                        Option("map_but_enable", "Enable"),
+                        Option("map_but_disable", "Disable"),
+                    ],
+                ),
+                DropdownInput(
+                    "settings_button",
+                    "Settings Page Button Display",
+                    infotext="Direct link to Receiver Settings Page Display ",
+                    options=[
+                        Option("settings_but_enable", "Enable"),
+                        Option("settings_but_disable", "Disable"),
+                    ],
+                ),                                                
+            ),            
             Section(
                 "Receiver limits",
                 NumberInput(
@@ -143,7 +200,7 @@ class GeneralSettingsController(SettingsFormController):
                     + "waterfall colors",
                 ),
             ),
-            Section(
+             Section(
                 "Compression",
                 DropdownInput(
                     "audio_compression",

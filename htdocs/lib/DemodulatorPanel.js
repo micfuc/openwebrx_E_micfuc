@@ -69,6 +69,22 @@ DemodulatorPanel.prototype.render = function() {
     var $modegrid = $('<div class="openwebrx-modes-grid"></div>');
     $modegrid.append.apply($modegrid, buttons);
     html.push($modegrid);
+    /*
+     html.push($(
+     '<div class="openwebrx-panel-line openwebrx-panel-flex-line">' +
+     '<div class="openwebrx-button openwebrx-demodulator-button openwebrx-button-dig">DIG</div>' +
+     '<select class="openwebrx-secondary-demod-listbox">' +
+     '<option value="none">Digital Modes Select</option>' +
+     digiModes.map(function(m){
+     return '<option value="' + m.modulation + '">' + m.name + '</option>';
+     }).join('') +
+     '</select>' +
+     '</div>'
+     ));
+     
+     this.el.find(".openwebrx-modes").html(html);
+     };
+     */
 
     html.push($(
         '<div class="openwebrx-panel-line openwebrx-panel-flex-line">' +
@@ -79,6 +95,10 @@ DemodulatorPanel.prototype.render = function() {
                     return '<option value="' + m.modulation + '">' + m.name + '</option>';
                 }).join('') +
             '</select>' +
+            '<select class="openwebrx-secondary-demod-listbox" id="change_display">' +
+            '<option value="none">Displays:</option>' + '<option value="1">Timeseries</option>' + '<option value="2">Timeseries Tick</option>' + '<option value="3">Spectrum Line</option>' + '<option value="4">Spectrum Fill</option>' + '<option value="5">Waterfall Off</option>' + '<option value="6">Waterfall On</option>' +
+            '</select>' +
+            '<button id="peak" class="openwebrx-SpectraHold-button" onclick="peak_spectra_hold()" style="margin-left:1px" title="Spectrum peak hold on/off" >^</button>' +
         '</div>'
     ));
 
@@ -155,6 +175,8 @@ DemodulatorPanel.prototype.setMode = function(requestedModulation, underlyingMod
 };
 
 DemodulatorPanel.prototype.disableDigiMode = function() {
+    // just a little trick to get out of the digimode
+    delete this.mode;
     this.setMode(this.getDemodulator().get_modulation());
 };
 
