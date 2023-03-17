@@ -1,24 +1,23 @@
 /*
 
-	This file is part of OpenWebRX,
-	an open-source SDR receiver software with a web UI.
-	Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
-	Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
-        Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
-	Copyright (c) 2022-2023 by Marat Fayzullin <luarvique@gmail.com>
+This file is part of OpenWebRX,
+an open-source SDR receiver software with a web UI.
+Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
+Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
+Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
+Copyright (c) 2022-2023 by Marat Fayzullin <luarvique@gmail.com>
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as
+ published by the Free Software Foundation, either version 3 of the
+ License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+ 
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
@@ -44,43 +43,6 @@ var ts_start = "rhs";
 var default_ret_step = 5 ; 
 // end  by I8FUC 20220814
 
-
-function updateVolume() {
-    audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
-}
-
-function toggleMute() {
-    var $muteButton = $('.openwebrx-mute-button');
-    var $volumePanel = $('#openwebrx-panel-volume');
-    if ($muteButton.hasClass('muted')) {
-        $muteButton.removeClass('muted');
-        $volumePanel.prop('disabled', false).val(volumeBeforeMute);
-    } else {
-        $muteButton.addClass('muted');
-        volumeBeforeMute = $volumePanel.val();
-        $volumePanel.prop('disabled', true).val(0);
-    }
-    updateVolume();
-}
-
-/* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- 
- - note this is optimised for tuning precision of 10Hz. Furture improvement to 
- include that variable and adjust accordingly -----------------------------*/
-function toggleStepHz() {
-    if (StepHz == 1000) {
-        StepHz = 5000;
-        document.getElementById('stepchangeHz').innerHTML = "5";
-        document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
-    } else if (StepHz == 5000) {
-        StepHz = 9000;
-        document.getElementById('stepchangeHz').innerHTML = "9";
-        document.getElementById('stepchangeHz').style.backgroundColor = "blue";
-    } else if (StepHz == 9000) {
-        StepHz = 1000;
-        document.getElementById('stepchangeHz').innerHTML = "1";
-        document.getElementById('stepchangeHz').style.backgroundColor = "red";
-    }
-}
 
 function updateNR() {
     var $nrPanel = $('#openwebrx-panel-nr');
@@ -141,6 +103,169 @@ function saveCanvas(canvas) {
         }, 0);
     }, 'image/png');
 }
+
+
+
+function updateVolume() {
+    audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
+}
+
+
+function toggleMute() {
+    var $muteButton = $('.openwebrx-mute-button');
+    var $volumePanel = $('#openwebrx-panel-volume');
+    if ($muteButton.hasClass('muted')) {
+        $muteButton.removeClass('muted');
+        $volumePanel.prop('disabled', false).val(volumeBeforeMute);
+    } else {
+        $muteButton.addClass('muted');
+        volumeBeforeMute = $volumePanel.val();
+        $volumePanel.prop('disabled', true).val(0);
+    }
+    updateVolume();
+}
+
+/* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- 
+ - note this is optimised for tuning precision of 10Hz. Furture improvement to 
+ include that variable and adjust accordingly -----------------------------*/
+function toggleStepHz() {
+    if (StepHz == 1000) {
+        StepHz = 5000;
+        document.getElementById('stepchangeHz').innerHTML = "5";
+        document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
+    } else if (StepHz == 5000) {
+        StepHz = 9000;
+        document.getElementById('stepchangeHz').innerHTML = "9";
+        document.getElementById('stepchangeHz').style.backgroundColor = "blue";
+    } else if (StepHz == 9000) {
+        StepHz = 1000;
+        document.getElementById('stepchangeHz').innerHTML = "1";
+        document.getElementById('stepchangeHz').style.backgroundColor = "red";
+    }
+}
+
+function freqstep(sel) {
+    var stepsize = 0;
+    switch (sel) {
+        case 0:
+            stepsize = -StepHz;
+            break;
+        case 1:
+            stepsize = -100;
+            break;
+        case 2:
+            stepsize = -10;  // Will only work if 10Hz resolution is set
+            break;
+        case 3:
+            stepsize = 10;  // Will only work if 10Hz resolution is set
+            break;
+        case 4:
+            stepsize = 100;
+            break;
+        case 5:
+            stepsize = StepHz;
+            break;
+        default:
+            stepsize = 0;
+    }
+    var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
+    var tuned_freq = offset_frequency + center_freq;
+    var new_offset = 0;
+    if (Math.abs(stepsize) > 100) {    // do the 'snap' to kHz only for large step ranges
+        var HzFraction = tuned_freq - (Math.trunc(tuned_freq/1000)*1000);
+        if (HzFraction > 0) {
+            // not snapped to kHz, do not use the full stepsize but first snap to the nearest kHz value
+            if (stepsize < 0) {
+                new_offset = offset_frequency - HzFraction;
+            } else {
+                new_offset = offset_frequency + (1000 - HzFraction);
+            }
+        } else {
+            new_offset = (Math.round((offset_frequency + stepsize)/1000)*1000);  // eroyee; 'snap' the largest stepsize to nearest 1kHz
+        }
+    } else {
+        new_offset = (offset_frequency + stepsize);
+    }
+    if (new_offset !== offset_frequency) {
+        $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset);
+        // check to see if we need to scroll
+        tuned_freq = new_offset + center_freq;
+        var visible_freq_range = get_visible_freq_range();
+        if (stepsize > 0) {
+            var range_plus = visible_freq_range.end - visible_freq_range.center;
+            if ((tuned_freq - visible_freq_range.center) / range_plus > 0.7) {
+                canRight();
+            }
+	} else {
+            var range_min = visible_freq_range.center - visible_freq_range.start;
+            if ((visible_freq_range.center - tuned_freq) / range_min > 0.7) {
+                canLeft();
+            }
+	}
+
+    }
+}
+/* -------------------------------------------------------------------------- */
+
+/* eroyee add for keyboard tuning 28 Dec 20, step toggle May 2022 */
+
+function init_key_listener(keypress) {
+    document.addEventListener("keydown", function (keypress) {
+        // End 
+        if (keypress.keyCode == "35") {
+            toggleStepHz();
+        }
+        // PgUp
+        if (keypress.keyCode == "33") {
+            freqstep(5);
+        }
+        // PgDwn
+        if (keypress.keyCode == "34") {
+            freqstep(0);
+        }
+        // Up cursor
+        if (keypress.keyCode == "38") {
+            freqstep(4);
+        }
+        // Down Cursor
+        if (keypress.keyCode == "40") {
+            freqstep(1);
+        }
+        // Left Cursor
+        if (keypress.keyCode == "37") {
+            freqstep(2);
+        }
+        // Right Cursor
+        if (keypress.keyCode == "39") {
+            freqstep(3);
+        }
+    });
+}
+/*  ------------------------------------------------------------------------- */
+
+/* --------- eroyee add for switching transparent (Ghost) RX panel ---------- */
+
+var GhostRX = true;
+function ToggleGhostRX() {
+    if (GhostRX) {
+        GhostRX = false;
+        document.getElementById('GhostRX').innerHTML = "G";
+        document.getElementById('GhostRX').style.backgroundColor = "rgba(255,255,255,0.3)"; // using rgba, 'a' is opacity value
+        document.getElementById('GhostRX').style.fontWeight = "bold";
+//        document.getElementById('spectrum').style.backgroundColor = "rgba(255,165,0,0.3)"; // using rgba, 'a' is opacity value
+        document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "rgba(255,255,255,0)";
+//    qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,0)";
+    } else {
+        GhostRX = true;
+        document.getElementById('GhostRX').innerHTML = "G";
+        document.getElementById('GhostRX').style.backgroundColor = "black";
+        document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "black";
+        document.getElementById('GhostRX').style.fontWeight = "normal";
+//        document.getElementById('spectrum').style.backgroundColor = "orange"; // using rgba, 'a' is opacity value
+//        qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,1)"; 
+    }
+}
+
 
 function zoomInOneStep() {
     zoom_set(zoom_level + 1);

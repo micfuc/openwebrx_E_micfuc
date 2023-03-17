@@ -542,8 +542,8 @@ input[type=range]:disabled {
     background-color: black;
     /*  border: none; */
     color: white;
-    height: 27px;
-    width: 23px;
+    height: 27px; // was 27
+    width: 15px; // was 23
     border-radius: 3px;
     border: 2px solid rgba(255,255,255,0.5);
     font-size: 16px;
@@ -561,8 +561,8 @@ input[type=range]:disabled {
     background-color: green;
     /*  border: none; */
     color: white;
-    height: 18px;
-    width: 16px;
+    height: 25px;  // was 18
+    width: 20px; // was 16
     border-radius: 3px;
     border: 0px solid #000;
     font-size: 14px;
@@ -589,14 +589,14 @@ input[type=range]:disabled {
 
 .openwebrx-square-button img
 {
-	height: 27px;
+	height: 20px; // was 27
 }
 
 .openwebrx-round-button
 {
 	margin-right: -2px;
-	width: 35px;
-	height: 35px;
+	width: 35px;  // was 35
+	height: 35px;  // was 35
 	border-radius: 25px;
 }
 
@@ -1521,7 +1521,7 @@ img.openwebrx-mirror-img
 }
 
 .openwebrx-zoom-button svg {
-    height: 27px;
+    height: 18px;  // was 27
 }
 
 @keyframes openwebrx-record-animation {
@@ -1532,8 +1532,8 @@ img.openwebrx-mirror-img
 
 .openwebrx-record-button {
     color: #ff8080;
-    float: right;
-    margin-top: 13px;
+    // float: right;
+    margin-top: 3px; // was 13
     animation-duration: 1s;
     animation-iteration-count: infinite;
 }
