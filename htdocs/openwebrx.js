@@ -2435,7 +2435,7 @@ function secondary_demod_waterfall_add(data) {
     //Add line to waterfall image
     var oneline_image = secondary_demod_current_canvas_context.createImageData(w, 1);
     for (var x = 0; x < w; x++) {
-        var color = waterfall_mkcolor(data[x] + secondary_demod_fft_offset_db);
+        var color = waterfall_mkcolor(data[x] + default_sec_fft_offset_db);        
         for (var i = 0; i < 3; i++) oneline_image.data[x * 4 + i] = color[i];
         oneline_image.data[x * 4 + 3] = 255;
     }
