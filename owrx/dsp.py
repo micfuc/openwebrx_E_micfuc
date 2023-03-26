@@ -537,6 +537,24 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
         if isinstance(demod, BaseDemodulatorChain):
             return demod
         # TODO: move this to Modes
+        if demod == "sp50":
+            from csdr.chain.analog import NFm
+            return NFm(self.props["output_rate"])
+        if demod == "sp25":
+            from csdr.chain.analog import NFm
+            return NFm(self.props["output_rate"])
+        if demod == "sp15":
+            from csdr.chain.analog import NFm
+            return NFm(self.props["output_rate"])
+        if demod == "sp10":
+            from csdr.chain.analog import NFm
+            return NFm(self.props["output_rate"])            
+        if demod == "sp5":
+            from csdr.chain.analog import NFm
+            return NFm(self.props["output_rate"])
+        if demod == "sp2":
+            from csdr.chain.analog import NFm
+            return NFm(self.props["output_rate"])                 
         if demod == "nfm":
             from csdr.chain.analog import NFm
             return NFm(self.props["output_rate"])
@@ -604,6 +622,9 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
         elif mod == "packet":
             from csdr.chain.digimodes import PacketDemodulator
             return PacketDemodulator()
+        elif mod == "spectrum":
+            from csdr.chain.digimodes import PacketDemodulator
+            return PacketDemodulator()            
         elif mod == "ais":
             from csdr.chain.digimodes import PacketDemodulator
             return PacketDemodulator(ais = True)

@@ -140,6 +140,9 @@ $(function(){
                     }, aprsOptions, getMarkerOpacityOptions(update.lastseen) ));
                     marker.lastseen = update.lastseen;
                     marker.mode     = update.mode;
+                    marker.direct   = update.direct;   // by I8FUC 20230324
+//                    if(update.direct == '[DIR]') { marker.direct   = update.direct; } ; // by I8FUC 20230324
+//                    if((update.direct == '[RPT]' ) && ( marker.direct != '[DIR]') ) { marker.direct   = update.direct; } ; // by I8FUC 20230324
                     marker.band     = update.band;
                     marker.comment  = update.location.comment;
                     marker.weather  = update.location.weather;
@@ -493,6 +496,11 @@ $(function(){
 
             weatherString += '</p>';
         }
+
+//       if (marker.direct) {
+           if( marker.direct == '[RPT]' ) {marker.direct = '<font color=red > <B> ' + marker.direct ; } else { marker.direct = '<font color=black> ' + marker.direct ;};   // by I8FUC
+           detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
+//        }
 
         if (marker.altitude) {
             detailsString += makeListItem('Altitude', marker.altitude.toFixed(0) + ' m');

@@ -214,13 +214,15 @@ PacketMessagePanel.prototype.pushMessage = function(msg) {
         link = '<div ' + attrs + '>' + overlay + '</div>'
     }
 
+    
+    if (msg.direct === '[RPT]') { msg.direct = '<font color=brown>' + msg.direct + ' ' ; }  else {msg.direct = '<font color=white>' + msg.direct + ' ' ;}; // by I8FUC 
     $b.append($(
         '<tr>' +
         '<td size=4 >' + msg['mode'] + '</td>' +
         '<td>' + timestamp + '</td>' +
         '<td class="callsign">' + source + '</td>' +
         '<td class="coord">' + link + '</td>' +
-        '<td class="message">' + (msg.comment || msg.message || '') + '</td>' +
+        '<td class="message">' + (msg.direct) + (msg.comment || msg.message ||'') +'</td>' +   
         '</tr>'
     ));
     $b.scrollTop($b[0].scrollHeight);

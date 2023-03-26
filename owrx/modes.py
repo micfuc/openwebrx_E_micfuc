@@ -145,7 +145,7 @@ class Modes(object):
         ),
         DigitalMode(
             "spectrum",
-            "Spectrum",
+            "Zoom",
             underlying=["sp50","sp25","sp15","sp10","sp5","sp2","nfm", "usb", "lsb"],        
             requirements=["packet"],
             service=False,

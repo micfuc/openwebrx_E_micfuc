@@ -200,7 +200,7 @@ class GeneralSettingsController(SettingsFormController):
                     + "waterfall colors",
                 ),
             ),
-             Section(
+            Section(
                 "Compression",
                 DropdownInput(
                     "audio_compression",

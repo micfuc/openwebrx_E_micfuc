@@ -148,9 +148,10 @@ class AprsLocation(LatLngLocation):
 
     def __dict__(self):
         res = super(AprsLocation, self).__dict__()
-        for key in ["comment", "symbol", "course", "speed", "altitude", "weather", "device", "power", "height", "gain", "directivity"]:
+        for key in ["comment", "symbol", "course", "speed", "altitude", "weather", "device", "power", "height", "gain", "directivity", "direct"]: # by I8FUC 20230324
             if key in self.data:
                 res[key] = self.data[key]
+#        print("=========================>The Array is: ", res)  
         return res
 
 
@@ -194,29 +195,39 @@ class AprsParser(PickleModule):
             aprsData["mode"] = "AIS" if aprsData.get("source")=="AIS" else "APRS"
 
             logger.debug("decoded APRS data: %s", aprsData)
-            self.updateMap(aprsData)
+#            print("..................................>The Array is: ", aprsData)  
+#            self.updateMap(aprsData)
             self.getMetric("total").inc()
+            aprsData["direct"] = "[RPT]"           # by I8FUC 20230323
             if self.isDirect(aprsData):
                 self.getMetric("direct").inc()
-
+                aprsData["direct"] = "[DIR]"     # by I8FUC 20230323
+            if aprsData.get("source")=="AIS":
+                aprsData["direct"] = '[DIR]'
+#            print("------------------------------->The Array is: ", aprsData)  
+            self.updateMap(aprsData)
             return aprsData
 
         except Exception:
             logger.exception("exception while parsing aprs data")
 
     def updateMap(self, mapData):
+#        print("=========================>The  mapData Array is: ", mapData)  
         mode = mapData["mode"] if "mode" in mapData else "APRS"
         if "type" in mapData and mapData["type"] == "thirdparty" and "data" in mapData:
             mapData = mapData["data"]
         if "lat" in mapData and "lon" in mapData:
             loc = AprsLocation(mapData)
             source = mapData["source"]
+            direct = mapData["direct"]   # by I8FUC 20230324
+#            direct = "THISISATEST"
             if "type" in mapData:
                 if mapData["type"] == "item":
                     source = mapData["item"]
                 elif mapData["type"] == "object":
                     source = mapData["object"]
-            Map.getSharedInstance().updateLocation(source, loc, mode, self.band)
+            Map.getSharedInstance().updateLocation(source, loc, mode, direct ,self.band) # by I8FUC 20230324
+#            Map.getSharedInstance().updateLocation(source, loc, mode,self.band) 
 
     def hasCompressedCoordinates(self, raw):
         return raw[0] == "/" or raw[0] == "\\"

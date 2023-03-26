@@ -24,7 +24,7 @@
 -->
 <html>
     <head>
-        <title>OpenWebRX+ | Open Source SDR Web App for Everyone!!!</title>
+        <title>OpenWebRX_E_micfuc_+ | Open Source SDR Modular Web App for Everyone!!!</title>
         <link rel="shortcut icon" type="image/x-icon" href="static/favicon.ico" sizes="16x16 32x32" />
         <link rel="icon" type="image/png" sizes="32x32" href="static/gfx/favicon32.png" />
         <link rel="icon" type="image/png" sizes="44x44" href="static/gfx/favicon44.png" />
@@ -100,19 +100,19 @@
                         <div class="openwebrx-ysf-down"></div>
                     </div>
                 </div>
-            <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-dstar" style="display: none;" data-panel-name="metadata-dstar">
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-dstar" style="display: none;" data-panel-name="metadata-dstar">
                     <div class="openwebrx-meta-slot">
                         <div class="openwebrx-meta-user-image">
                             <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
                         </div>
                         <div class="openwebrx-dstar-ourcall"><span class="location"></span><span class="callsign"></span></div>
                         <div class="openwebrx-dstar-message"></div>
-<div class="openwebrx-dstar-yourcall"></div>
+                        <div class="openwebrx-dstar-yourcall"></div>
                         <div class="openwebrx-dstar-departure"></div>
                         <div class="openwebrx-dstar-destination"></div>
                     </div>
                 </div>
-            <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-nxdn" style="display: none;" data-panel-name="metadata-nxdn">
+                <div class="openwebrx-panel openwebrx-meta-panel" id="openwebrx-panel-metadata-nxdn" style="display: none;" data-panel-name="metadata-nxdn">
                     <div class="openwebrx-meta-slot">
                         <div class="openwebrx-meta-user-image">
                             <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
@@ -128,16 +128,16 @@
                         <div class="openwebrx-dmr-slot">Timeslot 1</div>
                         <div class="openwebrx-meta-user-image">
                             <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
-                           <img class="groupcall" src="static/gfx/openwebrx-groupcall.svg">
+                            <img class="groupcall" src="static/gfx/openwebrx-groupcall.svg">
                         </div>
                         <div class="openwebrx-dmr-id"><span class="location"></span><span class="dmr-id"></span></div>
                         <div class="openwebrx-dmr-name"></div>
                         <div class="openwebrx-dmr-target"></div>
                         <div class="mute">
-                        <svg viewBox="0 0 400 400"><use xlink:href="static/gfx/svg-defs.svg#meta-mute"></use></svg>
+                            <svg viewBox="0 0 400 400"><use xlink:href="static/gfx/svg-defs.svg#meta-mute"></use></svg>
                         </div>
                     </div>
-    <div class="openwebrx-meta-slot openwebrx-dmr-timeslot-panel">
+                    <div class="openwebrx-meta-slot openwebrx-dmr-timeslot-panel">
                         <div class="openwebrx-dmr-slot">Timeslot 2</div>
                         <div class="openwebrx-meta-user-image">
                             <img class="directcall" src="static/gfx/openwebrx-directcall.svg">
@@ -150,21 +150,21 @@
                             <svg viewBox="0 0 400 400"><use xlink:href="static/gfx/svg-defs.svg#meta-mute"></use></svg>
                         </div>
                     </div>
-</div>
-    <div class="openwebrx-panel" id="openwebrx-panel-log" data-panel-name="debug" style="width: 619px;">
+                </div>
+                <div class="openwebrx-panel" id="openwebrx-panel-log" data-panel-name="debug" style="width: 619px;">
                     <div class="openwebrx-panel-inner nano" id="openwebrx-log-scroll">
                         <div class="nano-content">
-                        <div id="openwebrx-client-log-title">OpenWebRX+ client log</div>
+                            <div id="openwebrx-client-log-title">OpenWebRX_E_micfuc+ client log</div>
                             <div>
-                                Author contact: <a href="http://fms.komkon.org/" target="_blank">Marat Fayzullin</a> |
+                                This local Version contact: <a href="http://www.sarimesh.net/" target="_blank">SARIMESH group</a> |
                                 <a href="https://www.openwebrx.de" target="_blank">OpenWebRX homepage</a>
                             </div>
                             <div>Support and information: <a href="https://groups.io/g/openwebrx" target="_blank">Groups.io Mailinglist</a></div>
                             <div id="openwebrx-debugdiv"></div>
                         </div>
                     </div>
-</div>
-    <div class="openwebrx-panel" id="openwebrx-panel-status" data-panel-name="status" style="width: 615px;" data-panel-transparent="true">
+                </div>
+                <div class="openwebrx-panel" id="openwebrx-panel-status" data-panel-name="status" style="width: 615px;" data-panel-transparent="true">
                     <div class="openwebrx-progressbar" id="openwebrx-bar-audio-buffer" data-type="audiobuffer"></div>
                     <div class="openwebrx-progressbar" id="openwebrx-bar-audio-output" data-type="audiooutput"></div>
                     <div class="openwebrx-progressbar" id="openwebrx-bar-audio-speed" data-type="audiospeed"></div>
@@ -193,16 +193,11 @@
                         <div title="Mute on/off" class="openwebrx-button openwebrx-slider-button openwebrx-mute-button" onclick="toggleMute();">
                             <svg class="unmuted" viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#speaker"></use></svg>
                             <svg class="muted" viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#speaker-muted"></use></svg>
- 
-
-
-                       </div>
+                        </div>
                         <input title="Volume" id="openwebrx-panel-volume" class="openwebrx-panel-slider" type="range" min="0" max="150" value="50" step="1" onchange="updateVolume()" oninput="updateVolume()">
                         <div title="Tuning step" class="openwebrx-button openwebrx-slider-button" onclick="tuning_step_reset();">
                             <svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#tuning-step"></use></svg>
                         </div>
-
-
                         <select id="openwebrx-tuning-step-listbox" class="openwebrx-panel-listbox" onchange="tuning_step_changed();">
                             <option value="1"></option>
                             <option value="100">100Hz</option>
@@ -273,16 +268,14 @@
                                 <div class="openwebrx-panel-line">
                                 </div>
                             </div>
-
-
-                  <!--
+<!--
                     <div class="openwebrx-panel-line">
                         <div id="openwebrx-smeter">
                             <div class="openwebrx-smeter-bar"></div>
                         </div>
                         <div id="openwebrx-smeter-db">0 dB</div>
-                    </div>  
-                -->
+                    </div>
+-->
                 </div>
             </div>
         </div>

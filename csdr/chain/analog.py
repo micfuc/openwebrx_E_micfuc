@@ -45,13 +45,13 @@ class WFm(BaseDemodulatorChain, FixedIfSampleRateChain, DeemphasisTauChain, HdAu
         workers = [
             FmDemod(),
             Limit(),
-            FractionalDecimator(Format.FLOAT, 200000.0 / self.sampleRate, prefilter=True),
+            FractionalDecimator(Format.FLOAT, 378000.0 / self.sampleRate, prefilter=True),  #changed 200000 to 378000
             WfmDeemphasis(self.sampleRate, self.tau),
         ]
         super().__init__(workers)
 
     def getFixedIfSampleRate(self):
-        return 200000
+        return 378000                                            #changed 200000 to 378000
 
     def setDeemphasisTau(self, tau: float) -> None:
         if tau == self.tau:
@@ -63,7 +63,7 @@ class WFm(BaseDemodulatorChain, FixedIfSampleRateChain, DeemphasisTauChain, HdAu
         if sampleRate == self.sampleRate:
             return
         self.sampleRate = sampleRate
-        self.replace(2, FractionalDecimator(Format.FLOAT, 200000.0 / self.sampleRate, prefilter=True))
+        self.replace(2, FractionalDecimator(Format.FLOAT, 378000.0 / self.sampleRate, prefilter=True)) #changed 200000 to 378000
         self.replace(3, WfmDeemphasis(self.sampleRate, self.tau))
 
 

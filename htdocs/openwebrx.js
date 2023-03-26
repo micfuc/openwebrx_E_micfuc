@@ -66,9 +66,6 @@ function toggleNR() {
     nr_changed();
 }
 
-
-
-
 function toggleRecording() {
     var $recButton = $('.openwebrx-record-button');
 
@@ -103,8 +100,6 @@ function saveCanvas(canvas) {
         }, 0);
     }, 'image/png');
 }
-
-
 
 function updateVolume() {
     audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
@@ -311,7 +306,7 @@ function updateWaterfallColors(which) {
     waterfall_min_level = parseInt($wfmin.val());
     if (waterfall_min_level >= waterfall_max_level) {
         if (!which) {
-            waterfall_min_level = waterfall_max_level - 1;
+            waterfall_min_level = waterfall_max_level -1;
         } else {
             waterfall_max_level = waterfall_min_level + 1;
         }
@@ -321,11 +316,11 @@ function updateWaterfallColors(which) {
 
 function updateWaterfallSliders() {
     $('#openwebrx-waterfall-color-max')
-            .val(waterfall_max_level)
-            .attr('title', 'Waterfall maximum level (' + Math.round(waterfall_max_level) + ' dB)');
+        .val(waterfall_max_level)
+        .attr('title', 'Waterfall maximum level (' + Math.round(waterfall_max_level) + ' dB)');
     $('#openwebrx-waterfall-color-min')
-            .val(waterfall_min_level)
-            .attr('title', 'Waterfall minimum level (' + Math.round(waterfall_min_level) + ' dB)');
+        .val(waterfall_min_level)
+        .attr('title', 'Waterfall minimum level (' + Math.round(waterfall_min_level) + ' dB)');
 }
 
 function waterfallColorsDefault() {
@@ -2170,7 +2165,7 @@ function openwebrx_init() {
     initSliders();
     /* ----- --eroyee add for keyboard tuning 28 Dec 20 --------------------- */
     init_key_listener();
-    initTopBarMenu() ;   // by I8FUC to support top bar ccomponents hiding by admin screens
+    initTopBarMenu() ;   // by I8FUC to support top bar components hiding by admin screens
     /* ---------------------------------------------------------------------- */
 }
 

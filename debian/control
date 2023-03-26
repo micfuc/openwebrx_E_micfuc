@@ -1,12 +1,12 @@
-Source: openwebrx
-Maintainer: Marat Fayzullin <luarvique@gmail.com>
+Source: openwebrx_E_micfuc
+Maintainer: Michele Fucito<micfuc@gmail.com>
 Section: hamradio
 Priority: optional
 Standards-Version: 4.2.0
 Build-Depends: debhelper (>= 11), dh-python, python3-all (>= 3.5), python3-setuptools
 Homepage: https://www.openwebrx.de/
-Vcs-Browser: https://github.com/luarvique/openwebrx
-Vcs-Git: https://github.com/luarvique/openwebrx.git
+Vcs-Browser: https://github.com/micfuc/openwebrx_E_micfuc
+Vcs-Git: https://github.com/micfuc/openwebrx_E_micfuc.git
 
 Package: openwebrx
 Architecture: all

@@ -58,6 +58,7 @@ class Map(object):
 
     def addClient(self, client):
         self.clients.append(client)
+#        print("------------------>The  clients Array is: ", self.clients)  # by I8FUC
         client.write_update(
             [
                 {
@@ -65,11 +66,13 @@ class Map(object):
                     "location": record["location"].__dict__(),
                     "lastseen": record["updated"].timestamp() * 1000,
                     "mode": record["mode"],
+                    "direct": record["direct"],      # by I8FUC 20230324
                     "band": record["band"].getName() if record["band"] is not None else None,
                 }
                 for (callsign, record) in self.positions.items()
             ]
         )
+#        print("------------------>The  positions Array is: ", self.positions)   # by I8FUC
 
     def removeClient(self, client):
         try:
@@ -77,10 +80,15 @@ class Map(object):
         except ValueError:
             pass
 
-    def updateLocation(self, callsign, loc: Location, mode: str, band: Band = None):
+    def updateLocation(self, callsign, loc: Location, mode: str, direct: str , band: Band = None ):
+#    def updateLocation(self, callsign, loc: Location, mode: str, band: Band = None ):
         ts = datetime.now()
+# following 3 lines by I8FUC 20230325
+        if callsign in self.positions:
+           if( self.positions[callsign]["direct"] == '[DIR]') :
+              direct = '[DIR]'
         with self.positionsLock:
-            self.positions[callsign] = {"location": loc, "updated": ts, "mode": mode, "band": band}
+            self.positions[callsign] = {"location": loc, "updated": ts, "mode": mode, "direct": direct , "band": band} # by I8FUC 20230324
         self.broadcast(
             [
                 {
@@ -88,10 +96,12 @@ class Map(object):
                     "location": loc.__dict__(),
                     "lastseen": ts.timestamp() * 1000,
                     "mode": mode,
+                    "direct": direct,       # by I8FUC 20230324
                     "band": band.getName() if band is not None else None,
                 }
             ]
         )
+#        print("------------------->The  positions Array is: ", self.positions)   # by I8FUC
 
     def touchLocation(self, callsign):
         # not implemented on the client side yet, so do not use!

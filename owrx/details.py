@@ -7,7 +7,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
- 
 class ReceiverDetails(PropertyFilter):
     def __init__(self):
         super().__init__(

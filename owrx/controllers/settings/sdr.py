@@ -143,7 +143,6 @@ class SdrFormController(SettingsFormController, metaclass=ABCMeta):
             sections=super().render_sections(),
         )
 
-
     def render_tabs(self):
         return """
             <ul class="nav nav-tabs">
@@ -164,8 +163,7 @@ class SdrFormController(SettingsFormController, metaclass=ABCMeta):
             profile_tabs="".join(
                 """
                     <li class="nav-item">
-                        <a class="nav-link {profile_active}" href="{profile_link}"> {profile_name} </a>
-                        <!-- <a class="nav-link {profile_active}" href="{profile_link}">SSSSS {profile_name} TTTTT</a> -->                       
+                        <a class="nav-link {profile_active}" href="{profile_link}">{profile_name}</a>
                     </li>
                 """.format(
                     profile_link="{}settings/sdr/{}/profile/{}".format(
@@ -271,10 +269,7 @@ class SdrDeviceController(SdrFormControllerWithModal):
         tabs='<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Remove device...</button>' if (profile_name != "Agile-Mode") else "WARNING: Currently using Special Profile:[" + str(profile_name)  + "]"  
         return """
             {tabs}    
-        """.format(
-            tabs=tabs,
-        )            
-		
+        """.format(tabs=tabs,)
 
     def isDeviceActive(self) -> bool:
         return True
@@ -414,11 +409,7 @@ class SdrProfileController(SdrFormControllerWithModal):
         tabs='<button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Remove profile...</button>' if (profile_name != "Agile-Mode") else "WARNING: Currently using Special Profile:[" + str(profile_name)  + "]"  
         return """
             {tabs}
-            
-        """.format(
-            tabs=tabs,
-        )            
-
+        """.format(tabs=tabs,)
 
     def getModalObjectType(self):
         return "profile"
