@@ -278,7 +278,7 @@ class WsjtParser(AudioChopperParser):
             self.pushDecode(mode, band)
             if "callsign" in out and "locator" in out:
                 Map.getSharedInstance().updateLocation(
-                    out["callsign"], LocatorLocation(out["locator"]), mode, band
+                    out["callsign"], LocatorLocation(out["locator"]), mode, '' ,band # by I8FUC 20230327 added new direct placeholder parameter
                 )
                 ReportingEngine.getSharedInstance().spot(out)
 

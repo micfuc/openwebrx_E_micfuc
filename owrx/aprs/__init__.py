@@ -196,7 +196,6 @@ class AprsParser(PickleModule):
 
             logger.debug("decoded APRS data: %s", aprsData)
 #            print("..................................>The Array is: ", aprsData)  
-#            self.updateMap(aprsData)
             self.getMetric("total").inc()
             aprsData["direct"] = "[RPT]"           # by I8FUC 20230323
             if self.isDirect(aprsData):
@@ -220,7 +219,6 @@ class AprsParser(PickleModule):
             loc = AprsLocation(mapData)
             source = mapData["source"]
             direct = mapData["direct"]   # by I8FUC 20230324
-#            direct = "THISISATEST"
             if "type" in mapData:
                 if mapData["type"] == "item":
                     source = mapData["item"]
@@ -277,7 +275,7 @@ class AprsParser(PickleModule):
         information = data["data"]
 
         # forward some of the ax25 data
-        aprsData = {"source": data["source"], "destination": data["destination"], "path": data["path"]}
+        aprsData = {"source": data["source"], "destination": data["destination"], "path": data["path"], "direct": '' }
 
         if information[0] == 0x1C or information[0] == ord("`") or information[0] == ord("'"):
             aprsData.update(MicEParser().parse(data))

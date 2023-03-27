@@ -498,8 +498,9 @@ $(function(){
         }
 
 //       if (marker.direct) {
-           if( marker.direct == '[RPT]' ) {marker.direct = '<font color=red > <B> ' + marker.direct ; } else { marker.direct = '<font color=black> ' + marker.direct ;};   // by I8FUC
-           detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
+           if( marker.direct == '[RPT]' ) {marker.direct = '<font color=red > <B> ' + marker.direct + '<font color=black > </B>'; } else { marker.direct = '<font color=black> <B>' + marker.direct + '</B>';};   // by I8FUC
+//           if( marker.direct == '[RPT]' ) {marker.direct = '<font color=red > <B> via Digipeater<font color=black > </B>'; } else { marker.direct = '<font color=black> <B> Direct Radio</B>';};   // by I8FUC        
+   detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
 //        }
 
         if (marker.altitude) {

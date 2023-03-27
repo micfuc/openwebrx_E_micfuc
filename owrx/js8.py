@@ -103,7 +103,7 @@ class Js8Parser(AudioChopperParser):
 
             if (isinstance(frame, Js8FrameHeartbeat) or isinstance(frame, Js8FrameCompound)) and frame.grid:
                 Map.getSharedInstance().updateLocation(
-                    frame.callsign, LocatorLocation(frame.grid), "JS8", band
+                    frame.callsign, LocatorLocation(frame.grid), "JS8", '' , band  # by I8FUC 20230327 added new direct placeholder parameter
                 )
                 ReportingEngine.getSharedInstance().spot(
                     {
