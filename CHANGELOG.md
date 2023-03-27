@@ -1,20 +1,20 @@
 **1.2.9-micfuc**
 - This is a local personal version of openwebrx; it is a merge of the main openwebrx variants available over github in the last months
-- The base version is the Marat openwebrx+ variant that in the one that introduced massive additions with reference to the  Jakob original version
-- Major additional features are coming from ivanmarcus openwebRX_E  version with a number of small additions dome by Michele I8FUC
-- Main macroscopic additions with restect to the base Marat 1.2.9 versions are:
-  - Flexible and managed spectrum addition ( with line/fill/color/peak/speudopower legel lines ); options managed via admin panel
-  - Flexible and managed time series with various options ; options managed via admin panels
-  - "Black functions" to have a simplified and uncluttered top part of the main screen; manageable from admin panel
-  - Improved S-meter by ivanmarcus 
+- The base version is the Marat openwebrx+ variant that in the one that introduced massive additions with reference to the Jakob original version
+- Major additional features are coming from ivanmarcus openwebRX_E version with a number of small additions done by Michele I8FUC
+- Main macroscopic additions with respect to the base Marat 1.2.9 versions are:
+  - Flexible and managed spectrum addition by ivanmarcus ( with line/fill/color/peak/speudopower legend lines ); options managed via admin panel
+  - Flexible and managed time series by ivanmarcus with various options ; options managed via admin panels
+  - "Black functions" by ivanmarcus to have a simplified and uncluttered top part of the main screen; manageable from admin panel
+  - Improved S-meter by ivanmarcus
   - Transparent mode for the Receiver Panel by ivanmarcus on the bottom right side of the main screen to get a less clutterd main waterfall image
-  - Waterfall ON/OFF possibility ( via RX panel) to save cpu cycles on low end platforms.
-  - Possibility to hide/show Main screen top rigth end buttons ; function is manageable via admin panel 
+  - Waterfall ON/OFF possibility by ivanmarcus  ( via RX panel) to save cpu cycles on low end platforms.
+  - Possibility to hide/show Main screen top right end buttons  by ivanmarcus ; function is manageable via admin panel
   - Support for pseudo-session timeout and policy page setup by Michele I8FUC ( already imported by Marat ); manageable by admin panel
-  - Minor additions to the map spots labelling to show the way spots in APRS and AIS are collected ( either by direct paradio path or via digipeater).
-  - Introduction of a "Mode" column ( by Michele I8FUC ) in the Digital Panel in the low left hand side of the main screen to give immediate visual advice of the type of spots presently displayed. Also include the DIR/RPT indication for AIS/APRS spts with RPT in red color for quick evidence.
-  - Introduction of a "zoom" pseudo decoder ( by Michele I8FUC) as help in exploring "wide radio coverage profiles waterfall" (8 Mhz spans) where with the available "canvas zoom" no details are really visible.
-  - Several small changes/fixs from various authors
+  - Minor additions to the map spots labelling by Michele  to show the way spots in APRS and AIS are collected ( either by direct paradio path or via digipeater).
+  - Introduction of a "Mode" column by Michele in the Digital Panel in the low left hand side of the main screen to give immediate visual advice of the type of spots presently displayed. Also include the DIR/RPT indication for AIS/APRS spts with RPT in red color for quick evidence.
+  - Introduction of a "zoom" pseudo decoder by Michele as help in exploring "wide radio coverage profiles waterfall" (8 Mhz spans) where with the available "canvas zoom" no details are really visible.
+  - Several small changes/fixes from various authors
 
 
 **1.2.9**
