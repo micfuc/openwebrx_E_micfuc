@@ -67,6 +67,7 @@ class Map(object):
                     "lastseen": record["updated"].timestamp() * 1000,
                     "mode": record["mode"],
                     "direct": record["direct"],      # by I8FUC 20230324
+                    "path": record["path"],          # by I8FUC 20230403
                     "band": record["band"].getName() if record["band"] is not None else None,
                 }
                 for (callsign, record) in self.positions.items()
@@ -80,15 +81,18 @@ class Map(object):
         except ValueError:
             pass
 
-    def updateLocation(self, callsign, loc: Location, mode: str, direct: str , band: Band = None ):
+    def updateLocation(self, callsign, loc: Location, mode: str, direct: str , path: str, band: Band = None ):
 #    def updateLocation(self, callsign, loc: Location, mode: str, band: Band = None ):
         ts = datetime.now()
-# following 3 lines by I8FUC 20230325
+# following 5 lines by I8FUC 20230325
         if callsign in self.positions:
+           path = ''
            if( self.positions[callsign]["direct"] == '[DIR]') :
               direct = '[DIR]'
+           if( self.positions[callsign]["path"]) :
+              path = self.positions[callsign]["path"]            
         with self.positionsLock:
-            self.positions[callsign] = {"location": loc, "updated": ts, "mode": mode, "direct": direct , "band": band} # by I8FUC 20230324
+            self.positions[callsign] = {"location": loc, "updated": ts, "mode": mode, "direct": direct , "path": path ,"band": band} # by I8FUC 20230324
         self.broadcast(
             [
                 {
@@ -97,6 +101,7 @@ class Map(object):
                     "lastseen": ts.timestamp() * 1000,
                     "mode": mode,
                     "direct": direct,       # by I8FUC 20230324
+                    "path": path,           # by I8FUC 20230403
                     "band": band.getName() if band is not None else None,
                 }
             ]

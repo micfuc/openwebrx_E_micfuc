@@ -43,7 +43,7 @@ $(function(){
     var colorKeys = {};
     var colorScale = chroma.scale(['red', 'blue', 'green']).mode('hsl');
     var getColor = function(id){
-        if (!id) return "#000000";
+        if (!id) return "#ffffff00";
         if (!colorKeys[id]) {
             var keys = Object.keys(colorKeys);
             keys.push(id);
@@ -82,6 +82,8 @@ $(function(){
                 return r.band;
             case 'bymode':
                 return r.mode;
+            case 'off':
+                return '';
         }
     };
 
@@ -141,8 +143,9 @@ $(function(){
                     marker.lastseen = update.lastseen;
                     marker.mode     = update.mode;
                     marker.direct   = update.direct;   // by I8FUC 20230324
-//                    if(update.direct == '[DIR]') { marker.direct   = update.direct; } ; // by I8FUC 20230324
-//                    if((update.direct == '[RPT]' ) && ( marker.direct != '[DIR]') ) { marker.direct   = update.direct; } ; // by I8FUC 20230324
+                    marker.path     = update.path;   // by I8FUC 20230403
+//                    if(update.direct == '[DIR]') { marker.direct   = update.direct; marker.path   = update.path;} ; // by I8FUC 20230324
+//                    if((update.direct == '[RPT]' ) && ( marker.direct != '[DIR]') ) { marker.direct   = update.direct; marker.path   = update.path;} ; // by I8FUC 20230324
                     marker.band     = update.band;
                     marker.comment  = update.location.comment;
                     marker.weather  = update.location.weather;
@@ -497,11 +500,17 @@ $(function(){
             weatherString += '</p>';
         }
 
-//       if (marker.direct) {
-           if( marker.direct == '[RPT]' ) {marker.direct = '<font color=red > <B> ' + marker.direct + '<font color=black > </B>'; } else { marker.direct = '<font color=black> <B>' + marker.direct + '</B>';};   // by I8FUC
-//           if( marker.direct == '[RPT]' ) {marker.direct = '<font color=red > <B> via Digipeater<font color=black > </B>'; } else { marker.direct = '<font color=black> <B> Direct Radio</B>';};   // by I8FUC        
-   detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
-//        }
+//        if( marker.direct == '[RPT]' ) {marker.direct = '<font color=red > <B> ' + marker.direct + '<font color=black > </B>'; } else { marker.direct = '<font color=black> <B>' + marker.direct + '</B>';};   // by I8FUC
+        if( marker.direct == '[RPT]' ) {
+             marker.direct = '<font color=red > <B> ' + marker.direct + '<font color=black > </B>'; 
+             detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
+             detailsString += makeListItem('last via ', marker.path);           // by I8FUC 20230403
+             } 
+        else { 
+             marker.direct = '<font color=black> <B>' + marker.direct + '</B>';
+             detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
+             };   // by I8FUC        
+
 
         if (marker.altitude) {
             detailsString += makeListItem('Altitude', marker.altitude.toFixed(0) + ' m');

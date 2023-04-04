@@ -33,8 +33,9 @@ thirdpartyeRegex = re.compile("^([a-zA-Z0-9-]+)>((([a-zA-Z0-9-]+\\*?,)*)([a-zA-Z
 messageIdRegex = re.compile("^(.*){([0-9]{1,5})$")
 
 # regex to filter pseudo "WIDE" path elements
-widePattern = re.compile("^WIDE[0-9]-[0-9]$")
-
+# widePattern = re.compile("^WIDE[0-9]-[0-9]$")
+ widePattern = re.compile("^WIDE[0-9](-[0-9])?$")
+#widePattern = re.compile("^(ECHO|RELAY|TRACE|GATE|WIDE[0-9]?(-[0-9])?)$")
 
 def decodeBase91(input):
     base = decodeBase91(input[:-1]) * 91 if len(input) > 1 else 0
@@ -148,10 +149,10 @@ class AprsLocation(LatLngLocation):
 
     def __dict__(self):
         res = super(AprsLocation, self).__dict__()
-        for key in ["comment", "symbol", "course", "speed", "altitude", "weather", "device", "power", "height", "gain", "directivity", "direct"]: # by I8FUC 20230324
+        for key in ["comment", "symbol", "course", "speed", "altitude", "weather", "device", "power", "height", "gain", "directivity", "direct","path"]: # by I8FUC 20230324
             if key in self.data:
                 res[key] = self.data[key]
-#        print("=========================>The Array is: ", res)  
+#        print(">>>>>-------------------->The res Array is: ", res)  
         return res
 
 
@@ -200,7 +201,7 @@ class AprsParser(PickleModule):
             aprsData["direct"] = "[RPT]"           # by I8FUC 20230323
             if self.isDirect(aprsData):
                 self.getMetric("direct").inc()
-                aprsData["direct"] = "[DIR]"     # by I8FUC 20230323
+                aprsData["direct"] = "[DIR]"     # by I8FUC 20230323 
             if aprsData.get("source")=="AIS":
                 aprsData["direct"] = '[DIR]'
 #            print("------------------------------->The Array is: ", aprsData)  
@@ -219,12 +220,13 @@ class AprsParser(PickleModule):
             loc = AprsLocation(mapData)
             source = mapData["source"]
             direct = mapData["direct"]   # by I8FUC 20230324
+            path = mapData["path"]   # by I8FUC 20230403
             if "type" in mapData:
                 if mapData["type"] == "item":
                     source = mapData["item"]
                 elif mapData["type"] == "object":
                     source = mapData["object"]
-            Map.getSharedInstance().updateLocation(source, loc, mode, direct ,self.band) # by I8FUC 20230324
+            Map.getSharedInstance().updateLocation(source, loc, mode, direct , path, self.band) # by I8FUC 20230324 - 20230403
 #            Map.getSharedInstance().updateLocation(source, loc, mode,self.band) 
 
     def hasCompressedCoordinates(self, raw):
@@ -273,9 +275,9 @@ class AprsParser(PickleModule):
 
     def parseAprsData(self, data):
         information = data["data"]
-
+#        print(">>>>>>>>>>>>>>>>>>>>>>>>>The  data Array is: ", data)  
         # forward some of the ax25 data
-        aprsData = {"source": data["source"], "destination": data["destination"], "path": data["path"], "direct": '' }
+        aprsData = {"source": data["source"], "destination": data["destination"], "path": data["path"], "direct": ''}
 
         if information[0] == 0x1C or information[0] == ord("`") or information[0] == ord("'"):
             aprsData.update(MicEParser().parse(data))
