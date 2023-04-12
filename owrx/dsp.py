@@ -615,6 +615,9 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
             from csdr.chain.digimodes import AudioChopperDemodulator
             from owrx.wsjt import WsjtParser
             return AudioChopperDemodulator(mod, WsjtParser())
+        elif mod == "msk144":
+            from csdr.chain.digimodes import Msk144Demodulator
+            return Msk144Demodulator()
         elif mod == "js8":
             from csdr.chain.digimodes import AudioChopperDemodulator
             from owrx.js8 import Js8Parser
@@ -622,7 +625,7 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
         elif mod == "packet":
             from csdr.chain.digimodes import PacketDemodulator
             return PacketDemodulator()
-        elif mod == "spectrum":
+        elif mod == "zview":
             from csdr.chain.digimodes import PacketDemodulator
             return PacketDemodulator()            
         elif mod == "ais":
@@ -700,19 +703,20 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
         def unpickler(data):
             b = data.tobytes()
             # If we know it's not pickled, let us not unpickle
-            if len(b)<2 or b[0]!=0x80 or b[1]<0x03:
+            if len(b) < 2 or b[0] != 0x80 or not 3 <= b[1] <= pickle.HIGHEST_PROTOCOL:
                 callback(b.decode("ascii"))
-            else:
-                io = BytesIO(b)
-                try:
-                    while True:
-                        callback(pickle.load(io))
-                except EOFError:
-                    pass
-                except pickle.UnpicklingError:
-                    callback(b.decode("ascii"))
-                except ValueError:
-                    pass
+                return
+
+            io = BytesIO(b)
+            try:
+                while True:
+                    callback(pickle.load(io))
+            except EOFError:
+                pass
+            except pickle.UnpicklingError:
+                callback(b.decode("ascii"))
+            except ValueError:
+                pass
 
         return unpickler
 

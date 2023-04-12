@@ -32,10 +32,9 @@ thirdpartyeRegex = re.compile("^([a-zA-Z0-9-]+)>((([a-zA-Z0-9-]+\\*?,)*)([a-zA-Z
 # regex for getting the message id out of message
 messageIdRegex = re.compile("^(.*){([0-9]{1,5})$")
 
-# regex to filter pseudo "WIDE" path elements
-# widePattern = re.compile("^WIDE[0-9]-[0-9]$")
- widePattern = re.compile("^WIDE[0-9](-[0-9])?$")
-#widePattern = re.compile("^(ECHO|RELAY|TRACE|GATE|WIDE[0-9]?(-[0-9])?)$")
+# regex to filter aliases from the path
+noHopPattern = re.compile("^(WIDE[0-9]?(-[0-9])?|ECHO|RELAY|TRACE|GATE)\\*?$")
+
 
 def decodeBase91(input):
     base = decodeBase91(input[:-1]) * 91 if len(input) > 1 else 0
@@ -61,19 +60,21 @@ class Ax25Parser(PickleModule):
             return {
                 "destination": self.extractCallsign(ax25frame[0:7]),
                 "source": self.extractCallsign(ax25frame[7:14]),
-                "path": [self.extractCallsign(c) for c in chunks(ax25frame[14:control_pid], 7)],
+                "path": [self.extractCallsign(c, True) for c in chunks(ax25frame[14:control_pid], 7)],
                 "data": ax25frame[control_pid + 2 :],
             }
         except (ValueError, IndexError):
             logger.exception("error parsing ax25 frame")
 
-    def extractCallsign(self, input):
+    def extractCallsign(self, input, markVisited: bool = False):
+        # extract callsign and SSID, mark visited callsigns with asterisks
         cs = bytes([b >> 1 for b in input[0:6]]).decode(encoding, "replace").strip()
         ssid = (input[6] & 0b00011110) >> 1
+        mark = "*" if markVisited and (input[6] & 0b10000000)!=0 else ""
         if ssid > 0:
-            return "{callsign}-{ssid}".format(callsign=cs, ssid=ssid)
+            return "{callsign}-{ssid}{mark}".format(callsign=cs, ssid=ssid, mark=mark)
         else:
-            return cs
+            return "{callsign}{mark}".format(callsign=cs, mark=mark)
 
 
 class WeatherMapping(object):
@@ -149,10 +150,9 @@ class AprsLocation(LatLngLocation):
 
     def __dict__(self):
         res = super(AprsLocation, self).__dict__()
-        for key in ["comment", "symbol", "course", "speed", "altitude", "weather", "device", "power", "height", "gain", "directivity", "direct","path"]: # by I8FUC 20230324
+        for key in ["comment", "symbol", "course", "speed", "altitude", "weather", "device", "power", "height", "gain", "directivity", "direct"]: # by I8FUC 20230324
             if key in self.data:
                 res[key] = self.data[key]
-#        print(">>>>>-------------------->The res Array is: ", res)  
         return res
 
 
@@ -179,13 +179,23 @@ class AprsParser(PickleModule):
         return self.metrics[category]
 
     def isDirect(self, aprsData):
+        return len(self.getHops(aprsData)) == 0
+
+    def getHops(self, aprsData):
+        hops = []
+        if "source" in aprsData:
+            # AIS reports have no hops
+            if aprsData["source"] == "AIS":
+                return hops;
+            # encapsulated messages' path starts with the source callsign
+            if "type" in aprsData and aprsData["type"] in ["thirdparty", "item", "object"]:
+                hops += [ aprsData["source"] ]
+        # filter out special aliases and anything without asterisk
         if "path" in aprsData and len(aprsData["path"]) > 0:
-            hops = [host for host in aprsData["path"] if widePattern.match(host) is None]
-            if len(hops) > 0:
-                return False
-        if "type" in aprsData and aprsData["type"] in ["thirdparty", "item", "object"]:
-            return False
-        return True
+            hops += [hop.strip("*") for hop in aprsData["path"]
+                if hop.endswith("*") and not noHopPattern.match(hop)]
+        # return hops with all the asterisks stripped
+        return hops
 
     def process(self, data):
         try:
@@ -196,7 +206,6 @@ class AprsParser(PickleModule):
             aprsData["mode"] = "AIS" if aprsData.get("source")=="AIS" else "APRS"
 
             logger.debug("decoded APRS data: %s", aprsData)
-#            print("..................................>The Array is: ", aprsData)  
             self.getMetric("total").inc()
             aprsData["direct"] = "[RPT]"           # by I8FUC 20230323
             if self.isDirect(aprsData):
@@ -204,7 +213,7 @@ class AprsParser(PickleModule):
                 aprsData["direct"] = "[DIR]"     # by I8FUC 20230323 
             if aprsData.get("source")=="AIS":
                 aprsData["direct"] = '[DIR]'
-#            print("------------------------------->The Array is: ", aprsData)  
+#            print("------------------------------->The aprsData Array is: ", aprsData)  
             self.updateMap(aprsData)
             return aprsData
 
@@ -212,22 +221,20 @@ class AprsParser(PickleModule):
             logger.exception("exception while parsing aprs data")
 
     def updateMap(self, mapData):
-#        print("=========================>The  mapData Array is: ", mapData)  
         mode = mapData["mode"] if "mode" in mapData else "APRS"
+        hops = self.getHops(mapData)
         if "type" in mapData and mapData["type"] == "thirdparty" and "data" in mapData:
             mapData = mapData["data"]
         if "lat" in mapData and "lon" in mapData:
             loc = AprsLocation(mapData)
             source = mapData["source"]
             direct = mapData["direct"]   # by I8FUC 20230324
-            path = mapData["path"]   # by I8FUC 20230403
             if "type" in mapData:
                 if mapData["type"] == "item":
                     source = mapData["item"]
                 elif mapData["type"] == "object":
                     source = mapData["object"]
-            Map.getSharedInstance().updateLocation(source, loc, mode, direct , path, self.band) # by I8FUC 20230324 - 20230403
-#            Map.getSharedInstance().updateLocation(source, loc, mode,self.band) 
+            Map.getSharedInstance().updateLocation(source, loc, mode, direct , self.band,hops) # by I8FUC 20230324 - 20230403
 
     def hasCompressedCoordinates(self, raw):
         return raw[0] == "/" or raw[0] == "\\"
@@ -275,7 +282,7 @@ class AprsParser(PickleModule):
 
     def parseAprsData(self, data):
         information = data["data"]
-#        print(">>>>>>>>>>>>>>>>>>>>>>>>>The  data Array is: ", data)  
+
         # forward some of the ax25 data
         aprsData = {"source": data["source"], "destination": data["destination"], "path": data["path"], "direct": ''}
 

@@ -6,6 +6,7 @@ from owrx.controllers.assets import OwrxAssetsController, AprsSymbolsController,
 from owrx.controllers.websocket import WebSocketController
 from owrx.controllers.api import ApiController
 from owrx.controllers.metrics import MetricsController
+#from owrx.controllers.scanners import ScannersController  # by I8FUC
 from owrx.controllers.settings import SettingsController
 from owrx.controllers.settings.general import GeneralSettingsController
 from owrx.controllers.settings.sdr import (
@@ -103,6 +104,8 @@ class Router(object):
             StaticRoute("/api/features", ApiController),
             StaticRoute("/metrics", MetricsController, options={"action": "prometheusAction"}),
             StaticRoute("/metrics.json", MetricsController),
+#            StaticRoute("/scanners", ScannersController, options={"action": "prometheusAction"}),  # by I8FUC
+#            StaticRoute("/scanners.json", ScannersController),  # by I8FUC
             StaticRoute("/settings", SettingsController),
             StaticRoute("/settings/general", GeneralSettingsController),
             StaticRoute(

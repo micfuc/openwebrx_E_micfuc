@@ -13,7 +13,7 @@ Filter.prototype.getLimits = function() {
         max_bw = 100000;
     } else if (this.demodulator.get_modulation() === 'drm') {
         max_bw = 50000;
-    } else if (this.demodulator.get_modulation() === 'spectrum') {
+    } else if (this.demodulator.get_modulation() === 'zview') {
         max_bw = 50000;
     } else if (this.demodulator.get_modulation() === "freedv") {
         max_bw = 4000;

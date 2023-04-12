@@ -69,22 +69,6 @@ DemodulatorPanel.prototype.render = function() {
     var $modegrid = $('<div class="openwebrx-modes-grid"></div>');
     $modegrid.append.apply($modegrid, buttons);
     html.push($modegrid);
-    /*
-     html.push($(
-     '<div class="openwebrx-panel-line openwebrx-panel-flex-line">' +
-     '<div class="openwebrx-button openwebrx-demodulator-button openwebrx-button-dig">DIG</div>' +
-     '<select class="openwebrx-secondary-demod-listbox">' +
-     '<option value="none">Digital Modes Select</option>' +
-     digiModes.map(function(m){
-     return '<option value="' + m.modulation + '">' + m.name + '</option>';
-     }).join('') +
-     '</select>' +
-     '</div>'
-     ));
-     
-     this.el.find(".openwebrx-modes").html(html);
-     };
-     */
 
     html.push($(
         '<div class="openwebrx-panel-line openwebrx-panel-flex-line">' +
@@ -175,8 +159,7 @@ DemodulatorPanel.prototype.setMode = function(requestedModulation, underlyingMod
 };
 
 DemodulatorPanel.prototype.disableDigiMode = function() {
-    // just a little trick to get out of the digimode
-    delete this.mode;
+    delete this.mode;  // just a little trick to get out of the digimode
     this.setMode(this.getDemodulator().get_modulation());
 };
 
@@ -184,7 +167,7 @@ DemodulatorPanel.prototype.updatePanels = function() {
     var modulation = this.getDemodulator().get_secondary_demod();
     $('#openwebrx-panel-digimodes').attr('data-mode', modulation);
     toggle_panel("openwebrx-panel-digimodes", !!modulation);
-    toggle_panel("openwebrx-panel-wsjt-message", ["ft8", "wspr", "jt65", "jt9", "ft4", "fst4", "fst4w", "q65"].indexOf(modulation) >= 0);
+    toggle_panel("openwebrx-panel-wsjt-message", ["ft8", "wspr", "jt65", "jt9", "ft4", "fst4", "fst4w", "q65", "msk144"].indexOf(modulation) >= 0);
     toggle_panel("openwebrx-panel-js8-message", modulation == "js8");
     toggle_panel("openwebrx-panel-packet-message", ["packet", "ais"].indexOf(modulation) >= 0);
     toggle_panel("openwebrx-panel-pocsag-message", modulation === "pocsag");
@@ -400,3 +383,21 @@ $.fn.demodulatorPanel = function(){
     };
     return this.data('panel');
 };
+
+    /*
+     html.push($(
+     '<div class="openwebrx-panel-line openwebrx-panel-flex-line">' +
+     '<div class="openwebrx-button openwebrx-demodulator-button openwebrx-button-dig">DIG</div>' +
+     '<select class="openwebrx-secondary-demod-listbox">' +
+     '<option value="none">Digital Modes Select</option>' +
+     digiModes.map(function(m){
+     return '<option value="' + m.modulation + '">' + m.name + '</option>';
+     }).join('') +
+     '</select>' +
+     '</div>'
+     ));
+     
+     this.el.find(".openwebrx-modes").html(html);
+     };
+     */
+

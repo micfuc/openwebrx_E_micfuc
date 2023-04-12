@@ -516,71 +516,13 @@ input[type=range]:disabled {
     opacity: 0.5;
 }
 
-/* --- eroyee add 1kHz/5kHz/9kHz freq step change button --- */
-
-.openwebrx-stepchangeHz-button {
-
-    background-color: #04AA6D; /* Green */
-    /*  border: none; */
-    color: white;
-    height: 16px;
-    width: 16px;
-    border-radius: 3px;
-    border: 1px solid #FFF;
-    font-size: 9px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    bottom: 4px; /* bring up to same level as step buttons */
-}
-/* ----------------------------------------------------- */
-
-/* -- eroyee add transparent 'Ghost' RX panel button --- */
-
-.openwebrx-GhostRX-button {
-
-    background-color: black;
-    /*  border: none; */
-    color: white;
-    height: 27px; // was 27
-    width: 15px; // was 23
-    border-radius: 3px;
-    border: 2px solid rgba(255,255,255,0.5);
-    font-size: 16px;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    bottom: 2px; /* bring up to same level as adjacent buttons */
-}
-
-/* ----------------------------------------------------- */
-/* ---- eroyee add toggle spectrum peak hold button ---- */
-
-.openwebrx-SpectraHold-button {
-
-    background-color: green;
-    /*  border: none; */
-    color: white;
-    height: 25px;  // was 18
-    width: 20px; // was 16
-    border-radius: 3px;
-    border: 0px solid #000;
-    font-size: 14px;
-    font-weight: bold;
-    text-align: center;
-    cursor: pointer;
-    position: relative;
-    top: 0px; /* bring down to same level as adjacent drop-down */
-}
-/* ----------------------------------------------------- */
-
 .openwebrx-demodulator-button /* this is for mode (eg ssb etc) buttons */
 {
-    height: 14px; /* eroyee; changed from 19px to 14 */
-    font-size: 10pt; /* eroyee; changed from 12 to 10pt */
-    text-align: center;
-    flex: 1;
-    margin-right: 5px;
+	height: 14px; /* eroyee; changed from 19px to 14 */
+	font-size: 10pt; /* eroyee; changed from 12 to 10pt */
+	text-align: center;
+	flex: 1;
+	margin-right: 5px;
 }
 
 .openwebrx-demodulator-button.same-mod {
@@ -595,8 +537,8 @@ input[type=range]:disabled {
 .openwebrx-round-button
 {
 	margin-right: -2px;
-	width: 35px;  // was 35
-	height: 35px;  // was 35
+	width: 35px;
+	height: 35px;
 	border-radius: 25px;
 }
 
@@ -714,7 +656,7 @@ img.openwebrx-mirror-img
 
 #openwebrx-panel-receiver
 {
-    width:100px; /* eroyee; changed from 110px */
+	width:100px; /* eroyee; changed from 110px */
 }
 
 
@@ -788,144 +730,43 @@ img.openwebrx-mirror-img
 }
 
 #openwebrx-smeter {
-    border-color: #888;
-    border-style: solid;
-    border-width: 0px;
-    width: 259px;  /* adjust to fit with scale */
-    height: 7px;
-    background-color: #FFF;  /* same colour as scale */
-    border-radius: 0px;  /* no rounded corners! */
-    overflow: hidden;
+	border-color: #888;
+	border-style: solid;
+	border-width: 0px;
+	width: 259px;  /* adjust to fit with scale */
+	height: 7px;
+	background-color: #FFF;  /* same colour as scale */
+	border-radius: 0px;  /* no rounded corners! */
+	overflow: hidden;
 }
 
-/* eroyee, use this for js smeter */
-
-#openwebrx-smeter-bar {
-    width: 15%;
-    height: 100%;
-    background-color: rgba(4, 170, 109, 1);
-}
 /* ------------------------------ */
+/* turn '-OFF' when not using this (if using js smeter) */
 
-.openwebrx-smeter-bar-OFF { /* turn '-OFF' when not using this (if using js smeter) */
-    transition-property: transform;
-    transition-duration: 0.2s;
-    transition-timing-function: linear;
-    will-change: transform;
-    transform: translate(-100%) translateZ(0);
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(to top, #ff5939 , #961700);
-    margin: 0;
-    padding: 0;
-    border-radius: 0px; /* eroyee; bradius to 0 from 3 */
+.openwebrx-smeter-bar-OFF { 
+	transition-property: transform;
+	transition-duration: 0.2s;
+	transition-timing-function: linear;
+	will-change: transform;
+	transform: translate(-100%) translateZ(0);
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(to top, #ff5939 , #961700);
+	margin: 0;
+	padding: 0;
+	border-radius: 0px; /* eroyee; bradius to 0 from 3 */
 }
 
 #openwebrx-smeter-db
 {
-    color: #aaa;
-    display: inline-block;
-    font-size: 10pt;
-    float: right;
-    margin-right: 5px;
-    margin-top: 8px; /* eroyee; change to have 'dB' values displayed just under the 'dig' bar in the rx panel. */
-    font-family: 'roboto-mono';
+	color: #aaa;
+	display: inline-block;
+	font-size: 10pt;
+	float: right;
+	margin-right: 5px;
+	margin-top: 8px; /* eroyee; change to have 'dB' values displayed just under the 'dig' bar in the rx panel. */
+	font-family: 'roboto-mono';
 }
-
-/* ----- eroyee, makes CSS scale for s-meter ----- */
-/* loosely based on code from Artur Arsalanov 
-      https://codepen.io/pbweb/pen/gMQKEK */
-
-.openwebrx-smeter-scale {
-    /* display: inline-block; */
-    margin-left: 25px;
-    float: left;
-    width: 90%;
-    /* margin: 2px auto; */
-    margin-top: 22px;  /* distance from icons above */
-    margin-bottom: 4px;
-    height: 1px;
-}
-.openwebrx-smeter-scale .s{
-    position: absolute;
-    border-left: 4px solid #fff; /* width of tick */
-    height: 4px;
-    width: 15%;
-    padding-bottom: 0px;
-    border-bottom: 1px solid rgba(255,255,255,0.9); /* If using CSS smeter make same as smeter-bar to 'fill' border, for js smeter use 1px */
-}
-
-.openwebrx-smeter-scale .s:after {
-    position: absolute;
-    bottom: 8px;
-    font: 11px/1 sans-serif;
-}
-.openwebrx-smeter-scale .s:nth-of-type(1) {
-    left: 10.5px; /* 10px fits best to lhs meter start (was 0%) */
-}
-.openwebrx-smeter-scale .s:nth-of-type(1):after {
-    content: "0";
-    right:95%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(2) {
-    left: 15%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(2):after {
-    content: "S3";
-    right:90%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(3) {
-    left: 25%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(3):after {
-    content: "S5";
-    right:90%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(4) {
-    left: 35%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(4):after {
-    content: "S7";
-    right:90%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(5) {
-    left: 45%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(5):after {
-    content: "S9";
-    right:90%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(6) {
-    left: 55%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(6):after {
-    content: "+10";
-    right:85%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(7) {
-    left: 65%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(7):after {
-    content: "+20";
-    right:85%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(8) {
-    left: 79%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(8):after {
-    content: "+40";
-    right:85%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(9) {
-    left: 95%;
-    width: 0%;
-}
-.openwebrx-smeter-scale .s:nth-of-type(9):after {
-    content: "+60";
-    right: 100%;
-}
-
-/* ----------------------------------------------- */
 
 .openwebrx-overlay {
     position: absolute;
@@ -969,11 +810,11 @@ img.openwebrx-mirror-img
 
 #openwebrx-digimode-canvas-container
 {
-    /*margin: -10px -10px 10px -10px;*/
+	/*margin: -10px -10px 10px -10px;*/
     margin: -10px -10px 0px -10px;
-    border-radius: 15px;
-    height: 300px;
-    background-color: #333;
+	border-radius: 15px;
+	height: 300px;
+	background-color: #333;
     position: relative;
     overflow: hidden;
 }
@@ -991,15 +832,15 @@ img.openwebrx-mirror-img
 .openwebrx-panel input,
 .openwebrx-dialog select,
 .openwebrx-dialog input {
-    border-radius: 5px;
-    background-color: #373737;
-    color: White;
-    font-weight: normal;
-    font-size: 10pt; /* eroyee; 13pt to 10pt */
-    margin-right: 1px;
-    background:linear-gradient(organge, #4F4F4F);
-    border-color: transparent;
-    border-width: 0px;
+	border-radius: 5px;
+	background-color: #373737;
+	color: White;
+	font-weight: normal;
+	font-size: 10pt; /* eroyee; 13pt to 10pt */
+	margin-right: 1px;
+	background:linear-gradient(organge, #4F4F4F);
+	border-color: transparent;
+	border-width: 0px;
 }
 
 @supports(-moz-appearance: none) {
@@ -1026,15 +867,10 @@ img.openwebrx-mirror-img
 }
 
 .openwebrx-secondary-demod-listbox {
-    width: 173px;
-    height: 18px; /* eroyee; change height from 27 to 18px */
-    padding-left:3px;
-    flex: 4;
-}
-
-/* eroyee; change colour of 'Displays' drop-down menu */
-#change_display.openwebrx-secondary-demod-listbox {
-    background-color: green;
+	width: 173px;
+	height: 18px; /* eroyee; change height from 27 to 18px */
+	padding-left:3px;
+	flex: 4;
 }
 
 #openwebrx-sdr-profiles-listbox {
@@ -1476,8 +1312,10 @@ img.openwebrx-mirror-img
 #openwebrx-panel-digimodes[data-mode="fst4"]   #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="fst4w"]  #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="q65"]    #openwebrx-digimode-content-container,
-#openwebrx-panel-digimodes[data-mode="spectrum"]    #openwebrx-digimode-content-container,
+#openwebrx-panel-digimodes[data-mode="spectrum"] #openwebrx-digimode-content-container,
+#openwebrx-panel-digimodes[data-mode="msk144"] #openwebrx-digimode-content-container,
 #openwebrx-panel-digimodes[data-mode="sstv"]   #openwebrx-digimode-content-container,
+
 #openwebrx-panel-digimodes[data-mode="ft8"]    #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="wspr"]   #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="jt65"]   #openwebrx-digimode-select-channel,
@@ -1490,7 +1328,8 @@ img.openwebrx-mirror-img
 #openwebrx-panel-digimodes[data-mode="fst4"]   #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="fst4w"]  #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="q65"]    #openwebrx-digimode-select-channel,
-#openwebrx-panel-digimodes[data-mode="spectrum"]   #openwebrx-digimode-select-channel,
+#openwebrx-panel-digimodes[data-mode="msk144"] #openwebrx-digimode-select-channel,
+#openwebrx-panel-digimodes[data-mode="spectrum"] #openwebrx-digimode-select-channel,
 #openwebrx-panel-digimodes[data-mode="sstv"]   #openwebrx-digimode-select-channel
 {
     display: none;
@@ -1508,15 +1347,11 @@ img.openwebrx-mirror-img
 #openwebrx-panel-digimodes[data-mode="fst4"]   #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="fst4w"]  #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="q65"]    #openwebrx-digimode-canvas-container,
+#openwebrx-panel-digimodes[data-mode="msk144"] #openwebrx-digimode-canvas-container,
+#openwebrx-panel-digimodes[data-mode="spectrum"] #openwebrx-digimode-canvas-container,
 #openwebrx-panel-digimodes[data-mode="sstv"]   #openwebrx-digimode-canvas-container
 {
     height: 200px;
-    margin: -10px;
-}
-
-#openwebrx-panel-digimodes[data-mode="spectrum"]    #openwebrx-digimode-canvas-container
-{
-    height: 400px;
     margin: -10px;
 }
 
@@ -1581,5 +1416,257 @@ img.openwebrx-mirror-img
 
 .openwebrx-waterfall-container > * {
     flex: 0 0 auto;
+}
+
+.openwebrx-spectrum-container {
+    transition-property: height, opacity;
+    transition-duration: 1s;
+    transition-timing-function: ease-out;
+    opacity: 0;
+    height: 0;
+    max-height: 50px;
+    overflow: hidden;
+}
+
+.openwebrx-spectrum-container.expanded {
+    opacity: 1;
+    height: 50px;
+    border-bottom: 1px solid white;
+}
+
+.openwebrx-section-divider {
+    border-bottom: 2px dotted;
+    margin-bottom: 5px;
+    margin-top: 5px;
+    min-height: 5px;
+    width: 100%;
+    text-align: left;
+    font-size: 10pt;
+    color: #AAA;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.openwebrx-section {
+    display: block;
+}
+
+
+#openwebrx-panel-digimodes[data-mode="spectrum"]    #openwebrx-digimode-canvas-container
+{
+    height: 400px;
+    margin: -10px;
+}
+
+
+/* eroyee; change colour of 'Displays' drop-down menu */
+#change_display.openwebrx-secondary-demod-listbox {
+    background-color: green;
+}
+
+
+/* eroyee, use this for js smeter */
+
+#openwebrx-smeter-bar {
+    width: 15%;
+    height: 100%;
+    background-color: rgba(4, 170, 109, 1);
+}
+
+
+/* ----- eroyee, makes CSS scale for s-meter ----- */
+/* loosely based on code from Artur Arsalanov 
+      https://codepen.io/pbweb/pen/gMQKEK */
+
+.openwebrx-smeter-scale {
+    /* display: inline-block; */
+    margin-left: 25px;
+    float: left;
+    width: 90%;
+    /* margin: 2px auto; */
+    margin-top: 22px;  /* distance from icons above */
+    margin-bottom: 4px;
+    height: 1px;
+}
+.openwebrx-smeter-scale .s{
+    position: absolute;
+    border-left: 4px solid #fff; /* width of tick */
+    height: 4px;
+    width: 15%;
+    padding-bottom: 0px;
+    border-bottom: 1px solid rgba(255,255,255,0.9); /* If using CSS smeter make same as smeter-bar to 'fill' border, for js smeter use 1px */
+}
+
+.openwebrx-smeter-scale .s:after {
+    position: absolute;
+    bottom: 8px;
+    font: 11px/1 sans-serif;
+}
+.openwebrx-smeter-scale .s:nth-of-type(1) {
+    left: 10.5px; /* 10px fits best to lhs meter start (was 0%) */
+}
+.openwebrx-smeter-scale .s:nth-of-type(1):after {
+    content: "0";
+    right:95%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(2) {
+    left: 15%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(2):after {
+    content: "S3";
+    right:90%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(3) {
+    left: 25%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(3):after {
+    content: "S5";
+    right:90%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(4) {
+    left: 35%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(4):after {
+    content: "S7";
+    right:90%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(5) {
+    left: 45%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(5):after {
+    content: "S9";
+    right:90%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(6) {
+    left: 55%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(6):after {
+    content: "+10";
+    right:85%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(7) {
+    left: 65%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(7):after {
+    content: "+20";
+    right:85%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(8) {
+    left: 79%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(8):after {
+    content: "+40";
+    right:85%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(9) {
+    left: 95%;
+    width: 0%;
+}
+.openwebrx-smeter-scale .s:nth-of-type(9):after {
+    content: "+60";
+    right: 100%;
+}
+
+/* ----------------------------------------------- */
+
+
+/* --- eroyee add 1kHz/5kHz/9kHz freq step change button --- */
+
+.openwebrx-stepchangeHz-button {
+
+    background-color: #04AA6D; /* Green */
+    /*  border: none; */
+    color: white;
+    height: 16px;
+    width: 16px;
+    border-radius: 3px;
+    border: 1px solid #FFF;
+    font-size: 9px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    bottom: 4px; /* bring up to same level as step buttons */
+}
+/* ----------------------------------------------------- */
+
+/* -- eroyee add transparent 'Ghost' RX panel button --- */
+
+.openwebrx-GhostRX-button {
+
+    background-color: black;
+    /*  border: none; */
+    color: white;
+    height: 27px; // was 27
+    width: 15px; // was 23
+    border-radius: 3px;
+    border: 2px solid rgba(255,255,255,0.5);
+    font-size: 16px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    bottom: 2px; /* bring up to same level as adjacent buttons */
+}
+
+/* ----------------------------------------------------- */
+/* ---- eroyee add toggle spectrum peak hold button ---- */
+
+.openwebrx-SpectraHold-button {
+
+    background-color: green;
+    /*  border: none; */
+    color: white;
+    height: 25px;  // was 18
+    width: 20px; // was 16
+    border-radius: 3px;
+    border: 0px solid #000;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    top: 0px; /* bring down to same level as adjacent drop-down */
+}
+/* ----------------------------------------------------- */
+
+/* by I8FUC */
+.openwebrx-jump-button {
+
+    background-color: green;
+    /*  border: none; */
+    color: white;
+    height: 25px;  // was 18
+    width: 20px; // was 16
+    border-radius: 3px;
+    border: 0px solid #000;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    top: 0px; /* bring down to same level as adjacent drop-down */
+}
+/* ----------------------------------------------------- */
+
+
+
+/* by I8FUC */
+.go {
+  color: green;
+  background-color: black ;
+//  display: block;
+}
+
+.stop {
+  color: red;
+  background-color: white ;
+//  display: block;
+}
+
+.disable{
+  display: none;
 }
 

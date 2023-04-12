@@ -24,6 +24,7 @@ class ReceiverDetails(PropertyFilter):
                 "receiver_button",
                 "map_button",
                 "settings_button",
+                "files_button",
                 "usage_policy_url",
                 "session_timeout",
                 "ts_start",

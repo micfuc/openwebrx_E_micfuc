@@ -244,6 +244,17 @@ class Q65Profile(WsjtProfile):
     def decoder_commandline(self, file):
         return ["jt9", "--q65", "-p", str(self.interval), "-b", self.mode.name, "-d", str(self.decoding_depth()), file]
 
+# following class from Jakob
+class Msk144Profile(WsjtProfile):
+    def getMode(self):
+        return "MSK144"
+
+    def getInterval(self):
+        return 15
+
+    def decoder_commandline(self, file):
+        return None
+
 
 class WsjtParser(AudioChopperParser):
     def parse(self, profile: WsjtProfile, freq: int, raw_msg: bytes):
@@ -278,7 +289,7 @@ class WsjtParser(AudioChopperParser):
             self.pushDecode(mode, band)
             if "callsign" in out and "locator" in out:
                 Map.getSharedInstance().updateLocation(
-                    out["callsign"], LocatorLocation(out["locator"]), mode, '', '' ,band # by I8FUC 20230327 added new direct placeholder parameter
+                    out["callsign"], LocatorLocation(out["locator"]), mode, '',band # by I8FUC 20230327 added new direct placeholder parameter
                 )
                 ReportingEngine.getSharedInstance().spot(out)
 
@@ -366,6 +377,8 @@ class Jt9Decoder(Decoder):
         # '0003  -4  0.4 1762 #  CQ R2ABM KO85'
         # fst4 sample
         # '**** -23  0.6 3023 `  <...> <...> R 591631 BI53PV'
+        # MSK144 sample
+        # '221602   8  0.4 1488 &  K1JT WA4CQG EM72'
         msg, timestamp = self.parse_timestamp(msg)
         wsjt_msg = msg[17:53].strip()
 

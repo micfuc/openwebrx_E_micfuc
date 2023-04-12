@@ -1,7 +1,7 @@
 import logging
 
 # the linter will complain about this, but the logging must be configured before importing all the other modules
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(filename='/var/log/openwebrx.log' , encoding='utf-8' , level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")  # by I8FUC 20230409
 logger = logging.getLogger(__name__)
 
 from http.server import HTTPServer

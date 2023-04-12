@@ -1,23 +1,24 @@
 /*
 
-This file is part of OpenWebRX,
-an open-source SDR receiver software with a web UI.
-Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
-Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
-Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
-Copyright (c) 2022-2023 by Marat Fayzullin <luarvique@gmail.com>
+	This file is part of OpenWebRX,
+	an open-source SDR receiver software with a web UI.
+	Copyright (c) 2013-2015 by Andras Retzler <randras@sdr.hu>
+	Copyright (c) 2019-2021 by Jakob Ketterl <dd5jfk@darc.de>
+	Copyright (c) 2020-2022 by eroyee (https://github.com/eroyee/)
+	Copyright (c) 2022-2023 by Marat Fayzullin <luarvique@gmail.com>
 
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation, either version 3 of the
- License, or (at your option) any later version.
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
- 
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
@@ -36,6 +37,7 @@ var tuning_step_default = 1;
 var tuning_step = 1;
 var nr_enabled = false;
 var nr_threshold = 0;
+
 // start  by I8FUC 20220806
 var default_time_tick = 60;           
 var default_sec_fft_offset_db = 10 ;
@@ -43,6 +45,37 @@ var ts_start = "rhs";
 var default_ret_step = 5 ; 
 // end  by I8FUC 20220814
 
+function updateVolume() {
+    audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
+}
+
+function toggleSection(el) {
+    var next_el = el.nextElementSibling;
+    if (next_el) {
+        if (next_el.style.display === "none") {
+            el.innerHTML = el.innerHTML.replace("\u25B4", "\u25BE");
+            next_el.style.display = "block";
+        } else {
+            el.innerHTML = el.innerHTML.replace("\u25BE", "\u25B4");
+            next_el.style.display = "none";
+        }
+    }
+}
+
+function toggleMute() {
+    var $muteButton = $('.openwebrx-mute-button');
+    var $volumePanel = $('#openwebrx-panel-volume');
+    if ($muteButton.hasClass('muted')) {
+        $muteButton.removeClass('muted');
+        $volumePanel.prop('disabled', false).val(volumeBeforeMute);
+    } else {
+        $muteButton.addClass('muted');
+        volumeBeforeMute = $volumePanel.val();
+        $volumePanel.prop('disabled', true).val(0);
+    }
+
+    updateVolume();
+}
 
 function updateNR() {
     var $nrPanel = $('#openwebrx-panel-nr');
@@ -100,167 +133,6 @@ function saveCanvas(canvas) {
         }, 0);
     }, 'image/png');
 }
-
-function updateVolume() {
-    audioEngine.setVolume(parseFloat($("#openwebrx-panel-volume").val()) / 100);
-}
-
-
-function toggleMute() {
-    var $muteButton = $('.openwebrx-mute-button');
-    var $volumePanel = $('#openwebrx-panel-volume');
-    if ($muteButton.hasClass('muted')) {
-        $muteButton.removeClass('muted');
-        $volumePanel.prop('disabled', false).val(volumeBeforeMute);
-    } else {
-        $muteButton.addClass('muted');
-        volumeBeforeMute = $volumePanel.val();
-        $volumePanel.prop('disabled', true).val(0);
-    }
-    updateVolume();
-}
-
-/* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- 
- - note this is optimised for tuning precision of 10Hz. Furture improvement to 
- include that variable and adjust accordingly -----------------------------*/
-function toggleStepHz() {
-    if (StepHz == 1000) {
-        StepHz = 5000;
-        document.getElementById('stepchangeHz').innerHTML = "5";
-        document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
-    } else if (StepHz == 5000) {
-        StepHz = 9000;
-        document.getElementById('stepchangeHz').innerHTML = "9";
-        document.getElementById('stepchangeHz').style.backgroundColor = "blue";
-    } else if (StepHz == 9000) {
-        StepHz = 1000;
-        document.getElementById('stepchangeHz').innerHTML = "1";
-        document.getElementById('stepchangeHz').style.backgroundColor = "red";
-    }
-}
-
-function freqstep(sel) {
-    var stepsize = 0;
-    switch (sel) {
-        case 0:
-            stepsize = -StepHz;
-            break;
-        case 1:
-            stepsize = -100;
-            break;
-        case 2:
-            stepsize = -10;  // Will only work if 10Hz resolution is set
-            break;
-        case 3:
-            stepsize = 10;  // Will only work if 10Hz resolution is set
-            break;
-        case 4:
-            stepsize = 100;
-            break;
-        case 5:
-            stepsize = StepHz;
-            break;
-        default:
-            stepsize = 0;
-    }
-    var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
-    var tuned_freq = offset_frequency + center_freq;
-    var new_offset = 0;
-    if (Math.abs(stepsize) > 100) {    // do the 'snap' to kHz only for large step ranges
-        var HzFraction = tuned_freq - (Math.trunc(tuned_freq/1000)*1000);
-        if (HzFraction > 0) {
-            // not snapped to kHz, do not use the full stepsize but first snap to the nearest kHz value
-            if (stepsize < 0) {
-                new_offset = offset_frequency - HzFraction;
-            } else {
-                new_offset = offset_frequency + (1000 - HzFraction);
-            }
-        } else {
-            new_offset = (Math.round((offset_frequency + stepsize)/1000)*1000);  // eroyee; 'snap' the largest stepsize to nearest 1kHz
-        }
-    } else {
-        new_offset = (offset_frequency + stepsize);
-    }
-    if (new_offset !== offset_frequency) {
-        $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset);
-        // check to see if we need to scroll
-        tuned_freq = new_offset + center_freq;
-        var visible_freq_range = get_visible_freq_range();
-        if (stepsize > 0) {
-            var range_plus = visible_freq_range.end - visible_freq_range.center;
-            if ((tuned_freq - visible_freq_range.center) / range_plus > 0.7) {
-                canRight();
-            }
-	} else {
-            var range_min = visible_freq_range.center - visible_freq_range.start;
-            if ((visible_freq_range.center - tuned_freq) / range_min > 0.7) {
-                canLeft();
-            }
-	}
-
-    }
-}
-/* -------------------------------------------------------------------------- */
-
-/* eroyee add for keyboard tuning 28 Dec 20, step toggle May 2022 */
-
-function init_key_listener(keypress) {
-    document.addEventListener("keydown", function (keypress) {
-        // End 
-        if (keypress.keyCode == "35") {
-            toggleStepHz();
-        }
-        // PgUp
-        if (keypress.keyCode == "33") {
-            freqstep(5);
-        }
-        // PgDwn
-        if (keypress.keyCode == "34") {
-            freqstep(0);
-        }
-        // Up cursor
-        if (keypress.keyCode == "38") {
-            freqstep(4);
-        }
-        // Down Cursor
-        if (keypress.keyCode == "40") {
-            freqstep(1);
-        }
-        // Left Cursor
-        if (keypress.keyCode == "37") {
-            freqstep(2);
-        }
-        // Right Cursor
-        if (keypress.keyCode == "39") {
-            freqstep(3);
-        }
-    });
-}
-/*  ------------------------------------------------------------------------- */
-
-/* --------- eroyee add for switching transparent (Ghost) RX panel ---------- */
-
-var GhostRX = true;
-function ToggleGhostRX() {
-    if (GhostRX) {
-        GhostRX = false;
-        document.getElementById('GhostRX').innerHTML = "G";
-        document.getElementById('GhostRX').style.backgroundColor = "rgba(255,255,255,0.3)"; // using rgba, 'a' is opacity value
-        document.getElementById('GhostRX').style.fontWeight = "bold";
-//        document.getElementById('spectrum').style.backgroundColor = "rgba(255,165,0,0.3)"; // using rgba, 'a' is opacity value
-        document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "rgba(255,255,255,0)";
-//    qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,0)";
-    } else {
-        GhostRX = true;
-        document.getElementById('GhostRX').innerHTML = "G";
-        document.getElementById('GhostRX').style.backgroundColor = "black";
-        document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "black";
-        document.getElementById('GhostRX').style.fontWeight = "normal";
-//        document.getElementById('spectrum').style.backgroundColor = "orange"; // using rgba, 'a' is opacity value
-//        qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,1)"; 
-    }
-}
-
 
 function zoomInOneStep() {
     zoom_set(zoom_level + 1);
@@ -353,18 +225,18 @@ function waterfallColorsContinuous(levels) {
     if (levels.max > waterfall_continuous.max + 1) {
         waterfall_continuous.max += 1;
     } else if (levels.max < waterfall_continuous.max - 1) {
-        waterfall_continuous.max -= 0.1;
+        waterfall_continuous.max -= .1;
     }
     if (levels.min < waterfall_continuous.min - 1) {
         waterfall_continuous.min -= 1;
     } else if (levels.min > waterfall_continuous.min + 1) {
-        waterfall_continuous.min += 0.1;
+        waterfall_continuous.min += .1;
     }
     waterfallColorsAuto(waterfall_continuous);
 }
 
-/* eroyee; don't need this if using js meter
-
+// eroyee; don't need this if using js meter
+/*
 function setSmeterRelativeValue(value) {
     if (value < 0) value = 0;
     if (value > 1.0) value = 1.0;
@@ -401,65 +273,6 @@ function getLogSmeterValue(value) {
     return 10 * Math.log10(value);
 }
 
-/* eroyee, this is the original function (with mods) for css transform,
- replacement using js is below this block. CSS *should* be better but it 
- seems to increase CPU load considerably on low power machines:
- 
- function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
- {
- var logValue = getLogSmeterValue(value);
- setSquelchSliderBackground(logValue);
- var percent = (logValue + 100) / (100);  // waterfall min/max no longer affect s-meter, -0dBm should = 100%
- setSmeterRelativeValue(percent);
- $("#openwebrx-smeter-db").html(logValue.toFixed(1) + " dB");
- }
- 
- */
-/* eroyee function to draw smeter with js, is not as smooth, but is a *lot* 
- easier on remote CPU than using CSS transform; on a reasonable i7 
- (Linux + Firefox) with css transform the system load was ~3, with this 
- function it is typically < 2.
- 
- Signal should cause bar to rise quickly once timeout has completed, then decay 
- slowly according to the value of decay.
- 
- This is probably more suited to SSB reception, particularly with the slow AGC 
- as per my mods, although it shouldn't adversely affect AM/FM in most cases. 
- 
- SetTimeout is attempted in a probably futile effor to more closely sync bar
- movement with audio, expect this to vary with relative CPU speed etc. Quite 
- experimental and prob not be worth the effort...
- */
-
-var sig_data; // EROYEE FOR TIMESERIES
-function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
-{
-    var speak = 0;
-    var decay = 0.01;
-    var logValue = getLogSmeterValue(value);
-    sig_data = logValue; // EROYEE FOR TIMESERIES
-    var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
-    //    setTimeout(function(){
-    $("#openwebrx-smeter-db").html(logValue.toFixed(0) + "dB"); // eroyee; re-introduce dB levels for anyone that wants them
-//    },0.9);
-    setSquelchSliderBackground(logValue);
-    if (percent < 0) {
-        percent = 0;
-    }
-    if (percent > 1.0) {
-        percent = 1.0;
-    }
-    if (percent > speak) {
-        speak = percent;
-    } else {
-        speak = (speak - decay);
-    }
-    setTimeout(function () {
-        document.getElementById('openwebrx-smeter-bar').style.width = (speak * 100) + "%";
-    }, 300);
-// console.log(logValue, percent, speak);
-}
-/* -------------------------------------------------------------------------- */
 
 function typeInAnimation(element, timeout, what, onFinish) {
     if (!what) {
@@ -574,7 +387,6 @@ function scale_canvas_mousemove(evt) {
         for (i = 0; i < demodulators.length; i++) event_handled |= demodulators[i].envelope.drag_move(evt.pageX);
         if (!event_handled) demodulators[0].set_offset_frequency(scale_offset_freq_from_px(evt.pageX));
     }
-
 }
 
 function frequency_container_mousemove(evt) {
@@ -1100,28 +912,6 @@ function get_zoom_coeff_from_hps(hps) {
     return bandwidth / shown_bw;
 }
 
-// eroyee, clickbutton shift waterfall, apparently useful for mobile browsers // 
-
-function canLeft() {
-    if (zoom_center_rel > (-bandwidth / 1.5 + waterfallWidth() * zoom_center_where * range.hps)) {
-        zoom_center_rel -= range.hps * screen.availWidth * 0.5;    // 0.5 = scroll left for 50% of waterfall width
-        resize_canvases(false);
-        mkscale();
-        bookmarks.position();
-    }
-}
-
-function canRight() {
-    if (!(zoom_center_rel > (bandwidth / 1.5 - waterfallWidth() * (1 - zoom_center_where) * range.hps))) {
-        zoom_center_rel += range.hps * screen.availWidth * 0.5;    // 0.5 = scroll right for 50% of waterfall width
-        resize_canvases(false);
-        mkscale();
-        bookmarks.position();
-    }
-}
-
-// -------------------------------------------------------------------------- //
-
 var zoom_levels = [1];
 var zoom_level = 0;
 var zoom_offset_px = 0;
@@ -1286,6 +1076,17 @@ function on_ws_recv(evt) {
                         if ('tuning_step' in config) {
                             tuning_step_default = config['tuning_step'];
                             tuning_step_reset();
+                        }
+
+                        if ('ui_opacity' in config) {
+                            var x = config['ui_opacity'];
+                            x = x<10? 10 : x>100? 100 : x;
+                            $('.openwebrx-panel').css('opacity', x/100);
+                        }
+
+                        if ('ui_frame' in config) {
+                            var x = config['ui_frame'];
+                            $('#openwebrx-panel-receiver').css('border', x? '2px solid':'');
                         }
 
                         break;
@@ -1453,9 +1254,15 @@ function waterfall_measure_minmax_do(what) {
     var range = get_visible_freq_range();
     var start = center_freq - bandwidth / 2;
 
-    // this is based on an oversampling factor of about 1,25
+    // This is based on an oversampling factor of about 1,25
     range.start = Math.max(0.1, (range.start - start) / bandwidth);
     range.end   = Math.min(0.9, (range.end - start) / bandwidth);
+
+    // Align to the range edges, do not let things flip over
+    if (range.start >= 0.9)
+        range.start = range.end - range.bw / bandwidth;
+    else if (range.end <= 0.1)
+        range.end = range.start + range.bw / bandwidth;
 
     var data = what.slice(range.start * what.length, range.end * what.length);
     return {
@@ -1672,222 +1479,6 @@ function waterfall_init() {
     mkzoomlevels();
     waterfall_setup_done = 1;
 }
-
-// - eroyee add for dropdown menu select of different display options - //
-
-var wfStart = true;
-window.addEventListener("change", dispSelect); // from demodulators.js
-function dispSelect(evt) {
-    var sel = (change_display.value);
-    switch (sel) {
-        case '1':
-            if (timeseries_start) {
-                display_timeseries('stop');
-                setTimeout(function () {  // gets its tits in a tangle if restarted too quickly (when swapping between functions)
-                    ts_ticks = false;
-                    display_timeseries('start');
-                }, 100);
-            } else {
-                ts_ticks = false;
-                display_timeseries('start');
-            }
-            break;
-        case '2':
-            if (timeseries_start) {
-                display_timeseries('stop');
-                setTimeout(function () {
-                    ts_ticks = true;
-                    display_timeseries('start');
-                }, 100);
-            } else {
-                ts_ticks = true;
-                display_timeseries('start');
-            }
-            break;
-        case '3':
-            spec_start = false;
-            display_spectra('start', 'line');
-            break;
-        case '4':
-            spec_start = false;
-            display_spectra('start', 'fill');
-            break;
-        case '5':
-            if (wfStart) {
-                wfStart = false;
-            }
-            break;
-        case '6':
-            if (!wfStart) {
-                wfStart = true;
-            }
-            break;
-        default:
-            if (timeseries_start) {
-                ts_ticks = false;
-                display_timeseries('stop');
-            }
-            if (spec_start) {
-                display_spectra('stop', 0);
-            }
-    }
-}
-
-// - eroyee add for timeseries display, using spectrum container for present - //
-
-var timeSeriesCtx;
-var timeseries_start = false;
-const timeseries_window_h = 130;
-
-// modified by I8FUC 20220814
-const timeseries_data = new Array(screen.availWidth-34);		// do we want to start at the RHS?
-const timeseries_ticks = new Array(screen.availWidth-34).fill(0); 	// Follows from RHS      
- 
-
-var ts_time;
-var ts_ticks = false;
-const ts_out_data = [0];
-function display_timeseries(status)
-{
-    if (spec_start) {
-        display_spectra('stop');
-    }
-    if ((!timeseries_start) && (status = 'start')) {
-       if ( ts_start === "lhs"){   // by I8FUC 20220812
-          timeseries_data.length = 0;
-          timeseries_ticks.length = 0;          
-          };
-    
-        var divTimeseries = '<div id="signal-div-timeseries">'
-                + '<canvas id="signal-canvas-timeseries" width="' + (screen.availWidth) + '" height="' + (timeseries_window_h) + '" style="width:100%;height:' + (timeseries_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
-                + '</div>';
-//eroyee; below to drop down time series container
-        document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
-        document.getElementById('spectrum_container').style.opacity = "1";
-        var div = document.querySelector(".openwebrx-spectrum-container");
-        div.insertAdjacentHTML('beforeEnd', divTimeseries);
-//eroyee; setup the canvas and start timeseries display
-        timeSeriesCtx = document.querySelector("#signal-canvas-timeseries").getContext('2d');
-        timeSeriesCtx.width = (screen.availWidth);
-        timeSeriesCtx.height = (spec_window_h); // one less than canvas height
-        if (ts_ticks) {
-            let date = new Date();
-            ts_time = date.getTime();
-            let mins = date.getMinutes();
-            let secs = date.getSeconds();
-//            timeseries_ticks.push(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()); // pushes time string without leading 0's for nums < 10
-            timeseries_ticks.push(date.getHours() + ":" + (mins = mins <= 9 ? '0' + mins : mins) + ":" + (secs = secs <= 9 ? '0' + secs : secs)); // gives leading 0's
-        }
-        timeseries_start = true;
-    } else {
-        if (status = 'stop') {
-            timeseries_start = false;
-            ts_ticks = false;
-            document.getElementById('spectrum_container').style.height = "0px";
-            document.getElementById('spectrum_container').style.opacity = "0";
-            const flush = document.querySelector("#signal-canvas-timeseries");
-            flush.parentNode.removeChild(flush);
-            timeseries_start = false;
-          //  timeseries_data.length = 0;   // removed by I8FUC
-          //  timeseries_ticks.length = 0;  // removed by I8FUC
-            ts_out_data.length = 0;
-            return;
-        }
-    }
-}
-
-// ------------ eroyee add for start/stop spectrum display -------------- //
-
-var specStyle;
-var screenCtx;
-var spectrumCtx;
-var spectrumGradient;
-const spec_data_in = [];
-var spec_start = false;
-const spec_window_h = 130; // sets height of spectrum + timeseries display
-const label_w = 34; // sets width of label column (ie. dB values)
-const spec_out_data = [];
-function display_spectra(status, style)
-{
-    if (timeseries_start) {
-        display_timeseries('stop');
-        ts_ticks = false;
-    }
-    if ((!spec_start) && (status = 'start')) {
-//console.log(status);
-        var divspectrum = '<div id="freq-div-spectrum">'
-                + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;"></canvas>'
-                + '<canvas id="freq-canvas-spectrum-label" width="' + (label_w) + '" height="' + (spec_window_h) + '" style="width:' + (label_w) + ';height:' + (spec_window_h) + 'px;right:0px;position:absolute;bottom:0px"></canvas>'
-                + '</div>';
-//eroyee; below to drop down spectrum container
-        document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
-        document.getElementById('spectrum_container').style.opacity = "1";
-        var div = document.querySelector(".openwebrx-spectrum-container");
-        div.insertAdjacentHTML('beforeEnd', divspectrum);
-// eroyee; ensure new spectrum canvas is set with the same position and zoom level as the waterfall canvas (the label canvas is fixed and divorced from this)
-        document.querySelector("#freq-canvas-spectrum").style.left = document.querySelector("#webrx-canvas-container").style.left;
-        document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width;
-// eroyee set variables and canvas colours
-        spectrumCtx = document.querySelector("#freq-canvas-spectrum").getContext('2d');
-        spectrumCtx.width = (fft_size);
-        spectrumCtx.height = (spec_window_h) - 1; // one less than canvas height
-        spectrumGradient = spectrumCtx.createLinearGradient(0, 0, 0, spectrumCtx.height);
-        spectrumGradient.addColorStop(0.00, 'red'); // probably should align these colours with the waterfall...
-        spectrumGradient.addColorStop(0.50, 'yellow');
-        spectrumGradient.addColorStop(1.00, 'blue');
-// eroyee setup second small canvas to show -dB labels (since spectrum is expanded according to zoom)
-        screenCtx = document.querySelector("#freq-canvas-spectrum-label").getContext('2d');
-        screenCtx.width = (label_w);
-        screenCtx.height = (spec_window_h) - 1;
-// eroyee; initialise the spectrum and peak data arrays
-        for (i = 0; i < (fft_size); ++i) {
-            spec_peak_data[i] = 0; // initialise the peak data array with 0's
-        }
-        for (i = 0; i < (fft_size); ++i) {
-            spec_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
-        }
-        specStyle = style;
-//console.log(specStyle);
-        spec_start = true;
-    } else {
-        if (status = 'stop') {
-//console.log(status);
-            spec_start = false;
-            document.getElementById('spectrum_container').style.height = "0px";
-            document.getElementById('spectrum_container').style.opacity = "0";
-            const flush = document.getElementById("freq-div-spectrum");
-            flush.parentNode.removeChild(flush);
-            spec_start = false;
-            return;
-        }
-    }
-}
-
-// ----------------- eroyee for starting peak hold display ---------------------
-
-const spec_peak_data = [];
-var peak_start = false;
-function peak_spectra_hold()
-{
-    if (!spec_start && !timeseries_start) {
-        peak_start = false;
-        return;
-    }
-    if (!peak_start) {
-        peak_start = true;
-        for (i = 0; i < (fft_size); ++i) {
-            spec_peak_data[i] = 0; // initialise the peak data array with 0's
-        }
-    } else if (peak_start) {
-        peak_start = false;
-        for (i = 0; i < (fft_size); ++i) {
-            spec_peak_data[i] = 0; // clear the peak data array with 0's
-        }
-        return;
-    }
-}
-
-// ---- eroyee additions to waterfall_add function for spectrum display ----- //
 
 function waterfall_add(data) {
     if (!waterfall_setup_done) return;
@@ -2298,28 +1889,26 @@ function initPanels() {
         });
         if (panel_displayed(el)) first_show_panel(el);
     });
+}
 
-}    
-    
-function initTopBarMenu() {    // by I8FUC to support top bar ccomponents hiding by admin screens
-    $('#top_bar_buttons').find('.button').each(function () {
-        var el = this;
-          if(el.id && el.id === 'status_but_disable' ) { el.style.display= 'none' ; }   ;
-          if(el.id && el.id === 'status_but_enable' ) { el.style.display= 'block' ; }   ;
-          
-          if(el.id && el.id ===  'log_but_disable' ) { el.style.display= 'none' ; }  ;  
-           if(el.id && el.id === 'log_but_enable' ) { el.style.display= 'block' ; }  ;          
-                  
-          if(el.id && el.id === 'receiver_but_disable' ) { el.style.display= 'none' ; }  ; 
-          if(el.id && el.id === 'receiver_but_enable' ) { el.style.display= 'block' ; }  ;           
-            
-          if(el.id && el.id ===  'map_but_disable' ) { el.style.display= 'none' ; }  ;
-           if(el.id && el.id === 'map_but_enable' ) { el.style.display= 'block' ; }  ;         
-          
-          if(el.id && el.id === 'settings_but_disable' ) { el.style.display= 'none' ; } ;                          
-          if(el.id && el.id === 'settings_but_enable' ) { el.style.display= 'block' ; } ;             
-    });
+function initSpectrum() {
+    var canvas = document.getElementById('openwebrx-spectrum-canvas');
 
+    // Assume spectrum display behaving like the waterfall
+    canvas.addEventListener("mousedown", canvas_mousedown, false);
+    canvas.addEventListener("mousemove", canvas_mousemove, false);
+    canvas.addEventListener("mouseup", canvas_mouseup, false);
+    canvas.addEventListener("wheel", canvas_mousewheel, false);
+    canvas.addEventListener("touchmove", process_touch, false);
+    canvas.addEventListener("touchend", process_touch, false);
+    canvas.addEventListener("touchstart", process_touch, false);
+
+    // Create spectrum display
+    spectrum = new Spectrum(canvas, 150);
+}
+
+function toggleSpectrum() {
+    spectrum.toggle();
 }
 
 /*
@@ -2532,3 +2121,478 @@ function nr_changed() {
         }
     }));
 }
+
+
+
+function initTopBarMenu() {    // by I8FUC to support top bar ccomponents hiding by admin screens
+    $('#top_bar_buttons').find('.button').each(function () {
+        var el = this;
+          if(el.id && el.id === 'status_but_disable' ) { el.style.display= 'none' ; }   ;
+          if(el.id && el.id === 'status_but_enable' ) { el.style.display= 'block' ; }   ;
+          
+          if(el.id && el.id ===  'log_but_disable' ) { el.style.display= 'none' ; }  ;  
+           if(el.id && el.id === 'log_but_enable' ) { el.style.display= 'block' ; }  ;          
+                  
+          if(el.id && el.id === 'receiver_but_disable' ) { el.style.display= 'none' ; }  ; 
+          if(el.id && el.id === 'receiver_but_enable' ) { el.style.display= 'block' ; }  ;           
+            
+          if(el.id && el.id ===  'map_but_disable' ) { el.style.display= 'none' ; }  ;
+           if(el.id && el.id === 'map_but_enable' ) { el.style.display= 'block' ; }  ;         
+          
+          if(el.id && el.id === 'settings_but_disable' ) { el.style.display= 'none' ; } ;                          
+          if(el.id && el.id === 'settings_but_enable' ) { el.style.display= 'block' ; } ;   
+
+          if(el.id && el.id === 'files_but_disable' ) { el.style.display= 'none' ; } ;                          
+          if(el.id && el.id === 'files_but_enable' ) { el.style.display= 'block' ; } ; 
+         
+    });
+
+}
+
+
+// - eroyee add for dropdown menu select of different display options - //
+
+var wfStart = true;
+window.addEventListener("change", dispSelect); // from demodulators.js
+function dispSelect(evt) {
+    var sel = (change_display.value);
+    switch (sel) {
+        case '1':
+            if (timeseries_start) {
+                display_timeseries('stop');
+                setTimeout(function () {  // gets its tits in a tangle if restarted too quickly (when swapping between functions)
+                    ts_ticks = false;
+                    display_timeseries('start');
+                }, 100);
+            } else {
+                ts_ticks = false;
+                display_timeseries('start');
+            }
+            break;
+        case '2':
+            if (timeseries_start) {
+                display_timeseries('stop');
+                setTimeout(function () {
+                    ts_ticks = true;
+                    display_timeseries('start');
+                }, 100);
+            } else {
+                ts_ticks = true;
+                display_timeseries('start');
+            }
+            break;
+        case '3':
+            spec_start = false;
+            display_spectra('start', 'line');
+            break;
+        case '4':
+            spec_start = false;
+            display_spectra('start', 'fill');
+            break;
+        case '5':
+            if (wfStart) {
+                wfStart = false;
+            }
+            break;
+        case '6':
+            if (!wfStart) {
+                wfStart = true;
+            }
+            break;
+        default:
+            if (timeseries_start) {
+                ts_ticks = false;
+                display_timeseries('stop');
+            }
+            if (spec_start) {
+                display_spectra('stop', 0);
+            }
+    }
+}
+
+// - eroyee add for timeseries display, using spectrum container for present - //
+
+var timeSeriesCtx;
+var timeseries_start = false;
+const timeseries_window_h = 130;
+
+// modified by I8FUC 20220814
+const timeseries_data = new Array(screen.availWidth-34);		// do we want to start at the RHS?
+const timeseries_ticks = new Array(screen.availWidth-34).fill(0); 	// Follows from RHS      
+ 
+
+var ts_time;
+var ts_ticks = false;
+const ts_out_data = [0];
+function display_timeseries(status)
+{
+    if (spec_start) {
+        display_spectra('stop');
+    }
+    if ((!timeseries_start) && (status = 'start')) {
+       if ( ts_start === "lhs"){   // by I8FUC 20220812
+          timeseries_data.length = 0;
+          timeseries_ticks.length = 0;          
+          };
+    
+        var divTimeseries = '<div id="signal-div-timeseries">'
+                + '<canvas id="signal-canvas-timeseries" width="' + (screen.availWidth) + '" height="' + (timeseries_window_h) + '" style="width:100%;height:' + (timeseries_window_h) + 'px;left:0px;position:absolute;bottom:0px;">'
+                + '</div>';
+//eroyee; below to drop down time series container
+        document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
+        document.getElementById('spectrum_container').style.opacity = "1";
+        var div = document.querySelector(".openwebrx-spectrum-container");
+        div.insertAdjacentHTML('beforeEnd', divTimeseries);
+//eroyee; setup the canvas and start timeseries display
+        timeSeriesCtx = document.querySelector("#signal-canvas-timeseries").getContext('2d');
+        timeSeriesCtx.width = (screen.availWidth);
+        timeSeriesCtx.height = (spec_window_h); // one less than canvas height
+        if (ts_ticks) {
+            let date = new Date();
+            ts_time = date.getTime();
+            let mins = date.getMinutes();
+            let secs = date.getSeconds();
+//            timeseries_ticks.push(date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds()); // pushes time string without leading 0's for nums < 10
+            timeseries_ticks.push(date.getHours() + ":" + (mins = mins <= 9 ? '0' + mins : mins) + ":" + (secs = secs <= 9 ? '0' + secs : secs)); // gives leading 0's
+        }
+        timeseries_start = true;
+    } else {
+        if (status = 'stop') {
+            timeseries_start = false;
+            ts_ticks = false;
+            document.getElementById('spectrum_container').style.height = "0px";
+            document.getElementById('spectrum_container').style.opacity = "0";
+            const flush = document.querySelector("#signal-canvas-timeseries");
+            flush.parentNode.removeChild(flush);
+            timeseries_start = false;
+          //  timeseries_data.length = 0;   // removed by I8FUC
+          //  timeseries_ticks.length = 0;  // removed by I8FUC
+            ts_out_data.length = 0;
+            return;
+        }
+    }
+}
+
+// ------------ eroyee add for start/stop spectrum display -------------- //
+
+var specStyle;
+var screenCtx;
+var spectrumCtx;
+var spectrumGradient;
+const spec_data_in = [];
+var spec_start = false;
+const spec_window_h = 130; // sets height of spectrum + timeseries display
+const label_w = 34; // sets width of label column (ie. dB values)
+const spec_out_data = [];
+function display_spectra(status, style)
+{
+    if (timeseries_start) {
+        display_timeseries('stop');
+        ts_ticks = false;
+    }
+    if ((!spec_start) && (status = 'start')) {
+//console.log(status);
+        var divspectrum = '<div id="freq-div-spectrum">'
+                + '<canvas id="freq-canvas-spectrum" width="' + (fft_size) + '" height="' + (spec_window_h) + '" style="width:100%;height:' + (spec_window_h) + 'px;left:0px;position:absolute;bottom:0px;"></canvas>'
+                + '<canvas id="freq-canvas-spectrum-label" width="' + (label_w) + '" height="' + (spec_window_h) + '" style="width:' + (label_w) + ';height:' + (spec_window_h) + 'px;right:0px;position:absolute;bottom:0px"></canvas>'
+                + '</div>';
+//eroyee; below to drop down spectrum container
+        document.getElementById('spectrum_container').style.height = (spec_window_h) + "px";
+        document.getElementById('spectrum_container').style.opacity = "1";
+        var div = document.querySelector(".openwebrx-spectrum-container");
+        div.insertAdjacentHTML('beforeEnd', divspectrum);
+// eroyee; ensure new spectrum canvas is set with the same position and zoom level as the waterfall canvas (the label canvas is fixed and divorced from this)
+        document.querySelector("#freq-canvas-spectrum").style.left = document.querySelector("#webrx-canvas-container").style.left;
+        document.querySelector("#freq-canvas-spectrum").style.width = document.querySelector("#webrx-canvas-container").style.width;
+// eroyee set variables and canvas colours
+        spectrumCtx = document.querySelector("#freq-canvas-spectrum").getContext('2d');
+        spectrumCtx.width = (fft_size);
+        spectrumCtx.height = (spec_window_h) - 1; // one less than canvas height
+        spectrumGradient = spectrumCtx.createLinearGradient(0, 0, 0, spectrumCtx.height);
+        spectrumGradient.addColorStop(0.00, 'red'); // probably should align these colours with the waterfall...
+        spectrumGradient.addColorStop(0.50, 'yellow');
+        spectrumGradient.addColorStop(1.00, 'blue');
+// eroyee setup second small canvas to show -dB labels (since spectrum is expanded according to zoom)
+        screenCtx = document.querySelector("#freq-canvas-spectrum-label").getContext('2d');
+        screenCtx.width = (label_w);
+        screenCtx.height = (spec_window_h) - 1;
+// eroyee; initialise the spectrum and peak data arrays
+        for (i = 0; i < (fft_size); ++i) {
+            spec_peak_data[i] = 0; // initialise the peak data array with 0's
+        }
+        for (i = 0; i < (fft_size); ++i) {
+            spec_out_data[i] = 0;  // initialise the spectrum data array with 0's	    
+        }
+        specStyle = style;
+//console.log(specStyle);
+        spec_start = true;
+    } else {
+        if (status = 'stop') {
+//console.log(status);
+            spec_start = false;
+            document.getElementById('spectrum_container').style.height = "0px";
+            document.getElementById('spectrum_container').style.opacity = "0";
+            const flush = document.getElementById("freq-div-spectrum");
+            flush.parentNode.removeChild(flush);
+            spec_start = false;
+            return;
+        }
+    }
+}
+
+
+// ----------------- eroyee for starting peak hold display ---------------------
+
+const spec_peak_data = [];
+var peak_start = false;
+function peak_spectra_hold()
+{
+    if (!spec_start && !timeseries_start) {
+        peak_start = false;
+        return;
+    }
+    if (!peak_start) {
+        peak_start = true;
+        for (i = 0; i < (fft_size); ++i) {
+            spec_peak_data[i] = 0; // initialise the peak data array with 0's
+        }
+    } else if (peak_start) {
+        peak_start = false;
+        for (i = 0; i < (fft_size); ++i) {
+            spec_peak_data[i] = 0; // clear the peak data array with 0's
+        }
+        return;
+    }
+}
+
+// ---- eroyee additions to waterfall_add function for spectrum display ----- //
+
+
+// eroyee, clickbutton shift waterfall, apparently useful for mobile browsers // 
+
+function canLeft() {
+    if (zoom_center_rel > (-bandwidth / 1.5 + waterfallWidth() * zoom_center_where * range.hps)) {
+        zoom_center_rel -= range.hps * screen.availWidth * 0.5;    // 0.5 = scroll left for 50% of waterfall width
+        resize_canvases(false);
+        mkscale();
+        bookmarks.position();
+    }
+}
+
+function canRight() {
+    if (!(zoom_center_rel > (bandwidth / 1.5 - waterfallWidth() * (1 - zoom_center_where) * range.hps))) {
+        zoom_center_rel += range.hps * screen.availWidth * 0.5;    // 0.5 = scroll right for 50% of waterfall width
+        resize_canvases(false);
+        mkscale();
+        bookmarks.position();
+    }
+}
+
+// -------------------------------------------------------------------------- //
+
+
+
+/* eroyee, this is the original function (with mods) for css transform,
+ replacement using js is below this block. CSS *should* be better but it 
+ seems to increase CPU load considerably on low power machines:
+ 
+ function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
+ {
+ var logValue = getLogSmeterValue(value);
+ setSquelchSliderBackground(logValue);
+ var percent = (logValue + 100) / (100);  // waterfall min/max no longer affect s-meter, -0dBm should = 100%
+ setSmeterRelativeValue(percent);
+ $("#openwebrx-smeter-db").html(logValue.toFixed(1) + " dB");
+ }
+ 
+*/
+
+/* eroyee function to draw smeter with js, is not as smooth, but is a *lot* 
+ easier on remote CPU than using CSS transform; on a reasonable i7 
+ (Linux + Firefox) with css transform the system load was ~3, with this 
+ function it is typically < 2.
+ 
+ Signal should cause bar to rise quickly once timeout has completed, then decay 
+ slowly according to the value of decay.
+ 
+ This is probably more suited to SSB reception, particularly with the slow AGC 
+ as per my mods, although it shouldn't adversely affect AM/FM in most cases. 
+ 
+ SetTimeout is attempted in a probably futile effor to more closely sync bar
+ movement with audio, expect this to vary with relative CPU speed etc. Quite 
+ experimental and prob not be worth the effort...
+ */
+
+var sig_data; // EROYEE FOR TIMESERIES
+function setSmeterAbsoluteValue(value) //the value that comes from `csdr squelch_and_smeter_cc`
+{
+    var speak = 0;
+    var decay = 0.01;
+    var logValue = getLogSmeterValue(value);
+    sig_data = logValue; // EROYEE FOR TIMESERIES
+    var percent = (logValue + 82) / (82);  // eroyee; changed this so smeter is not affected by waterfall settings, set figure to reflect -dBm without ant
+    //    setTimeout(function(){
+    $("#openwebrx-smeter-db").html(logValue.toFixed(0) + "dB"); // eroyee; re-introduce dB levels for anyone that wants them
+//    },0.9);
+    setSquelchSliderBackground(logValue);
+    if (percent < 0) {
+        percent = 0;
+    }
+    if (percent > 1.0) {
+        percent = 1.0;
+    }
+    if (percent > speak) {
+        speak = percent;
+    } else {
+        speak = (speak - decay);
+    }
+    setTimeout(function () {
+        document.getElementById('openwebrx-smeter-bar').style.width = (speak * 100) + "%";
+    }, 300);
+// console.log(logValue, percent, speak);
+}
+/* -------------------------------------------------------------------------- */
+
+
+/* eroyee add for freq steps 22 Dec 2020, based on information from DJ1AN ----- 
+ - note this is optimised for tuning precision of 10Hz. Furture improvement to 
+ include that variable and adjust accordingly -----------------------------*/
+function toggleStepHz() {
+    if (StepHz == 1000) {
+        StepHz = 5000;
+        document.getElementById('stepchangeHz').innerHTML = "5";
+        document.getElementById('stepchangeHz').style.backgroundColor = "#04AA6D";
+    } else if (StepHz == 5000) {
+        StepHz = 9000;
+        document.getElementById('stepchangeHz').innerHTML = "9";
+        document.getElementById('stepchangeHz').style.backgroundColor = "blue";
+    } else if (StepHz == 9000) {
+        StepHz = 1000;
+        document.getElementById('stepchangeHz').innerHTML = "1";
+        document.getElementById('stepchangeHz').style.backgroundColor = "red";
+    }
+}
+
+function freqstep(sel) {
+    var stepsize = 0;
+    switch (sel) {
+        case 0:
+            stepsize = -StepHz;
+            break;
+        case 1:
+            stepsize = -100;
+            break;
+        case 2:
+            stepsize = -10;  // Will only work if 10Hz resolution is set
+            break;
+        case 3:
+            stepsize = 10;  // Will only work if 10Hz resolution is set
+            break;
+        case 4:
+            stepsize = 100;
+            break;
+        case 5:
+            stepsize = StepHz;
+            break;
+        default:
+            stepsize = 0;
+    }
+    var offset_frequency = $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().get_offset_frequency();
+    var tuned_freq = offset_frequency + center_freq;
+    var new_offset = 0;
+    if (Math.abs(stepsize) > 100) {    // do the 'snap' to kHz only for large step ranges
+        var HzFraction = tuned_freq - (Math.trunc(tuned_freq/1000)*1000);
+        if (HzFraction > 0) {
+            // not snapped to kHz, do not use the full stepsize but first snap to the nearest kHz value
+            if (stepsize < 0) {
+                new_offset = offset_frequency - HzFraction;
+            } else {
+                new_offset = offset_frequency + (1000 - HzFraction);
+            }
+        } else {
+            new_offset = (Math.round((offset_frequency + stepsize)/1000)*1000);  // eroyee; 'snap' the largest stepsize to nearest 1kHz
+        }
+    } else {
+        new_offset = (offset_frequency + stepsize);
+    }
+    if (new_offset !== offset_frequency) {
+        $('#openwebrx-panel-receiver').demodulatorPanel().getDemodulator().set_offset_frequency(new_offset);
+        // check to see if we need to scroll
+        tuned_freq = new_offset + center_freq;
+        var visible_freq_range = get_visible_freq_range();
+        if (stepsize > 0) {
+            var range_plus = visible_freq_range.end - visible_freq_range.center;
+            if ((tuned_freq - visible_freq_range.center) / range_plus > 0.7) {
+                canRight();
+            }
+	} else {
+            var range_min = visible_freq_range.center - visible_freq_range.start;
+            if ((visible_freq_range.center - tuned_freq) / range_min > 0.7) {
+                canLeft();
+            }
+	}
+
+    }
+}
+/* -------------------------------------------------------------------------- */
+
+/* eroyee add for keyboard tuning 28 Dec 20, step toggle May 2022 */
+
+function init_key_listener(keypress) {
+    document.addEventListener("keydown", function (keypress) {
+        // End 
+        if (keypress.keyCode == "35") {
+            toggleStepHz();
+        }
+        // PgUp
+        if (keypress.keyCode == "33") {
+            freqstep(5);
+        }
+        // PgDwn
+        if (keypress.keyCode == "34") {
+            freqstep(0);
+        }
+        // Up cursor
+        if (keypress.keyCode == "38") {
+            freqstep(4);
+        }
+        // Down Cursor
+        if (keypress.keyCode == "40") {
+            freqstep(1);
+        }
+        // Left Cursor
+        if (keypress.keyCode == "37") {
+            freqstep(2);
+        }
+        // Right Cursor
+        if (keypress.keyCode == "39") {
+            freqstep(3);
+        }
+    });
+}
+/*  ------------------------------------------------------------------------- */
+
+/* --------- eroyee add for switching transparent (Ghost) RX panel ---------- */
+
+var GhostRX = true;
+function ToggleGhostRX() {
+    if (GhostRX) {
+        GhostRX = false;
+        document.getElementById('GhostRX').innerHTML = "G";
+        document.getElementById('GhostRX').style.backgroundColor = "rgba(255,255,255,0.3)"; // using rgba, 'a' is opacity value
+        document.getElementById('GhostRX').style.fontWeight = "bold";
+//        document.getElementById('spectrum').style.backgroundColor = "rgba(255,165,0,0.3)"; // using rgba, 'a' is opacity value
+        document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "rgba(255,255,255,0)";
+//    qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,0)";
+    } else {
+        GhostRX = true;
+        document.getElementById('GhostRX').innerHTML = "G";
+        document.getElementById('GhostRX').style.backgroundColor = "black";
+        document.getElementById('openwebrx-panel-receiver').style.backgroundColor = "black";
+        document.getElementById('GhostRX').style.fontWeight = "normal";
+//        document.getElementById('spectrum').style.backgroundColor = "orange"; // using rgba, 'a' is opacity value
+//        qs("#openwebrx-button").style.backgroundColor = "rgba(55,55,55,1)"; 
+    }
+}
+
+

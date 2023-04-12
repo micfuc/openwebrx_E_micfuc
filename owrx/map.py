@@ -58,7 +58,6 @@ class Map(object):
 
     def addClient(self, client):
         self.clients.append(client)
-#        print("------------------>The  clients Array is: ", self.clients)  # by I8FUC
         client.write_update(
             [
                 {
@@ -67,8 +66,8 @@ class Map(object):
                     "lastseen": record["updated"].timestamp() * 1000,
                     "mode": record["mode"],
                     "direct": record["direct"],      # by I8FUC 20230324
-                    "path": record["path"],          # by I8FUC 20230403
                     "band": record["band"].getName() if record["band"] is not None else None,
+                    "hops": record["hops"],
                 }
                 for (callsign, record) in self.positions.items()
             ]
@@ -81,31 +80,39 @@ class Map(object):
         except ValueError:
             pass
 
-    def updateLocation(self, callsign, loc: Location, mode: str, direct: str , path: str, band: Band = None ):
-#    def updateLocation(self, callsign, loc: Location, mode: str, band: Band = None ):
+    def updateLocation(self, callsign, loc: Location, mode: str, direct: str , band: Band = None , hops: list[str] = [] ):
+        pm = Config.get()
+        preferRecent = pm["map_prefer_recent_reports"]
+        needBroadcast = False
         ts = datetime.now()
-# following 5 lines by I8FUC 20230325
+# following 3 lines by I8FUC 20230325
         if callsign in self.positions:
-           path = ''
            if( self.positions[callsign]["direct"] == '[DIR]') :
-              direct = '[DIR]'
-           if( self.positions[callsign]["path"]) :
-              path = self.positions[callsign]["path"]            
+              direct = '[DIR]'           
+#        print("------------------->The  positions Array is: ", self.positions)   # by I8FUC
+#        print("\n\n\n------------------->The  hops len is : ", len(hops))   # by I8FUC
+#        print("============== OLD HOPS =============>: ", hops)
         with self.positionsLock:
-            self.positions[callsign] = {"location": loc, "updated": ts, "mode": mode, "direct": direct , "path": path ,"band": band} # by I8FUC 20230324
-        self.broadcast(
-            [
-                {
-                    "callsign": callsign,
-                    "location": loc.__dict__(),
-                    "lastseen": ts.timestamp() * 1000,
-                    "mode": mode,
-                    "direct": direct,       # by I8FUC 20230324
-                    "path": path,           # by I8FUC 20230403
-                    "band": band.getName() if band is not None else None,
-                }
-            ]
-        )
+            # prefer messages with shorter hop count unless preferRecent set
+            if preferRecent or callsign not in self.positions or len(hops) <= len(self.positions[callsign]["hops"]):
+                self.positions[callsign] = {"location": loc, "updated": ts, "mode": mode, "direct": direct , "band": band, "hops": hops} # by I8FUC 20230324
+                needBroadcast = True
+#                print("============== NEW POSITION or POSITION CHANGE =============>: ", self.positions)
+#                print("============== NEW HOPS =============>: ", hops)
+        if needBroadcast:
+            self.broadcast(
+                [
+                    {
+                        "callsign": callsign,
+                        "location": loc.__dict__(),
+                        "lastseen": ts.timestamp() * 1000,
+                        "mode": mode,
+                        "direct": direct,       # by I8FUC 20230324
+                        "band": band.getName() if band is not None else None,
+                        "hops": hops,
+                    }
+                ]
+            )
 #        print("------------------->The  positions Array is: ", self.positions)   # by I8FUC
 
     def touchLocation(self, callsign):

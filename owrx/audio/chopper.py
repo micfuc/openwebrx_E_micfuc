@@ -12,12 +12,13 @@ import pickle
 import logging
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
+#logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG) # by I8FUC 20230409
 
 class AudioChopperParser(ABC):
     @abstractmethod
     def parse(self, profile: AudioChopperProfile, frequency: int, line: bytes):
+        logger.debug("Audio chopper param:", AudioChopperProfile, frequency , line ) # by I8FUC 20230409
         pass
 
 
@@ -79,13 +80,17 @@ class AudioChopper(ThreadModule, ProfileSourceSubscriber):
         self.setup_writers()
 
     def setDialFrequency(self, frequency: int) -> None:
+        logger.debug("setDialFrequency param:%d ", frequency  ) # by I8FUC 20230409
         self.dialFrequency = frequency
 
     def createJob(self, profile, filename):
+#        logger.debug("createJob param:", profile, filename  ) # by I8FUC 20230409
+        logger.debug("createJob param: dialFrequency: %d - filename: %s ", self.dialFrequency, filename  ) # by I8FUC 20230409
         return QueueJob(profile, self.dialFrequency, self, filename)
 
     def sendResult(self, result):
         for line in result.lines:
             data = self.parser.parse(result.profile, result.frequency, line)
             if data is not None and self.writer is not None:
+                logger.debug("chopper sendResult param:  data: %s ", data  ) # by I8FUC 20230409
                 self.writer.write(pickle.dumps(data))

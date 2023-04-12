@@ -81,6 +81,7 @@ class FeatureDetector(object):
         "wsjt-x": ["wsjtx"],
         "wsjt-x-2-3": ["wsjtx_2_3"],
         "wsjt-x-2-4": ["wsjtx_2_4"],
+        "msk144": ["msk144decoder"],
         "packet": ["direwolf"],
         "pocsag": ["digiham"],
         "js8call": ["js8", "js8py"],
@@ -262,7 +263,7 @@ class FeatureDetector(object):
             return False
 
     def _check_owrx_connector(self, command):
-        return self._check_connector(command, LooseVersion("0.5"))
+        return self._check_connector(command, LooseVersion("0.5"))  # by I8FUC was 0.5
 
     def has_rtl_connector(self):
         """
@@ -466,6 +467,13 @@ class FeatureDetector(object):
         """
         return self.has_wsjtx() and self._has_wsjtx_version(LooseVersion("2.4"))
 
+    def has_msk144decoder(self):
+        """
+        To decode the MSK144 digimode please install the "msk144decoder". See the
+        [project page](https://github.com/alexander-sholohov/msk144decoder) for more details.
+        """
+        return self.command_is_runnable("msk144decoder")
+
     def has_js8(self):
         """
         To decode JS8, you will need to install [JS8Call](http://js8call.com/)
@@ -481,7 +489,7 @@ class FeatureDetector(object):
         The js8py library is used to decode binary JS8 messages into readable text. More information is available on
         [its github page](https://github.com/jketterl/js8py).
         """
-        required_version = StrictVersion("0.1")
+        required_version = StrictVersion("0.1")  # by I8FUC was 0.1
         try:
             from js8py.version import strictversion
 

@@ -1,17 +1,16 @@
 function Header(el) {
     this.el = el;
     var is_firefox = navigator.userAgent.indexOf("Firefox") ;  // by I8FUC 
-    
+
     var $buttons = this.el.find('.openwebrx-main-buttons').find('[data-toggle-panel]').filter(function(){
         // ignore buttons when the corresponding panel is not in the DOM
         return $('#' + $(this).data('toggle-panel'))[0];
     });
 
-
     if (navigator.userAgent.indexOf("Firefox") >= 0){  // by I8FUC to support correct top bar buttons hiding on firefox derived browsers
-      $buttons.css({display: 'block'}).click(function () {    
+    $buttons.css({display: 'block'}).click(function () {
         toggle_panel($(this).data('toggle-panel'));
-        });
+    });
       }
     else{
       $buttons.click(function () {    

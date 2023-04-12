@@ -64,6 +64,18 @@
         </div>
         <div id="openwebrx-panels-container">
             <div id="openwebrx-panels-container-left">
+
+		<!-- eroyee, remove if don't want this -->
+		<div class="openwebrx-panel" data-panel-name="client-under-devel" style="width: 345px; background-color: Red;">
+                     <span style="font-size: 8pt; font-weight: bold;">Under construction</span>
+		     <br /><font size=1> We're working on the code right now, so the application might fail.</font>
+                </div>
+                <!--      -->
+                <!-- eroyee added class below to display client info in small box over waterfall  -->
+                <div class="openwebrx-panel" data-panel-name="client-info" style="width: 60px; font-size: 8pt; background-color: Blue;">
+                   <div class="openwebrx-info" id="openwebrx-bar-clients" data-type="clients"></div>
+                </div>
+
                 <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-sstv-message" style="display: none; width: 619px;" data-panel-name="sstv-message"></div>
                 <div class="openwebrx-panel" id="openwebrx-panel-digimodes" style="display: none; width: 619px;" data-panel-name="digimodes">
                     <div id="openwebrx-digimode-canvas-container">
@@ -241,7 +253,6 @@
                         <div class="openwebrx-button openwebrx-square-button openwebrx-zoom-button" onclick="zoomOutTotal();" title="Zoom out totally"><svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#zoom-out-total"></use></svg></div>
                         <button id="GhostRX" class="openwebrx-GhostRX-button" onclick="ToggleGhostRX()" style="margin-left:0px" title="Transparent RX on/off" >G</button>
                         <button id="peak" class="openwebrx-SpectraHold-button" onclick="peak_spectra_hold()" style="margin-left:1px" title="Spectrum peak hold on/off">^</button>
-                     
                         <div class="openwebrx-button openwebrx-square-button openwebrx-record-button" onclick="toggleRecording();" title="Record audio">REC</div>
                                 <div   id="openwebrx-smeter-db">0 dB</div>  
                                 <!-- eroyee, add class for S-meter scale, 25 May 22 -->

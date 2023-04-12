@@ -133,6 +133,7 @@ class Modes(object):
         WsjtMode("fst4", "FST4", requirements=["wsjt-x-2-3"]),
         WsjtMode("fst4w", "FST4W", bandpass=Bandpass(1350, 1650), requirements=["wsjt-x-2-3"]),
         WsjtMode("q65", "Q65", requirements=["wsjt-x-2-4"]),
+        DigitalMode("msk144", "MSK144", requirements=["msk144"], underlying=["usb"], service=True),
         Js8Mode("js8", "JS8Call"),
         DigitalMode(
             "packet",
@@ -144,7 +145,7 @@ class Modes(object):
             squelch=False,
         ),
         DigitalMode(
-            "spectrum",
+            "zview",
             "Zoom",
             underlying=["sp50","sp25","sp15","sp10","sp5","sp2","nfm", "usb", "lsb"],        
             requirements=["packet"],

@@ -1,3 +1,23 @@
+openwebrx (1.2.11-micfuc) bullseye jammy; urgency=low
+
+  * Added support for the MSK144 digimode from jakob.ketterl vr 1.3.0 
+  * Now tracking and displaying paths taken by APRS packets.
+  * Added option to draw a frame around the receiver panel.
+  * Added option to prefer direct APRS reports to relayed ones.
+  * Added map option to turn off the colored squares.
+  * Added 145.825MHz APRS frequency for the ISS repeater.
+  * Fixed waterfall hangup when zooming at the edge of a band.
+  * Fixed computing paths traversed by APRS packets.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Tue, 4 Apr 2023 16:12:00 +0000
+
+openwebrx (1.2.10) bullseye jammy; urgency=low
+
+  * Added spectrum display, toggled with a receiver panel button.
+  * Added a setting to change how opaque the user interface is.
+
+ -- Marat Fayzullin <luarvique@gmail.com>  Sat, 25 Mar 2023 16:12:00 +0000
+
 openwebrx (1.2.9) bullseye jammy; urgency=low
 
   * Fixed missing 'N' letters in RTTY and CW decoders output.

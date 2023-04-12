@@ -1,3 +1,33 @@
+**1.2.11-micfuc**
+- This is a local personal version of openwebrx; it is a merge of the main openwebrx variants available over github in the last months
+- The base version is the Marat openwebrx+ variant that in the one that introduced massive additions with reference to the Jakob original version
+- for additional details see  **1.2.9-micfuc**
+- In addition this includes following additions:
+  - code cleanup to better segregate non openwebrc+ features/added code
+  - DIR/RPT indication in packet display log with different color
+  - addition od "best path" indication for APRS spots in map view
+  - addition of admin control of "SSTV files" link on main screen 
+  - addition of admin option for file page display enable/disable
+  - re-addition of "Under construction" panel to allow insertion in openwebrx.de directory
+  - addition of small client display from ivancarcus
+  - addition in map view of display of the map timespan presently  active and direct link to metrics page for details on spots numbers and types
+  - Redirected main logging to a /var/log file for easy debugging during development phase
+
+**1.2.11**
+- Made receiver panel collapsible, to free screen estate.
+- Now tracking and displaying paths taken by APRS packets.
+- Added option to draw a frame around the receiver panel.
+- Added option to prefer direct APRS reports to relayed ones.
+- Added map option to turn off the colored squares.
+- Added 145.825MHz APRS frequency for the ISS repeater.
+- Fixed waterfall hangup when zooming at the edge of a band.
+- Fixed computing paths traversed by APRS packets.
+
+**1.2.10**
+- Added spectrum display, toggled with a receiver panel button.
+- Added a setting to change how opaque the user interface is.
+
+
 **1.2.9-micfuc**
 - This is a local personal version of openwebrx; it is a merge of the main openwebrx variants available over github in the last months
 - The base version is the Marat openwebrx+ variant that in the one that introduced massive additions with reference to the Jakob original version

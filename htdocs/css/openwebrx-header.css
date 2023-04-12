@@ -12,19 +12,6 @@
     overflow: hidden;
 }
 
-.webrx-top-container-black {   // by I8FUC to support ivanmarcus black_mod
-    position: relative;
-    z-index:1000;
-    background-color: #000; /* eroyee; black scheme */
-    background-position-x: center;
-    background-position-y: top;
-    background-repeat: no-repeat;
-    background-size: cover;
-
-    overflow: hidden;
-}
-
-
 .openwebrx-description-container {
     transition-property: height, opacity;
     transition-duration: 1s;
@@ -42,19 +29,9 @@
     height: 283px; /* eroyee dropped from 283 to to 238px in case added to spectrum - back by I8FUC */
 }
 
-/* eroyee add for spectrum display */
-
-.openwebrx-spectrum-container {
-    display: flex;
-    width: 100%;
-    height: 0px;
-    max-height: 256px;
-    overflow: hidden;
-}
-
 .webrx-top-bar {
-/* eroyee; change height to 40px from 67px - moved  to 45 by I8FUC */
-    height:45px;
+    height:45px; /* eroyee; change height to 40px from 67px - moved  to 45 by I8FUC */
+
     background: rgba(128, 128, 128, 0.15);
     margin:0;
     padding:0;
@@ -249,3 +226,27 @@
 .openwebrx-rx-details-arrow--up .up {
     display: initial;
 }
+
+
+.webrx-top-container-black {   // by I8FUC to support ivanmarcus black_mod
+    position: relative;
+    z-index:1000;
+    background-color: #000; /* eroyee; black scheme */
+    background-position-x: center;
+    background-position-y: top;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    overflow: hidden;
+}
+
+/* eroyee add for spectrum display */
+
+.openwebrx-spectrum-container {
+    display: flex;
+    width: 100%;
+    height: 0px;
+    max-height: 256px;
+    overflow: hidden;
+}
+

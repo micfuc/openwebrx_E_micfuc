@@ -104,7 +104,7 @@ $(function(){
             var disabled = rectangleFilter(fakeRectangle) ? '' : ' disabled';
             return '<li class="square' + disabled + '" data-selector="' + key + '"><span class="illustration" style="background-color:' + chroma(value).alpha(fillOpacity) + ';border-color:' + chroma(value).alpha(strokeOpacity) + ';"></span>' + key + '</li>';
         });
-        $(".openwebrx-map-legend .content").html('<ul>' + lis.join('') + '</ul>');
+        $(".openwebrx-map-legend .content").html('<ul>' + lis.join('') + '</ul>'+ '<br>TimeSpan=' + Math.ceil(map_position_retention_time/3600) +' hours' + '<br><a href="/metrics" target="metrics" >Detailed metrics</a>');  // by I8FUC 20230411
     }
 
     var processUpdates = function(updates) {
@@ -142,10 +142,8 @@ $(function(){
                     }, aprsOptions, getMarkerOpacityOptions(update.lastseen) ));
                     marker.lastseen = update.lastseen;
                     marker.mode     = update.mode;
+                    marker.hops     = update.hops;
                     marker.direct   = update.direct;   // by I8FUC 20230324
-                    marker.path     = update.path;   // by I8FUC 20230403
-//                    if(update.direct == '[DIR]') { marker.direct   = update.direct; marker.path   = update.path;} ; // by I8FUC 20230324
-//                    if((update.direct == '[RPT]' ) && ( marker.direct != '[DIR]') ) { marker.direct   = update.direct; marker.path   = update.path;} ; // by I8FUC 20230324
                     marker.band     = update.band;
                     marker.comment  = update.location.comment;
                     marker.weather  = update.location.weather;
@@ -248,7 +246,11 @@ $(function(){
                 var json = JSON.parse(e.data);
                 switch (json.type) {
                     case "config":
-                        Object.assign(config, json.value);
+                        Object.assign(config, json.value);   
+                        if ('map_position_retention_time' in config) {              // by I8FUC 20230411
+                           map_position_retention_time = config['map_position_retention_time'];
+//        		   console.log("timespan=", map_position_retention_time);
+                           } ;
                         if ('receiver_gps' in config) {
                             var receiverPos = {
                                 lat: config.receiver_gps.lat,
@@ -450,6 +452,7 @@ $(function(){
         var commentString = "";
         var weatherString = "";
         var detailsString = "";
+        var hopsString = "";
         var distance = "";
 
         if (marker.comment) {
@@ -500,11 +503,9 @@ $(function(){
             weatherString += '</p>';
         }
 
-//        if( marker.direct == '[RPT]' ) {marker.direct = '<font color=red > <B> ' + marker.direct + '<font color=black > </B>'; } else { marker.direct = '<font color=black> <B>' + marker.direct + '</B>';};   // by I8FUC
         if( marker.direct == '[RPT]' ) {
              marker.direct = '<font color=red > <B> ' + marker.direct + '<font color=black > </B>'; 
              detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
-             detailsString += makeListItem('last via ', marker.path);           // by I8FUC 20230403
              } 
         else { 
              marker.direct = '<font color=black> <B>' + marker.direct + '</B>';
@@ -562,10 +563,20 @@ $(function(){
             distance = " at " + distanceKm(receiverMarker.position, marker.position) + " km";
         }
 
+        if (marker.hops && marker.hops.length > 0) {
+            var hops = marker.hops.toString().split(',');
+            hops.forEach(function(part, index, hops) {
+                hops[index] = linkifyCallsign(part);
+            });
+
+            hopsString = '<p align="right"><i>via ' + hops.join(', ') + '&nbsp;</i></p>';
+        }
+
         infowindow.setContent(
             '<h3>' + linkifyCallsign(callsign) + distance + '</h3>' +
-            '<div align="center">' + timestring + ' using ' + marker.mode + ( marker.band ? ' on ' + marker.band : '' ) + '</div>' +
-            commentString + weatherString + detailsString
+            '<div align="center">' + timestring + ' using ' + marker.mode +
+            ( marker.band ? ' on ' + marker.band : '' ) + '</div>' +
+            commentString + weatherString + detailsString + hopsString
         );
 
         infowindow.open(map, marker);

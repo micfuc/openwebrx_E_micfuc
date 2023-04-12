@@ -7,8 +7,10 @@ from owrx.form.input import (
     FloatInput,
     TextAreaInput,
     DropdownInput,
+    CheckboxInput,
     Option,
 )
+from owrx.form.input.validator import RangeValidator
 from owrx.form.input.converter import WaterfallColorsConverter, IntConverter
 from owrx.form.input.receiverid import ReceiverKeysConverter
 from owrx.form.input.gfx import AvatarInput, TopPhotoInput
@@ -112,7 +114,7 @@ class GeneralSettingsController(SettingsFormController):
                         Option("map_but_disable", "Disable"),
                     ],
                 ),
-                DropdownInput(
+                DropdownInput(             # by I8FUC 20230404
                     "settings_button",
                     "Settings Page Button Display",
                     infotext="Direct link to Receiver Settings Page Display ",
@@ -120,7 +122,16 @@ class GeneralSettingsController(SettingsFormController):
                         Option("settings_but_enable", "Enable"),
                         Option("settings_but_disable", "Disable"),
                     ],
-                ),                                                
+                ),  
+                DropdownInput(
+                    "files_button",
+                    "Files Page Button Display",
+                    infotext="Direct link to Files(SSTV) Page Display ",
+                    options=[
+                        Option("files_but_enable", "Enable"),
+                        Option("files_but_disable", "Disable"),
+                    ],
+                ),                                              
             ),            
             Section(
                 "Receiver limits",
@@ -221,6 +232,18 @@ class GeneralSettingsController(SettingsFormController):
             ),
             Section(
                 "Display settings",
+                NumberInput(
+                    "ui_opacity",
+                    "User interface opacity",
+                    infotext="Specifies how opaque user interface is, "
+                    + "10% for near invisible, 100% for totally solid.",
+                    validator=RangeValidator(10, 100),
+                    append="%",
+                ),
+                CheckboxInput(
+                    "ui_frame",
+                    "Show frame around receiver panel",
+                ),
                 DropdownInput(
                     "tuning_precision",
                     "Tuning precision",
@@ -242,6 +265,10 @@ class GeneralSettingsController(SettingsFormController):
                     "Map retention time",
                     infotext="Specifies how log markers / grids will remain visible on the map",
                     append="s",
+                ),
+                CheckboxInput(
+                    "map_prefer_recent_reports",
+                    "Prefer more recent position reports to shorter path reports",
                 ),
                 TextInput(
                     "callsign_url",
