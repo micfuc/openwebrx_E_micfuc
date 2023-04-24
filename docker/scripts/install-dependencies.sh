@@ -7,6 +7,9 @@ function cmakebuild() {
   if [[ ! -z "${2:-}" ]]; then
     git checkout $2
   fi
+  if [[ -f ".gitmodules" ]]; then
+    git submodule update --init
+  fi
   mkdir build
   cd build
   cmake ${CMAKE_ARGS:-} ..
@@ -51,14 +54,18 @@ rm /js8call-hamlib.patch
 cmakebuild ${JS8CALL_DIR}
 rm ${JS8CALL_TGZ}
 
-WSJT_DIR=wsjtx-2.5.4
+WSJT_DIR=wsjtx-2.6.1
 WSJT_TGZ=${WSJT_DIR}.tgz
-wget http://physics.princeton.edu/pulsar/k1jt/${WSJT_TGZ}
+wget https://downloads.sourceforge.net/project/wsjt/${WSJT_DIR}/${WSJT_TGZ}
 tar xfz ${WSJT_TGZ}
 patch -Np0 -d ${WSJT_DIR} < /wsjtx-hamlib.patch
 mv /wsjtx.patch ${WSJT_DIR}
 cmakebuild ${WSJT_DIR}
 rm ${WSJT_TGZ}
+
+git clone https://github.com/alexander-sholohov/msk144decoder.git
+# latest from main as of 2023-02-21
+MAKEFLAGS="" cmakebuild msk144decoder fe2991681e455636e258e83c29fd4b2a72d16095
 
 git clone --depth 1 -b 1.6 https://github.com/wb2osz/direwolf.git
 cd direwolf

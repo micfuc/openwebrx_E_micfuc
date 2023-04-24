@@ -1,19 +1,61 @@
+**1.2.12-micfuc**
+- This is a local personal version of openwebrx; it is a merge of the main openwebrx variants available over github in the last months
+- The base version is the Marat openwebrx+ vr. 1.2.12 variant that in the one that introduced massive additions with reference to the Jakob original version
+- for additional details see  **1.2.9-micfuc**  and  **1.2.11-micfuc**
+- In addition this includes following features and/or changes:
+  - Added in the map view a new color mode named "Only Direct" to make a visual  attenuation of all the APRS spots not surely received via direct
+    radio path from the spot source.
+  - Added few weather fax frequencies in the bands.json file
+  - changed from 200K to 378k the siz of the WFM decoder
+  - Introduction of a "Proof of concept" of two new features  devoted to a "single user or admin mode " of operation of a OWRX installation
+    this features are then intended to be used by a logged in admin in order to simplify and speedup the operations required to setup new profiles and to optimize their tuning.
+    Anotter special use case is to implement a "pseudo scanner or jump mode" to perform unattended flexible operation of a OWRX installation.
+  - First admin-only feature is named "Agile Mode"; it consists in the definition of a special profile called "Agile Mode" that allows , 
+    only to a logged in administrator, to modify the tuning frequency directly from the main OWRX window in realtime; in this stage the 
+    parameters for this functionality are not jet manageable via the admin screen; this will fallowup asap. 
+    This code has been inspired and derivated from a message posted on the OWRX group https://groups.io/g/openwebrx/topic/88587539#4921 
+    thanks to the author for the idea...  
+   -The second admin-only feature is a "pseudo-scanner or jumper ": it is a tool that when enabled via a new button on RX panel (on the lower right corner 
+    of the main screen) allows to perform autonomously the jmping at fixed time intervals ( at present) bethween a group of profiles.
+    The objective of this feature is to setup a OWRX installation as a tool for continous scanning of a number of profiles to get an updated status of 
+    the propagation on the selected bands.  Also this feature is missing at present the admin interface ; it will be added asap.
+   - To use these two new features the following use pattern is required at present and could be improved in the future:
+          - login as administrator on the admin view page ; no operation is required in addition to logging in
+          - select at least one time the "agile Mode" profile and set a frequency or do a step on that profie 
+            via the arrows present at either sides of the frequency display value on the RX panel
+          - now staing in the Agile Mode profile it is possible to  "jump" left or right for 500 Khz 
+            or just enter a frequency value in the frequency field and the OWRX will immediately jump to that tuning point with 
+            the attributes of the Agile Mode profile ( i.e. sampling frequency, etc.)...
+          - To use the "jumping mode"  just select the "J" button on the bottom part of the RX panel ; to stop scanning push again
+          - The J button will flash at 1 sec period while the scanning in is progress
+          - All the parameters of this mechanisms are changeable at present via patches ; further
+            step would be to let them be changeable via amin screen.
+
+**1.2.12 original **
+- Added FAX decoder, tested on weather fax transmissions.
+- Added FAX background decoding service (not tested).
+- Added option to ignore indirect APRS reports.
+- Fixed a minor JavaScript error on startup.
+- Optimized SSTV decoder code.
+
 **1.2.11-micfuc**
 - This is a local personal version of openwebrx; it is a merge of the main openwebrx variants available over github in the last months
-- The base version is the Marat openwebrx+ variant that in the one that introduced massive additions with reference to the Jakob original version
+- The base version is the Marat openwebrx+ vr. 1.2.11 variant that in the one that introduced massive additions with reference to the Jakob original version
 - for additional details see  **1.2.9-micfuc**
 - In addition this includes following additions:
-  - code cleanup to better segregate non openwebrc+ features/added code
+  - code cleanup to better segregate non openwebrx+ features/added code
   - DIR/RPT indication in packet display log with different color
   - addition od "best path" indication for APRS spots in map view
   - addition of admin control of "SSTV files" link on main screen 
+  - addition of "Agile-Mode" to allow direct center frequency control from main screen ad admin managed feature
+  - Addition of "jumper mode" to allow automatic jumping of a number of specified profiles avere definet interval tim; managed by admin and as an admin only feature
   - addition of admin option for file page display enable/disable
   - re-addition of "Under construction" panel to allow insertion in openwebrx.de directory
   - addition of small client display from ivancarcus
   - addition in map view of display of the map timespan presently  active and direct link to metrics page for details on spots numbers and types
   - Redirected main logging to a /var/log file for easy debugging during development phase
 
-**1.2.11**
+**1.2.11 original **
 - Made receiver panel collapsible, to free screen estate.
 - Now tracking and displaying paths taken by APRS packets.
 - Added option to draw a frame around the receiver panel.

@@ -6,7 +6,6 @@ from owrx.controllers.assets import OwrxAssetsController, AprsSymbolsController,
 from owrx.controllers.websocket import WebSocketController
 from owrx.controllers.api import ApiController
 from owrx.controllers.metrics import MetricsController
-#from owrx.controllers.scanners import ScannersController  # by I8FUC
 from owrx.controllers.settings import SettingsController
 from owrx.controllers.settings.general import GeneralSettingsController
 from owrx.controllers.settings.sdr import (
@@ -35,7 +34,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-
+#logger.setLevel(logging.DEBUG) # by I8FUC 20230409
 
 class Request(object):
     def __init__(self, url, method, headers):

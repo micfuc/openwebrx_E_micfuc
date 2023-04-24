@@ -652,6 +652,9 @@ class DspManager(SdrSourceEventClient, ClientDemodulatorSecondaryDspEventClient)
         elif mod == "sstv":
             from csdr.chain.digimodes import SstvDemodulator
             return SstvDemodulator()
+        elif mod == "fax":
+            from csdr.chain.digimodes import FaxDemodulator
+            return FaxDemodulator()
 
     def setSecondaryDemodulator(self, mod):
         demodulator = self._getSecondaryDemodulator(mod)

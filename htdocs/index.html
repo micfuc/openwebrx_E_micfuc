@@ -77,6 +77,7 @@
                 </div>
 
                 <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-sstv-message" style="display: none; width: 619px;" data-panel-name="sstv-message"></div>
+                <div class="openwebrx-panel openwebrx-message-panel" id="openwebrx-panel-fax-message" style="display: none; width: 619px;" data-panel-name="fax-message"></div>
                 <div class="openwebrx-panel" id="openwebrx-panel-digimodes" style="display: none; width: 619px;" data-panel-name="digimodes">
                     <div id="openwebrx-digimode-canvas-container">
                         <div id="openwebrx-digimode-select-channel"></div>
@@ -253,6 +254,9 @@
                         <div class="openwebrx-button openwebrx-square-button openwebrx-zoom-button" onclick="zoomOutTotal();" title="Zoom out totally"><svg viewBox="0 0 80 80"><use xlink:href="static/gfx/svg-defs.svg#zoom-out-total"></use></svg></div>
                         <button id="GhostRX" class="openwebrx-GhostRX-button" onclick="ToggleGhostRX()" style="margin-left:0px" title="Transparent RX on/off" >G</button>
                         <button id="peak" class="openwebrx-SpectraHold-button" onclick="peak_spectra_hold()" style="margin-left:1px" title="Spectrum peak hold on/off">^</button>
+
+                        <button id="jump" class="openwebrx-jmp-button" onclick="jump_profile()" style="margin-left:1px" title="Jump profile">J</button>   <!-- by I8FUC -->                  
+
                         <div class="openwebrx-button openwebrx-square-button openwebrx-record-button" onclick="toggleRecording();" title="Record audio">REC</div>
                                 <div   id="openwebrx-smeter-db">0 dB</div>  
                                 <!-- eroyee, add class for S-meter scale, 25 May 22 -->

@@ -200,6 +200,7 @@ class AprsParser(PickleModule):
     def process(self, data):
         try:
             # TODO how can we tell if this is an APRS frame at all?
+#            logger.debug("raw APRS data: %s", data)
             aprsData = self.parseAprsData(data)
 
             # the frontend uses this to distinguish messages from the different parsers
@@ -234,7 +235,7 @@ class AprsParser(PickleModule):
                     source = mapData["item"]
                 elif mapData["type"] == "object":
                     source = mapData["object"]
-            Map.getSharedInstance().updateLocation(source, loc, mode, direct , self.band,hops) # by I8FUC 20230324 - 20230403
+            Map.getSharedInstance().updateLocation(source, loc, mode, direct , self.band, hops) # by I8FUC 20230324 - 20230403
 
     def hasCompressedCoordinates(self, raw):
         return raw[0] == "/" or raw[0] == "\\"

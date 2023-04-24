@@ -9,11 +9,8 @@ import threading
 import logging
 
 logger = logging.getLogger(__name__)
-#logger.setLevel(logging.INFO)
-logger.setLevel(logging.DEBUG)  # by I8FUC 20230409
+logger.setLevel(logging.INFO)
 
-
-#        logger.debug("createJob param: dialFrequency: %d - filename: %s ", self.dialFrequency, filename  ) # by I8FUC 20230409
 
 class QueueJobResult:
     def __init__(self, profile, frequency, lines):
@@ -48,7 +45,6 @@ class QueueJob(object):
 
         # keep this out of the try/except
         if lines is not None:
-            logger.debug("runJob sendResult param: frequency: %d - lines: %s ", self.frequency, lines  ) # by I8FUC 20230409
             self.writer.sendResult(QueueJobResult(self.profile, self.frequency, lines))
 
         try:

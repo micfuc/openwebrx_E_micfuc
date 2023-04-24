@@ -1,6 +1,3 @@
-
-
-
 OpenWebRX+
 =========
 
@@ -14,8 +11,7 @@ This is the **improved version** of the OpenWebRX online SDR. The pre-built Open
 * Bandpass control with the scroll wheel.
 * Improved tuning in CW mode.
 * More reliable SDRPlay devices operation.
-* Better map information, with distances.
-* Better APRS map information, with weather.
+* Better map information, with distances, APRS paths, weather, etc.
 * Support for configurable session timeout, with a policy page.
 * HTTPS protocol support (requires certificate).
 

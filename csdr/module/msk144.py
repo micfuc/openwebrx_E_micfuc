@@ -5,11 +5,11 @@ import pickle
 
 import logging
 logger = logging.getLogger(__name__)
-
+logger.setLevel(logging.DEBUG)  # by I8FUC 20230415
 
 class Msk144Module(PopenModule):
     def getCommand(self):
-        return ["msk144decoder"]
+        return ["msk144decoder","--file-log-enable=1","--file-log-workdir=/var/log/"]
 
     def getInputFormat(self) -> Format:
         return Format.SHORT
@@ -45,6 +45,7 @@ class ParserAdapter(ThreadModule):
                 for line in lines[0:-1]:
                     # actual messages from msk144decoder should start with "*** "
                     if line[0:4] == b"*** ":
+                        logger.debug("runJob msk144  param: frequency: %d - lines: %s ", self.dialFrequency, line[4:]  ) # by I8FUC 20230415
                         self.writer.write(pickle.dumps(self.parser.parse(profile, self.dialFrequency, line[4:])))
 
     def getInputFormat(self) -> Format:

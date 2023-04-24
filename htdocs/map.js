@@ -82,6 +82,8 @@ $(function(){
                 return r.band;
             case 'bymode':
                 return r.mode;
+            case 'bypath':            // by I8FUC 20230424
+                return r.off;
             case 'off':
                 return '';
         }
@@ -135,11 +137,12 @@ $(function(){
                         });
                         markers[update.callsign] = marker;
                     }
+//                    console.log("=====> update before is :", update ); // by I8FUC 20230423
                     marker.setOptions($.extend({
                         position: pos,
                         map: map,
                         title: update.callsign
-                    }, aprsOptions, getMarkerOpacityOptions(update.lastseen) ));
+                    }, aprsOptions, getMarkerOpacityOptions(update.lastseen, update.direct) ));  // by I8FUC 20230423 added direct parameter
                     marker.lastseen = update.lastseen;
                     marker.mode     = update.mode;
                     marker.hops     = update.hops;
@@ -153,7 +156,7 @@ $(function(){
                     marker.gain     = update.location.gain;
                     marker.device   = update.location.device;
                     marker.directivity = update.location.directivity;
-
+//                    console.log("==after===> marker  title direct   opacity ", marker.title, marker.direct  , marker.opacity );
                     if (expectedCallsign && expectedCallsign == update.callsign) {
                         map.panTo(pos);
                         showMarkerInfoWindow(update.callsign, pos);
@@ -454,6 +457,7 @@ $(function(){
         var detailsString = "";
         var hopsString = "";
         var distance = "";
+        var temp_direct = "" ;   //by I8FUC
 
         if (marker.comment) {
             commentString += '<p>' + makeListTitle('Comment') + '<div>' +
@@ -503,13 +507,16 @@ $(function(){
             weatherString += '</p>';
         }
 
+        // following if then else added by I8FUC 
         if( marker.direct == '[RPT]' ) {
-             marker.direct = '<font color=red > <B> ' + marker.direct + '<font color=black > </B>'; 
-             detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
+	     temp_direct = '<font color=red > <B> ' + marker.direct + '<font color=black > </B>';
+             detailsString += makeListItem('Best RX Path', temp_direct);  // by I8FUC
+//	     detailsString += makeListItem('Opacity', marker.opacity);  // by I8FUC
              } 
         else { 
-             marker.direct = '<font color=black> <B>' + marker.direct + '</B>';
-             detailsString += makeListItem('Best RX Path', marker.direct);  // by I8FUC
+             temp_direct = '<font color=black> <B>' + marker.direct + '</B>';
+             detailsString += makeListItem('Best RX Path', temp_direct);  // by I8FUC
+//	     detailsString += makeListItem('Opacity', marker.opacity);  // by I8FUC
              };   // by I8FUC        
 
 
@@ -608,8 +615,10 @@ $(function(){
         };
     };
 
-    var getMarkerOpacityOptions = function(lastseen) {
+    var getMarkerOpacityOptions = function(lastseen, direct) {  // by I8FUC 20230423  added direct param
         var scale = getScale(lastseen);
+	if (( direct != '[DIR]') && ( colorMode == 'bypath')    ) scale = scale * 0.3;  // by I8FUC 20230423  to distinguish digireated spots on map...
+//        console.log("=====> getMarkerOpacityOptions: colorMode direct opacity scale :", colorMode,  direct , scale  ); // by I8FUC 20230423 
         return {
             opacity: scale
         };
@@ -634,7 +643,7 @@ $(function(){
                 m.setMap();
                 return;
             }
-            m.setOptions(getMarkerOpacityOptions(m.lastseen));
+            m.setOptions(getMarkerOpacityOptions(m.lastseen, m.direct));
         });
     }, 1000);
 

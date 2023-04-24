@@ -327,11 +327,11 @@ SstvMessagePanel.prototype.pushMessage = function(msg) {
         var pixels = atob(msg.pixels);
         var img = this.ctx.createImageData(msg.width, 1);
         // Convert BMP BGR pixels into HTML RGBA pixels
-        for (var x = 0; x < msg.width; x++) {
-            img.data[x*4 + 0] = pixels.charCodeAt(x*3 + 2);
-            img.data[x*4 + 1] = pixels.charCodeAt(x*3 + 1);
-            img.data[x*4 + 2] = pixels.charCodeAt(x*3 + 0);
-            img.data[x*4 + 3] = 0xFF;
+        for(var x = 0, y = 0; x < msg.width*3; ) {
+            img.data[y++] = pixels.charCodeAt(x++);
+            img.data[y++] = pixels.charCodeAt(x++);
+            img.data[y++] = pixels.charCodeAt(x++);
+            img.data[y++] = 0xFF;
         }
         // Render scanline
         this.ctx.putImageData(img, 0, msg.line);
@@ -341,6 +341,87 @@ SstvMessagePanel.prototype.pushMessage = function(msg) {
 $.fn.sstvMessagePanel = function() {
     if (!this.data('panel')) {
         this.data('panel', new SstvMessagePanel(this));
+    }
+    return this.data('panel');
+};
+
+FaxMessagePanel = function(el) {
+    MessagePanel.call(this, el);
+    this.initClearTimer();
+}
+
+FaxMessagePanel.prototype = new MessagePanel();
+
+FaxMessagePanel.prototype.supportsMessage = function(message) {
+    return message['mode'] === 'Fax';
+};
+
+FaxMessagePanel.prototype.render = function() {
+    $(this.el).append($(
+        '<table>' +
+            '<thead><tr>' +
+                '<th class="message">Fax</th>' +
+            '</tr></thead>' +
+            '<tbody></tbody>' +
+        '</table>'
+    ));
+};
+
+FaxMessagePanel.prototype.pushMessage = function(msg) {
+    var $b = $(this.el).find('tbody');
+    if(msg.hasOwnProperty('message')) {
+        // Append a new debug message text
+// See service log for debug output instead
+//        $b.append($('<tr><td class="message">' + msg.message + '</td></tr>'));
+//        $b.scrollTop($b[0].scrollHeight);
+    }
+    else if(msg.width>0 && msg.height>0 && !msg.hasOwnProperty('line')) {
+        var f = msg.frequency>0? ' at ' + Math.floor(msg.frequency/1000) + 'kHz' : '';
+        var h = '<div>' + msg.timestamp + ' ' + msg.width + 'x' + msg.height +
+            ' ' + msg.faxMode + f + '</div>';
+        var c = '<div onclick="saveCanvas(\'' + msg.filename + '\');">' +
+            '<canvas class="frame" id="' + msg.filename +
+            '" width="' + msg.width + '" height="' + msg.height +
+            '"></canvas></div>';
+        // Append a new canvas
+        $b.append($('<tr><td class="message">' + h + c + '</td></tr>'));
+        $b.scrollTop($b[0].scrollHeight);
+        // Save canvas context and dimensions for future use
+        this.ctx    = $(this.el).find('canvas').get(-1).getContext("2d");
+        this.width  = msg.width;
+        this.height = msg.height;
+    }
+    else if(msg.width>0 && msg.height>0 && msg.line>=0 && msg.hasOwnProperty('pixels')) {
+        // Will copy pixels to img
+        var pixels = atob(msg.pixels);
+        var img = this.ctx.createImageData(msg.width, 1);
+
+        // Convert BMP BGR pixels into HTML RGBA pixels
+        if(msg.depth==8) {
+            for(var x=0, y=0; x<msg.width; x++) {
+                var c = pixels.charCodeAt(x);
+                img.data[y++] = c;
+                img.data[y++] = c;
+                img.data[y++] = c;
+                img.data[y++] = 0xFF;
+            }
+        } else {
+            for(var x=0, y=0; x<msg.width*3; ) {
+                img.data[y++] = pixels.charCodeAt(x++);
+                img.data[y++] = pixels.charCodeAt(x++);
+                img.data[y++] = pixels.charCodeAt(x++);
+                img.data[y++] = 0xFF;
+            }
+        }
+
+        // Render scanline
+        this.ctx.putImageData(img, 0, msg.line);
+    }
+};
+
+$.fn.faxMessagePanel = function() {
+    if (!this.data('panel')) {
+        this.data('panel', new FaxMessagePanel(this));
     }
     return this.data('panel');
 };

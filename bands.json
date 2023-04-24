@@ -392,6 +392,15 @@
     "tags": ["service"]
   },
   {
+    "name": "Wefax Marine",
+    "lower_bound":  7000000,
+    "upper_bound": 20000000,
+    "frequencies": {
+      "fax": [ 3853100, 7878100, 13880600 , 11084600]
+    },
+    "tags": ["Marine"]
+  },
+  {
     "name": "VHF Marine",
     "lower_bound": 156000000,
     "upper_bound": 174000000,

@@ -80,8 +80,9 @@ class Map(object):
         except ValueError:
             pass
 
-    def updateLocation(self, callsign, loc: Location, mode: str, direct: str , band: Band = None , hops: list[str] = [] ):
+    def updateLocation(self, callsign, loc: Location, mode: str, direct: str , band: Band = None , hops: [str] = [] ):   # by I8FUC 20230416 for rspberry operation
         pm = Config.get()
+        ignoreIndirect = pm["map_ignore_indirect_reports"]
         preferRecent = pm["map_prefer_recent_reports"]
         needBroadcast = False
         ts = datetime.now()
@@ -93,12 +94,12 @@ class Map(object):
 #        print("\n\n\n------------------->The  hops len is : ", len(hops))   # by I8FUC
 #        print("============== OLD HOPS =============>: ", hops)
         with self.positionsLock:
-            # prefer messages with shorter hop count unless preferRecent set
-            if preferRecent or callsign not in self.positions or len(hops) <= len(self.positions[callsign]["hops"]):
-                self.positions[callsign] = {"location": loc, "updated": ts, "mode": mode, "direct": direct , "band": band, "hops": hops} # by I8FUC 20230324
-                needBroadcast = True
-#                print("============== NEW POSITION or POSITION CHANGE =============>: ", self.positions)
-#                print("============== NEW HOPS =============>: ", hops)
+            # ignore indirect reports if ignoreIndirect set
+            if not ignoreIndirect or len(hops)==0:
+                # prefer messages with shorter hop count unless preferRecent set
+                if preferRecent or callsign not in self.positions or len(hops) <= len(self.positions[callsign]["hops"]):
+                    self.positions[callsign] = {"location": loc, "updated": ts, "mode": mode, "direct": direct , "band": band, "hops": hops} # by I8FUC 20230324
+                    needBroadcast = True
         if needBroadcast:
             self.broadcast(
                 [

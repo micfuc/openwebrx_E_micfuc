@@ -3,10 +3,11 @@ from csdr.module.msk144 import Msk144Module, ParserAdapter
 from owrx.audio.chopper import AudioChopper, AudioChopperParser
 from owrx.aprs.kiss import KissDeframer
 from owrx.aprs import Ax25Parser, AprsParser
-from pycsdr.modules import Convert, FmDemod, Agc, TimingRecovery, DBPskDecoder, VaricodeDecoder, CwDecoder, RttyDecoder, SstvDecoder, Shift
+from pycsdr.modules import Convert, FmDemod, Agc, TimingRecovery, DBPskDecoder, VaricodeDecoder, CwDecoder, RttyDecoder, SstvDecoder, FaxDecoder, Shift
 from pycsdr.types import Format
 from owrx.aprs.module import DirewolfModule
 from owrx.sstv import SstvParser
+from owrx.fax import FaxParser
 
 class AudioChopperDemodulator(ServiceDemodulator, DialFrequencyReceiver):
     def __init__(self, mode: str, parser: AudioChopperParser):
@@ -142,6 +143,26 @@ class SstvDemodulator(ServiceDemodulator, DialFrequencyReceiver):
         workers = [
             Agc(Format.COMPLEX_FLOAT),
             SstvDecoder(self.sampleRate, self.dbgTime),
+            self.parser
+        ]
+        super().__init__(workers)
+
+    def getFixedAudioRate(self) -> int:
+        return self.sampleRate
+
+    def setDialFrequency(self, frequency: int) -> None:
+        self.parser.setDialFrequency(frequency)
+
+
+class FaxDemodulator(ServiceDemodulator, DialFrequencyReceiver):
+    def __init__(self, service: bool = False):
+        self.parser = FaxParser(service=service)
+        self.sampleRate = 24000
+        self.lpm = 120
+        self.dbgTime = 300000
+        workers = [
+            Agc(Format.COMPLEX_FLOAT),
+            FaxDecoder(self.sampleRate, self.lpm, self.dbgTime),
             self.parser
         ]
         super().__init__(workers)

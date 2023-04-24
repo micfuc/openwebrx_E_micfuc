@@ -1089,6 +1089,16 @@ function on_ws_recv(evt) {
                             $('#openwebrx-panel-receiver').css('border', x? '2px solid':'');
                         }
 
+                        if ('agile_mode' in config) {
+                            agile_mode = config['agile_mode'];
+                            if ( agile_mode === 'agile_but_disable' ) { agile_mode_disable();};
+                        }
+
+                        if ('jumper_mode' in config) {
+                            jumper_mode = config['jumper_mode'];
+                            if ( jumper_mode === 'jumper_but_disable' ) { jumper_mode_disable();};
+                        }
+
                         break;
                     case "secondary_config":
                         var s = json['value'];
@@ -1162,6 +1172,7 @@ function on_ws_recv(evt) {
                             $('#openwebrx-panel-packet-message').packetMessagePanel(),
                             $('#openwebrx-panel-pocsag-message').pocsagMessagePanel(),
                             $('#openwebrx-panel-sstv-message').sstvMessagePanel(),
+                            $('#openwebrx-panel-fax-message').faxMessagePanel(),
                             $("#openwebrx-panel-js8-message").js8()
                         ];
                         if (!panels.some(function(panel) {
@@ -1994,6 +2005,7 @@ function secondary_demod_init() {
     $('#openwebrx-panel-packet-message').packetMessagePanel();
     $('#openwebrx-panel-pocsag-message').pocsagMessagePanel();
     $('#openwebrx-panel-sstv-message').sstvMessagePanel();
+    $('#openwebrx-panel-fax-message').faxMessagePanel();
     $('#openwebrx-panel-js8-message').js8();
 }
 
@@ -2144,6 +2156,13 @@ function initTopBarMenu() {    // by I8FUC to support top bar ccomponents hiding
 
           if(el.id && el.id === 'files_but_disable' ) { el.style.display= 'none' ; } ;                          
           if(el.id && el.id === 'files_but_enable' ) { el.style.display= 'block' ; } ; 
+/*
+          if(el.id && el.id === 'agile_but_disable' ) { el.style.display= 'none' ; } ;                          
+          if(el.id && el.id === 'agile_but_enable' ) { el.style.display= 'block' ; } ; 
+
+          if(el.id && el.id === 'jumper_but_disable' ) { el.style.display= 'none' ; } ;                          
+          if(el.id && el.id === 'jumper_but_enable' ) { el.style.display= 'block' ; } ; 
+*/
          
     });
 
@@ -2340,6 +2359,162 @@ function display_spectra(status, style)
     }
 }
 
+
+// ---- by I8FUC addition of Agile-Mode functionality ----- //
+//----- thanks to contribution from  https://groups.io/g/openwebrx/topic/88587539#4921  -----  //
+
+function _(q) { return document.querySelector(q); }
+ 
+function fixes() {
+        // Update waterfall colors
+        waterfall_measure_minmax_now = true;
+ 
+        // Smoother zooming
+        zoom_level_count = 128;
+        zoom_levels = [];
+        for (var i = 0; i < zoom_level_count; i++) {
+                zoom_levels[i] = 1 + (35 / (zoom_level_count / i));
+        }
+}
+
+
+let isLoggedIn = false;
+
+// Jump to any frequency by modifying profile "Agile-Mode"
+
+function freqJump(freq) {
+
+        if (agile_mode === 'agile_but_disable') return ;
+
+        var freq_new = -1;
+        var freq_exp = 0;
+        var freq_mod = getDemodulators()[0].modulation;
+ 
+        if (!isNaN(freq)) {
+                freq_exp = 6;
+                freq_new = freq;
+        } else {
+                freq_range = get_visible_freq_range();
+                freq_width = freq_range.end - freq_range.start;
+ 
+                if (freq == '+')
+                        freq_new = freq_range.center + freq_width;
+                if (freq == '-')
+                        freq_new = freq_range.center - freq_width;
+        }
+
+
+        console.log("isLoggedIn:", isLoggedIn);
+
+        if (freq_new !== -1 && freq_new > 0 && freq_new < 2400000000) {
+                // Save new frequency to profile "Agile-Mode" with POST query
+                console.log("Save new frequency to profile Agile-Mode....");
+                fetch("settings/sdr/sdrplay/profile/Agile-Mode", {
+                        "body": "center_freq=" + freq_new + "&" + "center_freq-exponent=" + freq_exp +"&start_mod=" + freq_mod,
+                        "method": "POST",
+                        "credentials": "include"
+                })
+                .then((data) => {
+                     console.log("Success:", data.url);
+                     if (data.url.includes('login') )  { console.log("NEED TO LOGIN"); setTimeout(function() { alert('Sorry: this function requires admin login!!!'); }, 1); isLoggedIn = false ;  } else { isLoggedIn = true ; };
+                })
+                .then(function() {
+                        // Update waterfall colors
+                        setTimeout(function() {
+                                fixes();
+                        }, 250);
+                });
+        }
+}
+ 
+document.addEventListener("DOMContentLoaded", (e) => {
+        // Jump arrow DIV content
+        var divFreqJumpNext = '<div id="freq-jump-next" class="openwebrx-button">></div>';
+        var divFreqJumpPrev = '<div id="freq-jump-prev" class="openwebrx-button"><</div>';
+
+        // Place jump arrow DIVs
+        var div = _(".frequencies-container");
+        div.insertAdjacentHTML('afterBegin', divFreqJumpPrev);
+        div.insertAdjacentHTML('beforeEnd', divFreqJumpNext);
+ 
+        // Add eventlisteners on jump arrows
+        _("#freq-jump-next").addEventListener('click', () => { freqJump('+'); }, false);
+        _("#freq-jump-prev").addEventListener('click', () => { freqJump('-'); }, false);
+ 
+        // Delay 3 secs
+        setTimeout(function() {
+                // Add eventlistener on freq input element, with 5 secs delay
+                _(".input-group > input").addEventListener('change', (e) => { freqJump(e.target.value); }, false);
+ 
+                // Apply fixes
+                fixes();
+        }, 2000);
+});
+
+
+function agile_mode_disable() {
+  const pElem = document.getElementById("freq-jump-prev");
+  pElem.className =  "disable" ;
+  const nElem = document.getElementById("freq-jump-next");
+  nElem.className =  "disable" ;
+}
+
+
+
+// ---- by I8FUC addition of pseudoscanner functionality ----- //
+
+// const SmartProfile = ['sdrplay|40m' , 'sdrplay|145_4'];
+ const SmartProfile = ['sdrplay|AIS' , 'sdrplay|145_4' , 'sdrplay|LowHAMs' , 'sdrplay|MedHAMs' , 'sdrplay|Hi1HAMs' , 'sdrplay|Hi2HAMs' , 'sdrplay|6m' ];
+
+//const SmartProfile = ['sdrplay|AIS' , 'sdrplay|145_4' , 'sdrplay|160m' , 'sdrplay|80m' , 'sdrplay|60m' , 'sdrplay|40m' , 'sdrplay|30m' , 'sdrplay|20m' , 'sdrplay|17m' , 'sdrplay|15m' , 'sdrplay|12m' , 'sdrplay|10m' , 'sdrplay|6m' ];
+
+var sp_indx = -1;
+var sp_flag = 0 ;    // 0=stop 1=go
+let IntervalTimerID;
+
+
+function jump_profile()
+{
+
+if (isLoggedIn === false)  { console.log("NEED TO LOGIN"); setTimeout(function() { alert('Sorry: this function requires admin login!!!'); }, 1) ; return; };
+
+if (sp_flag === 0)  { IntervalTimerID = setInterval(NextProfile, 180000); sp_flag =1 ;   console.log("Start"); changeColor() ;return ; } ;
+if (sp_flag === 1)  { clearInterval(IntervalTimerID ) ; IntervalTimerID=null ; sp_flag =0 ; console.log("Stop"); stopTextColor(); return ; }
+
+function NextProfile() {
+    if(sp_indx++ >= 6) sp_indx=0 ;
+    console.log("Running profile=", SmartProfile[sp_indx]);
+    ws.send(JSON.stringify({type: "selectprofile", params: {profile: SmartProfile[sp_indx] }}));
+    }
+
+
+}
+
+// variable to store our intervalID
+let nIntervId;
+
+function changeColor() {
+  // check if an interval has already been set up
+  if (!nIntervId) {
+    nIntervId = setInterval(flashText, 1000);
+  }
+}
+
+function stopTextColor() {
+  clearInterval(nIntervId);
+  // release our intervalID from the variable
+  nIntervId = null;
+}
+
+function flashText() {
+  const oElem = document.getElementById("jump");
+  oElem.className = oElem.className === "go" ? "stop" : "go";
+}
+
+function jumper_mode_disable() {
+  const oElem = document.getElementById("jump");
+  oElem.className =  "disable" ;
+}
 
 // ----------------- eroyee for starting peak hold display ---------------------
 

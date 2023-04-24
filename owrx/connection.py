@@ -143,6 +143,8 @@ class OpenWebRxReceiverClient(OpenWebRxClient, SdrSourceEventClient):
         "tuning_precision",
         "ui_opacity",
         "ui_frame",
+        "agile_mode",
+        "jumper_mode",
     ]
 
     def __init__(self, conn):
@@ -463,6 +465,8 @@ class MapConnection(OpenWebRxClient):
             "google_maps_api_key",
             "receiver_gps",
             "map_position_retention_time",
+            "map_ignore_indirect_reports",
+            "map_prefer_recent_reports",
             "callsign_url",
             "vessel_url",
             "receiver_name",

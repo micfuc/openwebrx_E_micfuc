@@ -169,6 +169,27 @@ class GeneralSettingsController(SettingsFormController):
                 ),
             ),
             Section(
+                "Admin Mode Tuning Features",
+                DropdownInput(
+                    "agile_mode",
+                    "Agile-Mode profile",
+                    infotext="Profile allowing direct center frequency change from main GUI ",
+                    options=[
+                        Option("agile_but_enable", "Enable"),
+                        Option("agile_but_disable", "Disable"),
+                    ],
+                ),
+                DropdownInput(
+                    "jumper_mode",
+                    "'Jumper' Pseudo scanning mode",
+                    infotext="Allows to automagically change a preset number of profiles in sequence with a defined time interval",
+                    options=[
+                        Option("jumper_but_enable", "Enable"),
+                        Option("jumper_but_disable", "Disable"),
+                    ]
+                ),
+            ),
+            Section(
                 "Waterfall settings",
                 DropdownInput(
                     "waterfall_scheme",
@@ -265,6 +286,10 @@ class GeneralSettingsController(SettingsFormController):
                     "Map retention time",
                     infotext="Specifies how log markers / grids will remain visible on the map",
                     append="s",
+                ),
+                CheckboxInput(
+                    "map_ignore_indirect_reports",
+                    "Ignore position reports arriving via indirect path",
                 ),
                 CheckboxInput(
                     "map_prefer_recent_reports",
