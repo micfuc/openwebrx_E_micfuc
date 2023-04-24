@@ -104,7 +104,7 @@ class FaxParser(ThreadModule):
                 b = self.depth / 8 if self.depth>8 else 1
                 w = self.width
                 if len(self.data)>=w*b:
-                    logger.debug("LINE %d: Got %d/%d pixels" % (self.line, w, len(self.data)/b))
+                    #logger.debug("LINE %d: Got %d/%d pixels" % (self.line, w, len(self.data)/b))
                     # Advance scanline
                     self.line = self.line + 1
                     # If running as a service...
@@ -182,8 +182,13 @@ class FaxParser(ThreadModule):
                         self.ioc    = self.data[6] * 4
                         self.lpm    = self.data[7]
                         self.line   = 0
+                        # Find total header size
+                        headerSize  = 54 + (4*256 if self.depth==8 else 0)
                         # 256x4 palette follows the header
-                        self.colors = self.data[54:54+4*256] if self.depth==8 else None
+                        if headerSize>54:
+                            self.colors = self.data[54:headerSize]
+                        else:
+                            self.colors = None
                         # Find mode name and time
                         modeName  = "IOC-%d %dLPM" % (self.ioc, self.lpm)
                         timeStamp = datetime.utcnow().strftime("%H:%M:%S")
@@ -196,7 +201,7 @@ class FaxParser(ThreadModule):
                         if self.service:
                             # Create a new image file and write BMP header
                             self.newFile(fileName)
-                            self.writeFile(self.data[0:54])
+                            self.writeFile(self.data[0:headerSize])
                         else:
                             # Compose result
                             out = {
@@ -210,7 +215,7 @@ class FaxParser(ThreadModule):
                                 "frequency": self.frequency
                             }
                         # Remove parsed data
-                        del self.data[0:54+(4*256 if self.depth==8 else 0)]
+                        del self.data[0:headerSize]
 
         except Exception as exptn:
             logger.debug("Exception parsing: %s" % str(exptn))

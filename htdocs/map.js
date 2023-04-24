@@ -617,7 +617,7 @@ $(function(){
 
     var getMarkerOpacityOptions = function(lastseen, direct) {  // by I8FUC 20230423  added direct param
         var scale = getScale(lastseen);
-	if (( direct != '[DIR]') && ( colorMode == 'bypath')    ) scale = scale * 0.3;  // by I8FUC 20230423  to distinguish digireated spots on map...
+	if (( direct != '[DIR]') && ( colorMode == 'bypath')    ) scale = scale * 0.2;  // by I8FUC 20230423  to distinguish digireated spots on map...
 //        console.log("=====> getMarkerOpacityOptions: colorMode direct opacity scale :", colorMode,  direct , scale  ); // by I8FUC 20230423 
         return {
             opacity: scale
