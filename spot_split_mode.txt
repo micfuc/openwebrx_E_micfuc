@@ -1,0 +1,106 @@
+OPENWEBRX spots split mode implementation proposal.
+
+Last updated 2023-04-28 by Michele I8FUC
+
+
+In the last few weeks a proposal was arising from Stefan to try to use the mapping functionality built-in the openwebrx suite to collect spots produced by external applications like the skimmers he is presently using in its wonderfull station in Germany, in order to create a local consistent display of the various spots collected by the several applications running locally in its  sites and to be a little more independent from the classical internet powered dedicated spotting sites.
+
+Also if this request is a little bit far from the classical target for openwebrx fans, it is really a very nice idea for other people like Stefan hosting in its site different applications devoted to collect spotting informations with the objective to produce geolocalized views of the actual or past status of the propagation just as seen from that exact site....
+
+After a little bit of openwebrx code reading it appears that at the present the spotting support and the map composition support is done directly from the various modules that are able to produce spots and that directly feed those acquired spots to a specific module that will act as a spot reporter or as a spot mapper on the local map view....
+
+In particular there is not at present any permanent storage of the acquired spots data that makes impossible to perform any historical data analyses or on demand spot treatment  apart of those possibilities expressely considered in the different modules implementation.
+
+There is also no actual way to retrive received spot data in order to feed those data to any external application for a sort of ancillary data treatment in order to create alternative mapping of the received spots.
+
+All these considerations does not mean that there is something missing: the original intention of the mapping and reporting features was completely in line with the type of usage that openwebrx was trying to get...  and the type of users that it was addressing....   but with the time beeing it is now clear that different and additional use cases can be envisaged for the openwebrx thanks to its flexible architecture and easy of implementation of new foreing features...  so it could be interesting to re-elaborate this part with a minimalistic impact objective to try to extend features of this wonderfull tool.
+
+At present  the status of the spotting and mapping funtionalities is the following:
+a) There are a number of spot "producers" i.e. the various modules that are able to produce spot-like  objects suitable to be uploaded to specialized portals and also suitable for putting them on a map for producing a geolocalized map of some aspects of the radio activity seen in the present site of installation of the OWRX instance.
+
+b) there are also a number of "spot consumers" that are able to be feed by one or more "producers" in order to perform specific actions like uploading time-to-time the received spots to some external internet based portals or to create a geolocalized map view of those spots locally on an ad hoc screen-page of the OWRX GUI.
+
+c) Each producer feeds its spots to the suitable consumers directly with a direct data transfer time-to time of just-in-time...  the various interfaces are very similar eachother...
+
+d) There is no permanent storage on any local or remote media of the produced spots, so it is not possible to perform easily additional processing of the collected spots without significant impact on the code. 
+
+
+The objective of this proposal is to create a mechanism to completely split the producer / consumer parts and to create a local mysql database to act as a mediation between the two groups of actors.
+
+This will give a number of benefits clearly identificable in terms of flexibility also if it will require some extra processing and management effort ; this is then consistent with an implementation strategy that, at least initially, would be like a specific configuration option: i.e. an implementation strategy where the original code stile is keept with the minimal impact and the actual dual-face operation is switched in/out at level of administration management screens.
+
+At a first level of code reading this strategy seems feasible and obviously should be analyzed in details with a "proof-of-concept" implementation as a first step.
+
+The actual operation scenario that would be implemented is then the following:
+
+a) any producer instead of feeding its spots to the present consumers directly, will write a tuple with a suitable data format to the local database.
+
+b) any consumer will be activated time-to-time or just on stimulus in order to collect the intended spots from the database and complete its mission like in the case of a directly received spot of the present scenarios.
+
+c) any additional producer and/or consumer could implement either the present operation pattern ( mediated by the database) or act in a completely different way taking advantage of the new split spot management mode.
+
+The latter point will allow to implement for example a new module able to receive via a simple streaming interface from a network port the spots produced for example from the various skimmers that Stefan was asking to join to the the OWRX generated spots to have a unique map of all the locally produced spots in his wonderfull station :)
+
+Another application that is presently under study by us (SARIMESH HAM group) is for supporting the LoRa experimentation we are doing in Italy using the LoRa technology ( this requires a special dedicated HW to collect spots similar to the APRS case , and are these spots that would be mapped over the OWRX map).
+
+
+
+A key point in the implementation of this new operation mode is the datamodel for the database implementation: the objective should be obviously to introduce the minimum possible additional load on the processor we will use... so the date model is a key issue to solve;  the atomicity of the database should be a good point for a successfull implementation.
+
+After some brainstorming  a possible first idea of data model could be the one that we will describe in the following:
+
+- Just two tables :
+   - spots table to hold the actual massive spots informations
+   - actors table to hold the reference of the actually registered producers and consumers: this will include few status informations in order to simplify producers/consumers operation in case of intermittent operation or to support crash situations.
+   
+ - Following tuple structure could be implemented for the two tables:
+ 
+ CREATE TABLE spots (
+      id INT NOT NULL AUTO_INCREMENT,   spot id  acting as primary key, so this number identifies uniquely any spot.
+      timestamp VARCHAR(15), 		timestamp  i.e 1682703750000 in msec
+      scope VARCHAR(16) , 		scope i.e. APRS,WSJT,LORA  mainly referes to the producer type  like direwold or wsjt ...
+      mode VARCHAR(8), 			mode i.e  FT8,FT4,MSK144,JS8,AIS,APRS,etc
+      freq DECIMAL(16), 		frequency of the spot i.e. 50315580 in hz
+      db DECIMAL(5,1), 			db snr value as per wsjt reporting or LoRa 
+      dt DECIMAL(5,1),     		dl time offset as per wsjt reporting
+      qi VARCHAR(16) ,			quality indicator as per direwold detailed log  i.e. 53(14/11)
+      sig DECIMAL(5,1),     		signal strength when applicable  i.e. for LoRa spots      
+      callsign VARCHAR(15), 		callsign of the spot originator as collected by the various producers  AB6RJT, DL5AR, etc
+      locator VARCHAR(15), 		locator as per callsign  i.e  IO93
+      intervall DECIMAL(6,2), 		interval time as per wsjt 120 , 7.5 , 15
+      msg VARCHAR(255), 		message part as per wsjt or direwolf reporting "7X3WPL 2E0FKB IO93"
+      direct VARCHAR(8), 		direct/repeated indication for the spot as possible detected by the producer i.e. [DIR], [RPT]
+      path VARCHAR(64), 		path indicator as per aprs spots i.e  "IR0EC-1, IR0ZYZ-1" 	
+      lat DECIMAL(10,6), 		latitude values as collected by direwolf i.e. 37.691333
+      lon DECIMAL(10,6), 		longitude values as collected by direwolf i.e.13.028333
+      sym VARCHAR(8), 			symbos as per direwolf logs
+      notes VARCHAR(255) , 		textual notes field
+      PRIMARY KEY (id) 
+      )
+
+
+ CREATE TABLE actors (
+      id INT NOT NULL AUTO_INCREMENT,   actor id  acting as primary key, so this number identifies uniquely any actor.
+      name VARCHAR(32),			actor common name i.e  aprs_collector, wsjt_collector, skimmer_interface etc.
+      ip VARCHAR(32), 		     	ip address of the actual actor 127.0.0.1 , 192.268.1.123 
+      port DECIMAL(8,0), 		port of the actual actor if applicable or process id for local actors i.e 45687 
+      timestamp VARCHAR(15), 		timestamp  i.e 1682703750000 in msec of last access to db for spots store/retrive      
+      status VARCHAR(16),          	operational status of this actor i.e. enabled, disabled, blocked
+      PRIMARY KEY (id) 
+      )
+
+
+
+
+Note: a spot in this context is NOT a station, but a POSITION...i.e. we care the radio meaning of a signal we detect, not the physical item that generated that signal; this is because we care the radio propagation aspects not the social behaveure of the spots source. This interpretation allows to use spots data as a method of radio coverage evaluation for example when experimenting with new technologies like LoRa in this period.
+Just in case the traditional APRS like meaning is required or wanted we could use the "scope" field as key to aggregate with some criteria all the positions related to a station callsign (i.e. the last seen, the best seen, etc.). 
+
+
+
+Obviously the prof-of-concept will cover only the main aspect of the implementation; to make it usable safely will then be necessary to implement a number of admin functions in order to setup , manage and monitor this functionality, like  garbage management, db size enforcement and eventually external actors support.
+
+
+
+
+
+
