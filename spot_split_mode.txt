@@ -3,7 +3,7 @@ OPENWEBRX spots split mode implementation proposal.
 Last updated 2023-04-28 by Michele I8FUC
 
 
-In the last few weeks a proposal was arising from Stefan to try to use the mapping functionality
+In the last few weeks a proposal was arising from Stefan DC7DS to try to use the mapping functionality
 built-in the openwebrx suite to collect spots produced by external applications like the skimmers 
 he is presently using in its wonderfull station in Germany, in order to create a local consistent
  display of the various spots collected by the several applications running locally in its  sites
@@ -144,7 +144,8 @@ that we will describe in the following:
       name VARCHAR(32),			actor common name i.e  aprs_collector, wsjt_collector, skimmer_interface etc.
       ip VARCHAR(32), 		     	ip address of the actual actor 127.0.0.1 , 192.268.1.123 
       port DECIMAL(8,0), 		port of the actual actor if applicable or process id for local actors i.e 45687 
-      timestamp VARCHAR(15), 		timestamp  i.e 1682703750000 in msec of last access to db for spots store/retrive      
+      timestamp VARCHAR(15), 		timestamp  i.e 1682703750000 in msec of last access to db for spots store/retrive  
+      lastspot INT,			last spot id retrived from spot_db    
       status VARCHAR(16),          	operational status of this actor i.e. enabled, disabled, blocked
       PRIMARY KEY (id) 
       )
