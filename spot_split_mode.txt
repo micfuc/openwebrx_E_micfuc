@@ -117,6 +117,7 @@ that we will describe in the following:
  
  CREATE TABLE spots (
       id INT NOT NULL AUTO_INCREMENT,   spot id  acting as primary key, so this number identifies uniquely any spot.
+      actorId INT, 		        actor id for this spot ( i.e. 1 )
       timestamp VARCHAR(15), 		timestamp  i.e 1682703750000 in msec
       scope VARCHAR(16) , 		scope i.e. APRS,WSJT,LORA  mainly referes to the producer type  like direwold or wsjt ...
       mode VARCHAR(8), 			mode i.e  FT8,FT4,MSK144,JS8,AIS,APRS,etc
