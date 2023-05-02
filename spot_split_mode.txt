@@ -1,6 +1,6 @@
 OPENWEBRX spots split mode implementation proposal.
 
-Last updated 2023-04-28 by Michele I8FUC
+Last updated 2023-05-02 by Michele I8FUC
 
 
 In the last few weeks a proposal was arising from Stefan DC7DS to try to use the mapping functionality
@@ -49,7 +49,7 @@ putting them on a map for producing a geolocalized map of some aspects of the ra
 activity seen in the present site of installation of the OWRX instance.
 
 b) there are also a number of "spot consumers" that are able to be feed by one or more 
-"producers" in order to perform specific actions like uploading time-to-time the received 
+"producer" in order to perform specific actions like uploading time-to-time the received 
 spots to some external internet based portals or to create a geolocalized map view of 
 those spots locally on an ad hoc screen-page of the OWRX GUI.
 
@@ -136,13 +136,13 @@ that we will describe in the following:
       locator VARCHAR(15), 		locator as per callsign  i.e  IO93
       intervall DECIMAL(6,2), 		interval time as per wsjt 120 , 7.5 , 15
       msg VARCHAR(255), 		message part as per wsjt or direwolf reporting "7X3WPL 2E0FKB IO93"
-      direct VARCHAR(8), 		direct/repeated indication for the spot as possible detected by the producer i.e. [DIR], [RPT]
+      direct VARCHAR(8), 		direct/repeated indication for the spot as possibly detected by the producer i.e. [DIR], [RPT]
       path VARCHAR(64), 		path indicator as per aprs spots i.e  "IR0EC-1, IR0ZYZ-1" 	
       lat DECIMAL(10,6), 		latitude values as collected by direwolf i.e. 37.691333
       lon DECIMAL(10,6), 		longitude values as collected by direwolf i.e.13.028333
-      sym VARCHAR(8), 			symbos as per direwolf logs
-      location JSON ,                   location object in json serialized
-      band JSON,			band object Json serialized
+      hops JSON, 			possible path the spot arrived to the rx ; json serialized
+      location JSON ,                   location object keeping representation of direwolf produced spots json serialized
+      band JSON,			band object json serialized
       notes VARCHAR(255) , 		textual notes field
       PRIMARY KEY (id) 
       )
@@ -153,14 +153,16 @@ that we will describe in the following:
       name VARCHAR(32),			actor common name i.e  aprs_collector, wsjt_collector, skimmer_interface etc.
       ip VARCHAR(32), 		     	ip address of the actual actor 127.0.0.1 , 192.268.1.123 
       port DECIMAL(8,0), 		port of the actual actor if applicable or process id for local actors i.e 45687 
-      timestamp VARCHAR(15), 		timestamp  i.e 1682703750000 in msec of last access to db for spots store/retrive  
-      lastspot INT,			last spot id retrived from spot_db    
+      timestamp VARCHAR(15), 		timestamp  i.e 1682703750000 in msec of last access to db for spots store/retrive by this actor
+      lastspot INT,			last spot id retrived from spot_db by this actor   
       status VARCHAR(16),          	operational status of this actor i.e. enabled, disabled, blocked
       PRIMARY KEY (id) 
       )
 
 
-
+The datamodel above indicated is redundant in some way in order to simplify possible practical use of the same; 
+in a further step if needed it could be optimized by suppressing several fields beeing part of some complex 
+objects like the location object. 
 
 Note: a spot in this context is NOT a station, but a POSITION...i.e. we care the radio meaning 
 of a signal we detect, not the physical item that generated that signal; this is because we care 
@@ -176,7 +178,8 @@ station callsign (i.e. the last seen, the best seen, etc.).
 Obviously the prof-of-concept will cover only the main aspect of the implementation; 
 to make it usable safely will then be necessary to implement a number of admin 
 functions in order to setup , manage and monitor this functionality, like  
-garbage management, db size enforcement and eventually external actors support.
+garbage management, db size enforcement and eventually external actors support like 
+db snapshot import or export 
 
 
 Additional notes
@@ -205,8 +208,10 @@ the new way would be that the the single module will issue its mapping request a
 but the mapping interface will just use that request as a stimulus to update the present map 
 status FROM the present status of the spots storage; in this case the mapping interface will 
 act just as an actor and will just retrive spots from the spot storage with an id greater 
-then the old value stored in the actors table.
+then the old value stored in its actors table tuple.
 
 
+73 by Michele I8FUC
+info@sarimesh.net
 
 
