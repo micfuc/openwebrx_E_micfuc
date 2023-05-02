@@ -17,10 +17,16 @@ actual or past status of the propagation just as seen from that exact site....
 After a little bit of openwebrx code reading it appears that at the present the spotting support
 and the map composition support is done directly from the various modules that are able to 
 produce spots and that directly feed those acquired spots to a specific module that will act 
-as a spot reporter or as a spot mapper on the local map view....
+as spot reporter or as  spot mapper on the local map view....
+
+There is in particular a clear interface for the two mechanism via two different interfaces:
+- a "spot" interface that feed a single spot to the spot reporting mechanism toward the backend 
+  pskreporter for queueeing and timed reporting toward the web portal
+- an "updateLocation" interface that feed a single spot to the backend mapping interface that 
+  feeds the frontend javascript engine running on the target browser for creating the map display
 
 In particular there is not at present any permanent storage of the acquired spots data that 
-makes impossible to perform any historical data analyses or on demand spot treatment  apart 
+makes impossible to perform any historycal data analyses or on demand spot treatment  apart 
 of those possibilities expressely considered in the different modules implementation.
 
 There is also no actual way to retrive received spot data in order to feed those data to 
@@ -118,7 +124,7 @@ that we will describe in the following:
  CREATE TABLE spots (
       id INT NOT NULL AUTO_INCREMENT,   spot id  acting as primary key, so this number identifies uniquely any spot.
       actorId INT, 		        actor id for this spot ( i.e. 1 )
-      timestamp VARCHAR(15), 		timestamp  i.e 1682703750000 in msec
+      timestamp DECIMAL(15,3), 		timestamp  i.e 1682703750000 in msec
       scope VARCHAR(16) , 		scope i.e. APRS,WSJT,LORA  mainly referes to the producer type  like direwold or wsjt ...
       mode VARCHAR(8), 			mode i.e  FT8,FT4,MSK144,JS8,AIS,APRS,etc
       freq DECIMAL(16), 		frequency of the spot i.e. 50315580 in hz
@@ -135,6 +141,8 @@ that we will describe in the following:
       lat DECIMAL(10,6), 		latitude values as collected by direwolf i.e. 37.691333
       lon DECIMAL(10,6), 		longitude values as collected by direwolf i.e.13.028333
       sym VARCHAR(8), 			symbos as per direwolf logs
+      location JSON ,                   location object in json serialized
+      band JSON,			band object Json serialized
       notes VARCHAR(255) , 		textual notes field
       PRIMARY KEY (id) 
       )
@@ -171,6 +179,33 @@ functions in order to setup , manage and monitor this functionality, like
 garbage management, db size enforcement and eventually external actors support.
 
 
+Additional notes
+
+
+Unfortunatelly the dual interface presently in place for spots and map management creates a 
+small problem if we want to implement a master/slave  paradigm where there is a single 
+storage of objects from which to source items to feed to the 
+two present mechanisms i.e. spot reporting and position mapping; a further issue is that while 
+the spotting mechanism is an event driven mechanism that provides "instant positions" for a 
+given station, the mapping mechanism in presently based on the concept od "station present 
+position" then collapsing all the old positions of a station to the latest one...
+
+In front of trying to implement a coherent behaveur a possible way to proceed is to use the spot 
+storage as the master and derive the mapping view from it based on given criteria... .
+This approach let make the mapping view much more flexible due to the fact that different 
+views can be derived from the same spot storage in order to make evidence for example of 
+history data.
+
+The above imply that spotting must always be active and if reporting to external portals has 
+to be disabled this should be performed AFTER the spot collection.
+
+A further fallout of the above choice is that the mapping interface should be sligthly modified
+in the sense that while today it is driven by the single modules that need to display a position,
+the new way would be that the the single module will issue its mapping request as usual, 
+but the mapping interface will just use that request as a stimulus to update the present map 
+status FROM the present status of the spots storage; in this case the mapping interface will 
+act just as an actor and will just retrive spots from the spot storage with an id greater 
+then the old value stored in the actors table.
 
 
 
